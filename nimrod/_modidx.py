@@ -5,4 +5,6 @@ d = { 'settings': { 'branch': 'main',
                 'doc_host': 'https://slegroux.github.io',
                 'git_url': 'https://github.com/slegroux/nimrod',
                 'lib_path': 'nimrod'},
-  'syms': {'nimrod.core': {'nimrod.core.foo': ('data.datasets.html#foo', 'nimrod/core.py')}}}
+  'syms': { 'nimrod.core': { 'nimrod.core.foo': ('core.html#foo', 'nimrod/core.py'),
+                             'nimrod.core.test': ('core.html#test', 'nimrod/core.py')},
+            'nimrod.data.datasets': {}}}
