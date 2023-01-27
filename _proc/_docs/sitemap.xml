@@ -2,10 +2,14 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://slegroux.github.io/nimrod/core.html</loc>
-    <lastmod>2023-01-27T22:38:05.552Z</lastmod>
+    <lastmod>2023-01-27T23:44:34.930Z</lastmod>
+  </url>
+  <url>
+    <loc>https://slegroux.github.io/nimrod/index.html</loc>
+    <lastmod>2023-01-27T23:44:33.234Z</lastmod>
   </url>
   <url>
     <loc>https://slegroux.github.io/nimrod/data.datasets.html</loc>
-    <lastmod>2023-01-27T23:03:34.963Z</lastmod>
+    <lastmod>2023-01-27T23:46:32.041Z</lastmod>
   </url>
 </urlset>

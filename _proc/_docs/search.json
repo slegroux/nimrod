@@ -7,10 +7,31 @@
     "text": "source\n\nfoo\n\n foo ()\n\n\n\n\ntest\n\n test ()"
   },
   {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "nimrod",
+    "section": "",
+    "text": "This file will become your README and also the index of your documentation."
+  },
+  {
+    "objectID": "index.html#install",
+    "href": "index.html#install",
+    "title": "nimrod",
+    "section": "Install",
+    "text": "Install\npip install nimrod"
+  },
+  {
+    "objectID": "index.html#how-to-use",
+    "href": "index.html#how-to-use",
+    "title": "nimrod",
+    "section": "How to use",
+    "text": "How to use\nFill me in please! Don’t forget code examples:\n\n1+1\n\n2"
+  },
+  {
     "objectID": "data.datasets.html",
     "href": "data.datasets.html",
     "title": "Datasets",
     "section": "",
-    "text": "source\n\nfoo\n\n foo ()"
+    "text": "source\n\nImageDataset\n\n ImageDataset ()\n\nBase class for image datasets providing visualization of (image, label) samples\n\nsource\n\n\nMNISTDataset\n\n MNISTDataset (data_root:str='~/Data', train=True, transform=ToTensor())\n\nMNIST digit dataset\n\nds = MNISTDataset('~/Data', train=False)\nprint(f\"Number of samples in the dataset: {len(ds)}\")\nX,y = ds[0]\nprint(f\"Shape of image: {X.shape}, corresponding digit: {int(y)}\")\nprint(f\"types: {X.type()}, {y.type()}\")\n\nds.show(0)\n\nNumber of samples in the dataset: 10000\nShape of image: torch.Size([784]), corresponding digit: 7\ntypes: torch.FloatTensor, torch.LongTensor"
   }
 ]
