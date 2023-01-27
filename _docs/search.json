@@ -4,7 +4,7 @@
     "href": "core.html",
     "title": "core",
     "section": "",
-    "text": "foo\n\n foo ()"
+    "text": "source\n\nfoo\n\n foo ()"
   },
   {
     "objectID": "index.html",
@@ -26,5 +26,12 @@
     "title": "nimrod",
     "section": "How to use",
     "text": "How to use\nFill me in please! Don’t forget code examples:\n\n1+1\n\n2"
+  },
+  {
+    "objectID": "data.datasets.html",
+    "href": "data.datasets.html",
+    "title": "core",
+    "section": "",
+    "text": "source\n\nfoo\n\n foo ()"
   }
 ]
