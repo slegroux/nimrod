@@ -30,12 +30,11 @@ class MNISTDataset(ImageDataset):
     def __init__(
         self,
         data_root:str='~/Data', # data save path
-        train=True, # download train(T)/dev(F)
-        transform=torchvision.transforms.ToTensor() # data formatting
+        train:bool=True, # download train(T)/dev(F)
+        transform:torchvision.transforms.transforms=torchvision.transforms.ToTensor() # data formatting
     ):
 
         super().__init__()
-        # list(PIL image 28x28, label)
         self.ds = torchvision.datasets.MNIST(
             data_root,
             train = train,
@@ -46,6 +45,6 @@ class MNISTDataset(ImageDataset):
         return len(self.ds)
     
     def __getitem__(self, idx):
-        # x = self.ds[idx][0].squeeze(0).flatten()
-        x = self.ds.data[idx]
-        return x, self.ds.targets[idx]
+        x = self.ds[idx][0]
+        y = self.ds[idx][1]
+        return x, y
