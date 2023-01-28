@@ -4,7 +4,7 @@
 __all__ = ['foo', 'test']
 
 # %% ../nbs/02_models.ipynb 3
-from . import modules
+from .modules import Encoder
 
 # %% ../nbs/02_models.ipynb 4
 def foo(): pass
