@@ -16,4 +16,12 @@ d = { 'settings': { 'branch': 'main',
                                       'nimrod.data.datasets.MNISTDataset.__init__': ( 'data.datasets.html#mnistdataset.__init__',
                                                                                       'nimrod/data/datasets.py'),
                                       'nimrod.data.datasets.MNISTDataset.__len__': ( 'data.datasets.html#mnistdataset.__len__',
-                                                                                     'nimrod/data/datasets.py')}}}
+                                                                                     'nimrod/data/datasets.py')},
+            'nimrod.models': { 'nimrod.models.foo': ('models.html#foo', 'nimrod/models.py'),
+                               'nimrod.models.test': ('models.html#test', 'nimrod/models.py')},
+            'nimrod.modules': { 'nimrod.modules.Decoder': ('modules.html#decoder', 'nimrod/modules.py'),
+                                'nimrod.modules.Decoder.__init__': ('modules.html#decoder.__init__', 'nimrod/modules.py'),
+                                'nimrod.modules.Decoder.forward': ('modules.html#decoder.forward', 'nimrod/modules.py'),
+                                'nimrod.modules.Encoder': ('modules.html#encoder', 'nimrod/modules.py'),
+                                'nimrod.modules.Encoder.__init__': ('modules.html#encoder.__init__', 'nimrod/modules.py'),
+                                'nimrod.modules.Encoder.forward': ('modules.html#encoder.forward', 'nimrod/modules.py')}}}

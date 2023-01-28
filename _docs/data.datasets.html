@@ -234,37 +234,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <pre><code> MNISTDataset (data_root:str='~/Data', train=True, transform=ToTensor())</code></pre>
 </blockquote>
 <p>MNIST digit dataset</p>
-<table class="table">
-<thead>
-<tr class="header">
-<th></th>
-<th><strong>Type</strong></th>
-<th><strong>Default</strong></th>
-<th><strong>Details</strong></th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>data_root</td>
-<td>str</td>
-<td>~/Data</td>
-<td>Path to data root folder</td>
-</tr>
-<tr class="even">
-<td>train</td>
-<td>bool</td>
-<td>True</td>
-<td>Training (True) or Validation set(False),</td>
-</tr>
-<tr class="odd">
-<td>transform</td>
-<td>ToTensor</td>
-<td>ToTensor()</td>
-<td></td>
-</tr>
-</tbody>
-</table>
-<div class="cell" data-vscode="{&quot;languageId&quot;:&quot;python&quot;}" data-execution_count="29">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>ds <span class="op">=</span> MNISTDataset(<span class="st">'~/Data'</span>, train<span class="op">=</span><span class="va">False</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Number of samples in the dataset: </span><span class="sc">{</span><span class="bu">len</span>(ds)<span class="sc">}</span><span class="ss">"</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>X,y <span class="op">=</span> ds[<span class="dv">0</span>]</span>

@@ -27,23 +27,15 @@ class ImageDataset(Dataset):
 class MNISTDataset(ImageDataset):
     "MNIST digit dataset"
 
-    def __init__(self,
-        data_root:str='~/Data',
-        train=True,
-        transform=torchvision.transforms.ToTensor()
-        ):
-        """ Download and format MNIST dataset
+    def __init__(
+        self,
+        data_root:str='~/Data', # data save path
+        train=True, # download train(T)/dev(F)
+        transform=torchvision.transforms.ToTensor() # data formatting
+    ):
 
-        Parameters
-        ----------
-        data_root : str, optional
-            _description_, by default '~/Data'
-        train: bool, optional
-            Training (True) or Validation set(False)
-        transform : _type_, optional
-            _description_, by default torchvision.transforms.ToTensor()
-        """        
         super().__init__()
+        # list(PIL image 28x28, label)
         self.ds = torchvision.datasets.MNIST(
             data_root,
             train = train,
@@ -54,5 +46,6 @@ class MNISTDataset(ImageDataset):
         return len(self.ds)
     
     def __getitem__(self, idx):
-        x = self.ds[idx][0].squeeze(0).flatten()
+        # x = self.ds[idx][0].squeeze(0).flatten()
+        x = self.ds.data[idx]
         return x, self.ds.targets[idx]

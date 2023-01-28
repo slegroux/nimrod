@@ -234,21 +234,63 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <pre><code> MNISTDataset (data_root:str='~/Data', train=True, transform=ToTensor())</code></pre>
 </blockquote>
 <p>MNIST digit dataset</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>ds <span class="op">=</span> MNISTDataset(<span class="st">'~/Data'</span>, train<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Number of samples in the dataset: </span><span class="sc">{</span><span class="bu">len</span>(ds)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>X,y <span class="op">=</span> ds[<span class="dv">0</span>]</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Shape of image: </span><span class="sc">{</span>X<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">, corresponding digit: </span><span class="sc">{</span><span class="bu">int</span>(y)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"types: </span><span class="sc">{</span>X<span class="sc">.</span><span class="bu">type</span>()<span class="sc">}</span><span class="ss">, </span><span class="sc">{</span>y<span class="sc">.</span><span class="bu">type</span>()<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>ds.show(<span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<table class="table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>data_root</td>
+<td>str</td>
+<td>~/Data</td>
+<td>data save path</td>
+</tr>
+<tr class="even">
+<td>train</td>
+<td>bool</td>
+<td>True</td>
+<td>download train(T)/dev(F)</td>
+</tr>
+<tr class="odd">
+<td>transform</td>
+<td>ToTensor</td>
+<td>ToTensor()</td>
+<td>data formatting</td>
+</tr>
+</tbody>
+</table>
+<div class="cell" data-vscode="{&quot;languageId&quot;:&quot;python&quot;}" data-execution_count="61">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>ds <span class="op">=</span> torchvision.datasets.MNIST(<span class="st">'~/Data'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="61">
+<pre><code>60000</code></pre>
+</div>
+</div>
+<div class="cell" data-vscode="{&quot;languageId&quot;:&quot;python&quot;}" data-execution_count="74">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>ds.data.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="74">
+<pre><code>torch.Size([60000, 28, 28])</code></pre>
+</div>
+</div>
+<div class="cell" data-vscode="{&quot;languageId&quot;:&quot;python&quot;}">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>ds <span class="op">=</span> MNISTDataset(<span class="st">'~/Data'</span>, train<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Number of samples in the dataset: </span><span class="sc">{</span><span class="bu">len</span>(ds)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>X,y <span class="op">=</span> ds[<span class="dv">0</span>]</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Shape of image: </span><span class="sc">{</span>X<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">, corresponding digit: </span><span class="sc">{</span><span class="bu">int</span>(y)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"types: </span><span class="sc">{</span>X<span class="sc">.</span><span class="bu">type</span>()<span class="sc">}</span><span class="ss">, </span><span class="sc">{</span>y<span class="sc">.</span><span class="bu">type</span>()<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>ds.show(<span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Number of samples in the dataset: 10000
 Shape of image: torch.Size([784]), corresponding digit: 7
 types: torch.FloatTensor, torch.LongTensor</code></pre>
 </div>
 <div class="cell-output cell-output-display">
-<p><img src="00_data.datasets_files/figure-html/cell-4-output-2.png" class="img-fluid"></p>
+<p><img src="00_data.datasets_files/figure-html/cell-6-output-2.png" class="img-fluid"></p>
 </div>
 </div>
 
