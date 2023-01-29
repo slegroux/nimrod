@@ -31,8 +31,11 @@ class AutoEncoder(nn.Module):
 class AutoEncoderPL(pl.LightningModule):
     def __init__(self, autoencoder:AutoEncoder):
         super().__init__()
-        self.save_hyperparameters()
+        self.save_hyperparameters(ignore=['autoencoder'])
         self.autoencoder = autoencoder
+
+    def forward(self, x):
+        return self.autoencoder(x)
 
     def training_step(self, batch, batch_idx):
         # training_step defines the train loop.
@@ -49,7 +52,7 @@ class AutoEncoderPL(pl.LightningModule):
         x = x.view(x.size(0), -1) # flatten B x C x H x W to B x L (grey pic)
         x_hat = self.autoencoder(x)
         loss = F.mse_loss(x_hat, x)
-        self.log("test_loss", loss)
+        self.log("test_loss", loss, on_step=True, on_epoch=True, sync_dist=True)
         return loss
     
     def validation_step(self, batch, batch_idx):
@@ -58,7 +61,7 @@ class AutoEncoderPL(pl.LightningModule):
         x = x.view(x.size(0), -1) # flatten B x C x H x W to B x L (grey pic)
         x_hat = self.autoencoder(x)
         loss = F.mse_loss(x_hat, x)
-        self.log("val_loss", loss)
+        self.log("val_loss", loss, on_step=True, on_epoch=True, sync_dist=True)
         return loss
 
     def configure_optimizers(self):

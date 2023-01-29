@@ -1,3 +1,5 @@
+project: "autoencoder"
+name: "v0.0.1"
 defaults:
   - callbacks: callbacks
   - logger: wandb

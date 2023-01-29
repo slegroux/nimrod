@@ -37,14 +37,19 @@ def main(cfg: DictConfig) -> None:
     early_stopping = instantiate(cfg.callbacks.early_stopping)
     model_checkpoint = instantiate(cfg.callbacks.model_checkpoint)
     callbacks = [early_stopping, model_checkpoint]
-
+    wandb_logger = instantiate(cfg.logger.wandb)
+    loggers = [wandb_logger]
+    last_ckpt = "checkpoints/last-v3.ckpt"
     trainer = Trainer(
         default_root_dir=root_dir,
+        max_epochs=500,
         # limit_train_batches=100, max_epochs=1000,
         callbacks = callbacks,
-        devices=devices, accelerator="gpu"
-        )
-    # trainer.fit(model=autoencoder_pl, train_dataloaders=train_l, val_dataloaders=dev_l)
+        logger = loggers,
+        devices=devices, accelerator="gpu",
+        strategy='ddp'
+    )
+    trainer.fit(model=autoencoder_pl, train_dataloaders=train_l, val_dataloaders=dev_l, ckpt_path=last_ckpt)
     # trainer.test(autoencoder_pl, dataloaders=test_l)
 
 if __name__ == "__main__":
