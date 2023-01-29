@@ -12,7 +12,10 @@ import pytorch_lightning as pl
 
 # %% ../nbs/02_models.ipynb 4
 class AutoEncoder(nn.Module):
-    def __init__(self, encoder:Encoder, decoder:Decoder):
+    def __init__(self,
+        encoder:Encoder, # Encoder layer
+        decoder:Decoder # Decoder layer
+        ):
         super().__init__()
         self.encoder = encoder
         self.decoder = decoder
@@ -37,6 +40,24 @@ class AutoEncoderPL(pl.LightningModule):
         x_hat = self.autoencoder(x)
         loss = F.mse_loss(x_hat, x)
         self.log("train_loss", loss)
+        return loss
+    
+    def testing_step(self, batch, batch_idx):
+        # training_step defines the train loop.
+        x, y = batch
+        x = x.view(x.size(0), -1) # flatten B x C x H x W to B x L (grey pic)
+        x_hat = self.autoencoder(x)
+        loss = F.mse_loss(x_hat, x)
+        self.log("test_loss", loss)
+        return loss
+    
+    def validation_step(self, batch, batch_idx):
+        # training_step defines the train loop.
+        x, y = batch
+        x = x.view(x.size(0), -1) # flatten B x C x H x W to B x L (grey pic)
+        x_hat = self.autoencoder(x)
+        loss = F.mse_loss(x_hat, x)
+        self.log("val_loss", loss)
         return loss
 
     def configure_optimizers(self):

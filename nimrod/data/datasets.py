@@ -9,6 +9,7 @@ import torchvision
 from torch.utils.data import Dataset, DataLoader
 import torch
 from matplotlib import pyplot as plt
+import torch.utils.data as data
 
 # %% ../../nbs/00_data.datasets.ipynb 4
 class ImageDataset(Dataset):
@@ -29,18 +30,20 @@ class MNISTDataset(ImageDataset):
 
     def __init__(
         self,
-        data_root:str='~/Data', # data save path
-        train:bool=True, # download train(T)/dev(F)
+        data_root:str='~/Data', # path where data is saved
+        train = True, # train or test dataset
         transform:torchvision.transforms.transforms=torchvision.transforms.ToTensor() # data formatting
     ):
 
         super().__init__()
+
         self.ds = torchvision.datasets.MNIST(
             data_root,
             train = train,
             transform=transform, 
             download=True
         )
+
     def __len__(self):
         return len(self.ds)
     
@@ -48,3 +51,16 @@ class MNISTDataset(ImageDataset):
         x = self.ds[idx][0]
         y = self.ds[idx][1]
         return x, y
+    
+    def train_dev_split(self,
+        ratio:float # percentage of train/dev split
+    ):
+        train_set_size = int(len(self.ds) * ratio)
+        valid_set_size = len(self.ds) - train_set_size
+
+        # split the train set into two
+        seed = torch.Generator().manual_seed(42)
+        train_set, valid_set = data.random_split(self.ds, [train_set_size, valid_set_size], generator=seed)
+        return train_set, valid_set
+
+

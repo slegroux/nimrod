@@ -1,0 +1,3 @@
+defaults:
+  - callbacks: callbacks
+  - logger: wandb

@@ -129,3 +129,6 @@ dmypy.json
 .pyre/
 *.gz
 recipes/*/*_logs/*
+recipes/*/outputs
+recipes/*/checkpoints
+*.bak

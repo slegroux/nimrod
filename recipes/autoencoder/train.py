@@ -1,13 +1,20 @@
+#!/usr/bin/env python
+
 from nimrod.modules import Encoder, Decoder
 from nimrod.models import AutoEncoder, AutoEncoderPL
 from nimrod.data.datasets import MNISTDataset
-import pytorch_lightning as pl
+from pytorch_lightning import Trainer
+from pytorch_lightning.callbacks import EarlyStopping
 from torch.utils.data import DataLoader
-from torchvision.datasets import MNIST
-from torchvision import transforms
 import os
+from omegaconf import DictConfig, OmegaConf
+import hydra
+from hydra.utils import instantiate
 
-def main():
+@hydra.main(version_base=None,config_path="conf", config_name="config")
+def main(cfg: DictConfig) -> None:
+    print(OmegaConf.to_yaml(cfg))
+    
     # MODEL
     enc = Encoder()
     dec = Decoder()
@@ -15,17 +22,30 @@ def main():
     autoencoder_pl = AutoEncoderPL(autoencoder)
 
     # DATA
-    # train = MNIST(os.getcwd(), download=True, train=True, transform=transforms.ToTensor())
-    # dev = MNIST(os.getcwd(), download=True, train=False, transform=transforms.ToTensor())
-    # dev = MNISTDataset('~/Data', train=False)
-    train = MNISTDataset('~/Data', train=True)
+    full_train = MNISTDataset('~/Data', train=True)
+    test = MNISTDataset('~/Data', train=False)
+    train, dev = full_train.train_dev_split(0.8)
+    dev = MNISTDataset('~/Data', train=False)
 
-    train_loader = DataLoader(train)
-    # dev_loader = DataLoader(dev)
+    train_l = DataLoader(train)
+    dev_l = DataLoader(dev)
+    test_l = DataLoader(test)
 
     # TRAINING
-    trainer = pl.Trainer(devices=[7], accelerator="gpu")
-    trainer.fit(model=autoencoder_pl, train_dataloaders=train_loader)
+    root_dir = os.path.dirname(__file__)
+    devices = [0,1,2,3,4,5,6,7]
+    early_stopping = instantiate(cfg.callbacks.early_stopping)
+    model_checkpoint = instantiate(cfg.callbacks.model_checkpoint)
+    callbacks = [early_stopping, model_checkpoint]
+
+    trainer = Trainer(
+        default_root_dir=root_dir,
+        # limit_train_batches=100, max_epochs=1000,
+        callbacks = callbacks,
+        devices=devices, accelerator="gpu"
+        )
+    # trainer.fit(model=autoencoder_pl, train_dataloaders=train_l, val_dataloaders=dev_l)
+    # trainer.test(autoencoder_pl, dataloaders=test_l)
 
 if __name__ == "__main__":
     main()

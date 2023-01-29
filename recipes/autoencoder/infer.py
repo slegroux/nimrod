@@ -1,0 +1,1 @@
+"lightning_logs/version_0/checkpoints/'epoch=6-step=42000.ckpt'"
