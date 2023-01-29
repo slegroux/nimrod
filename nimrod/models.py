@@ -31,6 +31,7 @@ class AutoEncoder(nn.Module):
 class AutoEncoderPL(pl.LightningModule):
     def __init__(self, autoencoder:AutoEncoder):
         super().__init__()
+        self.save_hyperparameters()
         self.autoencoder = autoencoder
 
     def training_step(self, batch, batch_idx):
