@@ -2,7 +2,7 @@ wandb:
   _target_: pytorch_lightning.loggers.wandb.WandbLogger
   project: ${project}
   name: ${name}
-  save_dir: ${log_dir}
+  save_dir: "${paths.output_dir}"
   offline: False # store only locally
   id: null # give id to resume experiment
   entity: "slegroux"

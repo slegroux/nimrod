@@ -128,10 +128,7 @@ dmypy.json
 # Pyre type checker
 .pyre/
 *.gz
-recipes/*/*_logs/*
-recipes/*/outputs
 recipes/*/logs
-recipes/*/checkpoints
 *.bak
-recipes/autoencoder/wandb
 tests/
+.hydra/
