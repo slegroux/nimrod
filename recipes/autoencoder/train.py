@@ -31,26 +31,27 @@ def main(cfg: DictConfig) -> None:
     full_train = MNISTDataset('~/Data', train=True)
     test = MNISTDataset('~/Data', train=False)
     train, dev = full_train.train_dev_split(0.8)
-    dev = MNISTDataset('~/Data', train=False)
-    train_l = DataLoader(train)
-    dev_l = DataLoader(dev)
-    test_l = DataLoader(test)
+    # train_dl = instantiate(cfg.dataloaders.train)
+    # print(cfg.dataloaders.train)
+    # train_l = DataLoader(train)
+    # dev_l = DataLoader(dev)
+    # test_l = DataLoader(test)
 
-    # TRAIN
-    callbacks = []
-    early_stopping = instantiate(cfg.callbacks.early_stopping)
-    callbacks.append(early_stopping)
-    model_checkpoint = instantiate(cfg.callbacks.model_checkpoint)
-    callbacks.append(model_checkpoint)
-    # for _, cb_conf in cfg.callbacks.items():
-    #     callbacks.append(hydra.utils.instantiate(cb_conf))
-    logger = instantiate(cfg.logger.wandb)
-    trainer = hydra.utils.instantiate(cfg.trainer, callbacks=callbacks, logger=[logger])
-    trainer.fit(model=autoencoder_pl, train_dataloaders=train_l, val_dataloaders=dev_l,ckpt_path=cfg.get("ckpt_path"))
+    # # TRAIN
+    # callbacks = []
+    # early_stopping = instantiate(cfg.callbacks.early_stopping)
+    # callbacks.append(early_stopping)
+    # model_checkpoint = instantiate(cfg.callbacks.model_checkpoint)
+    # callbacks.append(model_checkpoint)
+    # # for _, cb_conf in cfg.callbacks.items():
+    # #     callbacks.append(hydra.utils.instantiate(cb_conf))
+    # logger = instantiate(cfg.logger.wandb)
+    # trainer = hydra.utils.instantiate(cfg.trainer, callbacks=callbacks, logger=[logger])
+    # trainer.fit(model=autoencoder_pl, train_dataloaders=train_l, val_dataloaders=dev_l,ckpt_path=cfg.get("ckpt_path"))
 
-    # TEST
-    if cfg.get("test"):
-        trainer.test(autoencoder_pl, dataloaders=test_l)
+    # # TEST
+    # if cfg.get("test"):
+    #     trainer.test(autoencoder_pl, dataloaders=test_l)
     wandb.finish()
 
 if __name__ == "__main__":

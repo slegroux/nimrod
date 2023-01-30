@@ -7,6 +7,7 @@ log_dir: "logs"
 ckpt_path: null # ckpt to resume training from
 seed: 42
 test: True
+ignore_warnings: True
 
 hydra:
   defaults:
@@ -23,9 +24,7 @@ defaults:
   - callbacks: default
   - logger: wandb
   - trainer: default
+  - dataloaders: default
   # - paths: default
   # - hydra: default
-
-
-
 
