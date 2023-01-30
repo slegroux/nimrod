@@ -1,0 +1,3 @@
+defaults:
+  - model_checkpoint.yaml
+  - early_stopping.yaml

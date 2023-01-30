@@ -8,7 +8,7 @@ import torch.nn.functional as F
 import torch.nn as nn
 import torch
 from .modules import Encoder, Decoder
-import pytorch_lightning as pl
+from pytorch_lightning import LightningModule
 
 # %% ../nbs/02_models.ipynb 4
 class AutoEncoder(nn.Module):
@@ -28,43 +28,35 @@ class AutoEncoder(nn.Module):
         return x_hat
 
 # %% ../nbs/02_models.ipynb 7
-class AutoEncoderPL(pl.LightningModule):
+class AutoEncoderPL(LightningModule):
     def __init__(self, autoencoder:AutoEncoder):
         super().__init__()
-        self.save_hyperparameters(ignore=['autoencoder'])
+        # self.save_hyperparameters()
         self.autoencoder = autoencoder
+        self.metric = torch.nn.MSELoss()
 
     def forward(self, x):
         return self.autoencoder(x)
 
+    def _shared_eval(self, batch, batch_idx, prefix, prog_bar=True, on_step=True, on_epoch=True, sync_dist=True):
+        x, _ = batch
+        x = x.view(x.size(0), -1) # flatten B x C x H x W to B x L (grey pic)
+        x_hat = self.autoencoder(x)
+        loss = self.metric(x_hat, x)
+        self.log(f"{prefix}_loss", loss, on_step=on_step, on_epoch=on_epoch, sync_dist=sync_dist)
+        return loss
+
     def training_step(self, batch, batch_idx):
-        # training_step defines the train loop.
-        x, y = batch
-        x = x.view(x.size(0), -1) # flatten B x C x H x W to B x L (grey pic)
-        x_hat = self.autoencoder(x)
-        loss = F.mse_loss(x_hat, x)
-        self.log("train_loss", loss)
-        return loss
+        return self._shared_eval(batch, batch_idx, "train", sync_dist=False)
     
-    def testing_step(self, batch, batch_idx):
-        # training_step defines the train loop.
-        x, y = batch
-        x = x.view(x.size(0), -1) # flatten B x C x H x W to B x L (grey pic)
-        x_hat = self.autoencoder(x)
-        loss = F.mse_loss(x_hat, x)
-        self.log("test_loss", loss, on_step=True, on_epoch=True, sync_dist=True)
-        return loss
+    def test_step(self, batch, batch_idx):
+        self._shared_eval(batch, batch_idx, "test")
     
     def validation_step(self, batch, batch_idx):
-        # training_step defines the train loop.
-        x, y = batch
-        x = x.view(x.size(0), -1) # flatten B x C x H x W to B x L (grey pic)
-        x_hat = self.autoencoder(x)
-        loss = F.mse_loss(x_hat, x)
-        self.log("val_loss", loss, on_step=True, on_epoch=True, sync_dist=True)
-        return loss
+        self._shared_eval(batch, batch_idx, "val")
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=1e-3)
         return optimizer
+
 

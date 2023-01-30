@@ -130,6 +130,8 @@ dmypy.json
 *.gz
 recipes/*/*_logs/*
 recipes/*/outputs
+recipes/*/logs
 recipes/*/checkpoints
 *.bak
 recipes/autoencoder/wandb
+tests/

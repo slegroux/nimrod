@@ -3,18 +3,24 @@
 from nimrod.modules import Encoder, Decoder
 from nimrod.models import AutoEncoder, AutoEncoderPL
 from nimrod.data.datasets import MNISTDataset
+import pytorch_lightning as pl
 from pytorch_lightning import Trainer
-from pytorch_lightning.callbacks import EarlyStopping
 from torch.utils.data import DataLoader
-import os
 from omegaconf import DictConfig, OmegaConf
 import hydra
 from hydra.utils import instantiate
+import wandb
+import os
 
-@hydra.main(version_base=None,config_path="conf", config_name="config")
+@hydra.main(version_base="1.3",config_path="conf", config_name="train.yaml")
 def main(cfg: DictConfig) -> None:
+
+    # PARAMS
     print(OmegaConf.to_yaml(cfg))
-    
+
+    # SEED
+    pl.seed_everything(cfg.seed, workers=True)
+
     # MODEL
     enc = Encoder()
     dec = Decoder()
@@ -26,31 +32,26 @@ def main(cfg: DictConfig) -> None:
     test = MNISTDataset('~/Data', train=False)
     train, dev = full_train.train_dev_split(0.8)
     dev = MNISTDataset('~/Data', train=False)
-
     train_l = DataLoader(train)
     dev_l = DataLoader(dev)
     test_l = DataLoader(test)
 
-    # TRAINING
-    root_dir = os.path.dirname(__file__)
-    devices = [0,1,2,3,4,5,6,7]
+    # TRAIN
+    callbacks = []
     early_stopping = instantiate(cfg.callbacks.early_stopping)
+    callbacks.append(early_stopping)
     model_checkpoint = instantiate(cfg.callbacks.model_checkpoint)
-    callbacks = [early_stopping, model_checkpoint]
-    wandb_logger = instantiate(cfg.logger.wandb)
-    loggers = [wandb_logger]
-    last_ckpt = "checkpoints/last-v3.ckpt"
-    trainer = Trainer(
-        default_root_dir=root_dir,
-        max_epochs=500,
-        # limit_train_batches=100, max_epochs=1000,
-        callbacks = callbacks,
-        logger = loggers,
-        devices=devices, accelerator="gpu",
-        strategy='ddp'
-    )
-    trainer.fit(model=autoencoder_pl, train_dataloaders=train_l, val_dataloaders=dev_l, ckpt_path=last_ckpt)
-    # trainer.test(autoencoder_pl, dataloaders=test_l)
+    callbacks.append(model_checkpoint)
+    # for _, cb_conf in cfg.callbacks.items():
+    #     callbacks.append(hydra.utils.instantiate(cb_conf))
+    logger = instantiate(cfg.logger.wandb)
+    trainer = hydra.utils.instantiate(cfg.trainer, callbacks=callbacks, logger=[logger])
+    trainer.fit(model=autoencoder_pl, train_dataloaders=train_l, val_dataloaders=dev_l,ckpt_path=cfg.get("ckpt_path"))
+
+    # TEST
+    if cfg.get("test"):
+        trainer.test(autoencoder_pl, dataloaders=test_l)
+    wandb.finish()
 
 if __name__ == "__main__":
     main()
