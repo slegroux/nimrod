@@ -38,7 +38,7 @@ class AutoEncoderPL(LightningModule):
     def forward(self, x):
         return self.autoencoder(x)
 
-    def _shared_eval(self, batch, batch_idx, prefix, prog_bar=True, on_step=True, on_epoch=True, sync_dist=True):
+    def _shared_eval(self, batch, batch_idx, prefix, prog_bar=True, on_step=False, on_epoch=True, sync_dist=True):
         x, _ = batch
         x = x.view(x.size(0), -1) # flatten B x C x H x W to B x L (grey pic)
         x_hat = self.autoencoder(x)
