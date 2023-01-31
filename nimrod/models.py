@@ -43,7 +43,7 @@ class AutoEncoderPL(LightningModule):
         x = x.view(x.size(0), -1) # flatten B x C x H x W to B x L (grey pic)
         x_hat = self.autoencoder(x)
         loss = self.metric(x_hat, x)
-        self.log(f"{prefix}_loss", loss, on_step=on_step, on_epoch=on_epoch, sync_dist=sync_dist)
+        self.log(f"{prefix}/loss", loss, on_step=on_step, on_epoch=on_epoch, sync_dist=sync_dist)
         return loss
 
     def training_step(self, batch, batch_idx):

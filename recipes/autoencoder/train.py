@@ -50,8 +50,8 @@ def main(cfg: DictConfig) -> None:
     trainer.fit(model=autoencoder_pl, train_dataloaders=train_l, val_dataloaders=dev_l,ckpt_path=cfg.get("ckpt_path"))
 
     # # TEST
-    # if cfg.get("test"):
-    #     trainer.test(autoencoder_pl, dataloaders=test_l)
+    if cfg.get("test"):
+        trainer.test(autoencoder_pl, dataloaders=test_l)
     wandb.finish()
 
 if __name__ == "__main__":
