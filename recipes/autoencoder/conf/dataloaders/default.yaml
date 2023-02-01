@@ -1,3 +1,9 @@
 defaults:
   - train
   - dev
+
+train:
+  batch_size: 1024
+
+dev:
+  batch_size: 1024

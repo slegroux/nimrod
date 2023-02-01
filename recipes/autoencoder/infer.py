@@ -4,8 +4,8 @@ from nimrod.modules import Encoder, Decoder
 from nimrod.data.datasets import MNISTDataset
 import torch
 import os
-script_dir = os.path.dirname(__file__)
-ckpt_path = os.path.join(script_dir, "checkpoints/last-v3.ckpt")
+# script_dir = os.path.dirname(__file__)
+# ckpt_path = os.path.join(script_dir, "checkpoints/last-v3.ckpt")
 
 a = AutoEncoder(Encoder(), Decoder())
 mdl_pl = AutoEncoderPL(a)

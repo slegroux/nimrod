@@ -1,30 +1,19 @@
 # @package _global_
 
-project: "autoencoder"
-name: "v0.0.2"
-ckpt_dir: "checkpoints"
-# log_dir: "logs"
-ckpt_path: null # ckpt to resume training from
-seed: 42
-test: True
-ignore_warnings: True
-
-# hydra:
-#   defaults:
-#     - override hydra_logging: colorlog
-#     - override job_logging: colorlog
-#   run:
-#     dir: ${log_dir}/runs/${now:%Y-%m-%d}_${now:%H-%M-%S}
-#   sweep:
-#     dir: ${log_dir}/multiruns/${now:%Y-%m-%d}_${now:%H-%M-%S}
-#     subdir: ${hydra.job.num}
-
 defaults:
   - _self_
   - callbacks: default
   - logger: wandb
-  - trainer: default
+  - datasets: mnist
   - dataloaders: default
+  - trainer: default
   - paths: default
   - hydra: default
 
+project: "autoencoder"
+ckpt_path: null # ckpt to resume training from
+seed: 42
+test: True
+train: True
+ignore_warnings: True
+tags: ["dev"]
