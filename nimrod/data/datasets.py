@@ -10,12 +10,13 @@ from torch.utils.data import Dataset, DataLoader
 import torch
 from matplotlib import pyplot as plt
 import torch.utils.data as data
+from torchvision.utils import make_grid
 
 # %% ../../nbs/data.datasets.ipynb 4
 class ImageDataset(Dataset):
     " Base class for image datasets providing visualization of (image, label) samples"
 
-    def show(self,
+    def show_idx(self,
         index:int # Index of the (image,label) sample to visualize
         ):
         X, y = self.__getitem__(index)
@@ -24,14 +25,31 @@ class ImageDataset(Dataset):
         plt.title(f"Label: {int(y)}")
         plt.show()
 
-    def show_img_batch(self, batch, n=5):
-        x, y = batch
-        images = [img for img in x[:n]]
-        plt.imshow(images.numpy().reshape(28,28),cmap='gray')
+    @staticmethod
+    def show_grid(imgs):
+        if not isinstance(imgs, list):
+            imgs = [imgs]
+        fig, axs = plt.subplots(ncols=len(imgs), squeeze=False)
+        for i, img in enumerate(imgs):
+            img = img.detach()
+            axs[0, i].imshow(img.numpy().reshape(28,28))
+            axs[0, i].set(xticklabels=[], yticklabels=[], xticks=[], yticks=[])
+
+    def show_random(self,
+        n=3 # number of images to display
+        ):
+        indices = torch.randint(0,len(self), (n,))
+        images = []
+        for index in indices:
+            X, y = self.__getitem__(index)
+            X = X.reshape(28,28)
+            images.append(X)
+        self.show_grid(images)
+        
     
             
 
-# %% ../../nbs/data.datasets.ipynb 5
+# %% ../../nbs/data.datasets.ipynb 6
 class MNISTDataset(ImageDataset):
     "MNIST digit dataset"
 

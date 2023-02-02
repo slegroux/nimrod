@@ -15,19 +15,17 @@ ckpt_path = os.path.join("logs/runs/", run_id, "checkpoints", "last.ckpt")
 a = AutoEncoder(Encoder(), Decoder())
 model = AutoEncoderPL.load_from_checkpoint(ckpt_path, autoencoder=a)
 model.eval()
-# x = torch.randn(1, 28*28)
-# with torch.no_grad():
-#     y_hat = model(x)
-# print(x.shape, y_hat.shape)
 
 ds = MNISTDataset(train=False)
 index = 128
-ds.show(index)
-x = ds[index][0].flatten().unsqueeze(0)
-with torch.no_grad():
-    y_hat = model(x)
-print(x.shape, y_hat.shape)
-plt.imshow(y_hat.reshape(28,28).numpy(), cmap='gray')
+ds.show_idx(index)
+# ds.show_random()
+
+# x = ds[index][0].flatten().unsqueeze(0)
+# with torch.no_grad():
+#     y_hat = model(x)
+# print(x.shape, y_hat.shape)
+# plt.imshow(y_hat.reshape(28,28).numpy(), cmap='gray')
 
 
 # TODO: pure pytorch inference (to leverage tooling)
