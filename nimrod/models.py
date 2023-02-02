@@ -31,7 +31,7 @@ class AutoEncoder(nn.Module):
 class AutoEncoderPL(LightningModule):
     def __init__(self, autoencoder:AutoEncoder):
         super().__init__()
-        # self.save_hyperparameters()
+        self.save_hyperparameters()
         self.autoencoder = autoencoder
         self.metric = torch.nn.MSELoss()
 

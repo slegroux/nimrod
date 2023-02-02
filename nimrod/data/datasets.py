@@ -24,6 +24,13 @@ class ImageDataset(Dataset):
         plt.title(f"Label: {int(y)}")
         plt.show()
 
+    def show_img_batch(self, batch, n=5):
+        x, y = batch
+        images = [img for img in x[:n]]
+        plt.imshow(images.numpy().reshape(28,28),cmap='gray')
+    
+            
+
 # %% ../../nbs/data.datasets.ipynb 5
 class MNISTDataset(ImageDataset):
     "MNIST digit dataset"
@@ -53,13 +60,14 @@ class MNISTDataset(ImageDataset):
         return x, y
     
     def train_dev_split(self,
-        ratio:float # percentage of train/dev split
+        ratio:float, # percentage of train/dev split,
+        seed:int=42 # rand generator seed
     ):
         train_set_size = int(len(self.ds) * ratio)
         valid_set_size = len(self.ds) - train_set_size
 
         # split the train set into two
-        seed = torch.Generator().manual_seed(42)
+        seed = torch.Generator().manual_seed(seed)
         train_set, valid_set = data.random_split(self.ds, [train_set_size, valid_set_size], generator=seed)
         return train_set, valid_set
 
