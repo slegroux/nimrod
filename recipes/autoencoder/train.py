@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
 from nimrod.modules import Encoder, Decoder
-from nimrod.models import AutoEncoder, AutoEncoderPL
+from nimrod.models.autoencoders import AutoEncoder, AutoEncoderPL
+from pytorch_lightning.profilers import AdvancedProfiler, SimpleProfiler
 from nimrod.data.datasets import MNISTDataset
 import pytorch_lightning as pl
 from pytorch_lightning import Trainer
@@ -28,23 +29,22 @@ def main(cfg: DictConfig) -> None:
     autoencoder_pl = AutoEncoderPL(autoencoder)
 
     # DATA
-    full_train = instantiate(cfg.datasets.mnist.train)
-    test = instantiate(cfg.datasets.mnist.test)
+    full_train = instantiate(cfg.datasets.train)
+    test = instantiate(cfg.datasets.test)
     train, dev = full_train.train_dev_split(0.8)
     train_dl = instantiate(cfg.dataloaders.train, dataset=train)
     dev_dl = instantiate(cfg.dataloaders.dev, dataset=dev)
     test_dl = instantiate(cfg.dataloaders.dev, dataset=test)
 
-    # from IPython import embed; embed()
     # TRAIN
     callbacks = []
-    early_stopping = instantiate(cfg.callbacks.early_stopping)
-    callbacks.append(early_stopping)
-    model_checkpoint = instantiate(cfg.callbacks.model_checkpoint)
-    callbacks.append(model_checkpoint)
-    logger = instantiate(cfg.logger.wandb)
+    for _, cb_conf in cfg.callbacks.items():
+        callbacks.append(instantiate(cb_conf))
 
-    trainer = hydra.utils.instantiate(cfg.trainer, callbacks=callbacks, logger=[logger])
+    logger = instantiate(cfg.logger)
+    profiler = instantiate(cfg.profiler)
+
+    trainer = instantiate(cfg.trainer, callbacks=callbacks, profiler=profiler, logger=[logger])
 
     if cfg.get("train"):
         trainer.fit(model=autoencoder_pl, train_dataloaders=train_dl, val_dataloaders=dev_dl, ckpt_path=cfg.get("ckpt_path"))
@@ -52,7 +52,6 @@ def main(cfg: DictConfig) -> None:
     # TEST
     if cfg.get("test"):
         trainer.test(autoencoder_pl, dataloaders=test_dl)
-
 
     wandb.finish()
 

@@ -1,3 +1,4 @@
 defaults:
-  - model_checkpoint.yaml
-  - early_stopping.yaml
+  - model_checkpoint
+  - early_stopping
+  - _self_

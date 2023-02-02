@@ -1,12 +1,11 @@
-wandb:
-  _target_: pytorch_lightning.loggers.wandb.WandbLogger
-  project: ${project}
-  name: ${run_id}
-  save_dir: ${paths.output_dir}
-  offline: False # store only locally
-  id: null # give id to resume experiment
-  entity: "slegroux"
-  log_model: False
-  prefix: ""
-  group: ""
-  tags: ${tags}
+_target_: pytorch_lightning.loggers.wandb.WandbLogger
+project: ${project}
+name: ${run_id}
+save_dir: ${paths.output_dir}
+offline: False # store only locally
+id: null # give id to resume experiment
+entity: "slegroux"
+log_model: False
+prefix: ""
+group: ""
+tags: ${tags}

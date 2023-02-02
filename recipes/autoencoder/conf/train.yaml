@@ -9,6 +9,7 @@ defaults:
   - paths: default
   - hydra: default
   - logger: wandb
+  - profiler: simple
 
 run_id: ${now:%Y-%m-%d}_${now:%H-%M-%S}
 project: "autoencoder"

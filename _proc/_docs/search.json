@@ -1,0 +1,37 @@
+[
+  {
+    "objectID": "index.html#description",
+    "href": "index.html#description",
+    "title": "nimrod",
+    "section": "Description",
+    "text": "Description\nThis is a repo with minimal tooling, modules, models and recipes to get easily get started with deep learning training and experimentation"
+  },
+  {
+    "objectID": "index.html#install",
+    "href": "index.html#install",
+    "title": "nimrod",
+    "section": "Install",
+    "text": "Install\npip install nimrod"
+  },
+  {
+    "objectID": "index.html#usage",
+    "href": "index.html#usage",
+    "title": "nimrod",
+    "section": "Usage",
+    "text": "Usage\nCheck recipes in recipes/ folder. For instance:\ncd recipes/autoencoder/\npython train.py"
+  },
+  {
+    "objectID": "index.html#authors",
+    "href": "index.html#authors",
+    "title": "nimrod",
+    "section": "Authors",
+    "text": "Authors\n2023 Sylvain Le Groux slegroux@ccrma.stanford.edu"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Nimrod",
+    "section": "",
+    "text": "Text_content"
+  }
+]
