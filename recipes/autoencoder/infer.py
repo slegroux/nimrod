@@ -1,23 +1,34 @@
 #!/usr/bin/env python
+
 from nimrod.models import AutoEncoderPL, AutoEncoder
 from nimrod.modules import Encoder, Decoder
 from nimrod.data.datasets import MNISTDataset
+from matplotlib import pyplot as plt
 import torch
 import os
-# script_dir = os.path.dirname(__file__)
-# ckpt_path = os.path.join(script_dir, "checkpoints/last-v3.ckpt")
+
+
+run_id = "v0.0.0"
+ckpt_path = os.path.join("logs/runs/", run_id, "checkpoints", "last.ckpt")
+
 
 a = AutoEncoder(Encoder(), Decoder())
-mdl_pl = AutoEncoderPL(a)
-model = mdl_pl.load_from_checkpoint(ckpt_path)
-# model.eval()
+model = AutoEncoderPL.load_from_checkpoint(ckpt_path, autoencoder=a)
+model.eval()
 # x = torch.randn(1, 28*28)
 # with torch.no_grad():
 #     y_hat = model(x)
 # print(x.shape, y_hat.shape)
 
-# ds = MNISTDataset(train=False)
-# print(len(ds))
+ds = MNISTDataset(train=False)
+index = 128
+ds.show(index)
+x = ds[index][0].flatten().unsqueeze(0)
+with torch.no_grad():
+    y_hat = model(x)
+print(x.shape, y_hat.shape)
+plt.imshow(y_hat.reshape(28,28).numpy(), cmap='gray')
+
 
 # TODO: pure pytorch inference (to leverage tooling)
 # enc = Encoder()

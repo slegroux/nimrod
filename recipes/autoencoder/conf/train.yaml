@@ -3,13 +3,14 @@
 defaults:
   - _self_
   - callbacks: default
-  - logger: wandb
   - datasets: mnist
   - dataloaders: default
   - trainer: default
   - paths: default
   - hydra: default
+  - logger: wandb
 
+run_id: ${now:%Y-%m-%d}_${now:%H-%M-%S}
 project: "autoencoder"
 ckpt_path: null # ckpt to resume training from
 seed: 42
