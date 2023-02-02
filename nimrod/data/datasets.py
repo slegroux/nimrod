@@ -46,10 +46,8 @@ class ImageDataset(Dataset):
             images.append(X)
         self.show_grid(images)
         
-    
-            
 
-# %% ../../nbs/data.datasets.ipynb 6
+# %% ../../nbs/data.datasets.ipynb 5
 class MNISTDataset(ImageDataset):
     "MNIST digit dataset"
 
