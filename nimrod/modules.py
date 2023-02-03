@@ -5,6 +5,7 @@ __all__ = ['Encoder', 'Decoder']
 
 # %% ../nbs/modules.ipynb 3
 import torch.nn as nn
+import torch
 
 # %% ../nbs/modules.ipynb 4
 class Encoder(nn.Module):
