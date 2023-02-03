@@ -1,9 +1,13 @@
 defaults:
   - train
   - dev
+  - test
 
 train:
   batch_size: 1024
 
 dev:
   batch_size: 1024
+
+test:
+  batch_size: 32

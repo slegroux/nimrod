@@ -1,17 +1,9 @@
 #!/usr/bin/env python
-
-from nimrod.modules import Encoder, Decoder
-from nimrod.models.autoencoders import AutoEncoder, AutoEncoderPL
-from pytorch_lightning.profilers import AdvancedProfiler, SimpleProfiler
-from nimrod.data.datasets import MNISTDataset
 import pytorch_lightning as pl
-from pytorch_lightning import Trainer
-from torch.utils.data import DataLoader
 from omegaconf import DictConfig, OmegaConf
 import hydra
 from hydra.utils import instantiate
 import wandb
-import os
 
 @hydra.main(version_base="1.3",config_path="conf", config_name="train.yaml")
 def main(cfg: DictConfig) -> None:
@@ -23,10 +15,7 @@ def main(cfg: DictConfig) -> None:
     pl.seed_everything(cfg.seed, workers=True)
 
     # MODEL
-    enc = Encoder()
-    dec = Decoder()
-    autoencoder = AutoEncoder(enc, dec)
-    autoencoder_pl = AutoEncoderPL(autoencoder)
+    autoencoder_pl = instantiate(cfg.model)
 
     # DATA
     full_train = instantiate(cfg.datasets.train)
