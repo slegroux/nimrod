@@ -2,6 +2,26 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://slegroux.github.io/nimrod/index.html</loc>
-    <lastmod>2023-02-02T03:46:00.185Z</lastmod>
+    <lastmod>2023-02-02T21:57:21.115Z</lastmod>
+  </url>
+  <url>
+    <loc>https://slegroux.github.io/nimrod/models.html</loc>
+    <lastmod>2023-02-02T21:55:08.807Z</lastmod>
+  </url>
+  <url>
+    <loc>https://slegroux.github.io/nimrod/models.autoencoder.html</loc>
+    <lastmod>2023-02-02T21:54:26.594Z</lastmod>
+  </url>
+  <url>
+    <loc>https://slegroux.github.io/nimrod/models.autoencoders.html</loc>
+    <lastmod>2023-02-02T21:57:37.407Z</lastmod>
+  </url>
+  <url>
+    <loc>https://slegroux.github.io/nimrod/data.datasets.html</loc>
+    <lastmod>2023-02-02T21:57:36.287Z</lastmod>
+  </url>
+  <url>
+    <loc>https://slegroux.github.io/nimrod/modules.html</loc>
+    <lastmod>2023-02-02T21:57:49.408Z</lastmod>
   </url>
 </urlset>

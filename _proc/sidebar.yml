@@ -3,5 +3,5 @@ website:
     contents:
       - index.ipynb
       - data.datasets.ipynb
-      - models.ipynb
+      - models.autoencoders.ipynb
       - modules.ipynb

@@ -26,7 +26,7 @@ class ImageDataset(Dataset):
         plt.show()
 
     @staticmethod
-    def show_grid(imgs):
+    def show_grid(imgs, save_path=None):
         if not isinstance(imgs, list):
             imgs = [imgs]
         fig, axs = plt.subplots(ncols=len(imgs), squeeze=False)
@@ -34,6 +34,8 @@ class ImageDataset(Dataset):
             img = img.detach()
             axs[0, i].imshow(img.numpy().reshape(28,28))
             axs[0, i].set(xticklabels=[], yticklabels=[], xticks=[], yticks=[])
+        if save_path:
+            plt.savefig(save_path)
 
     def show_random(self,
         n=3 # number of images to display

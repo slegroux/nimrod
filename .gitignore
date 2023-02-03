@@ -132,3 +132,7 @@ recipes/*/logs
 *.bak
 tests/
 .hydra/
+*.png
+*.pt
+*.onnx
+*.ckpt
