@@ -3,5 +3,10 @@
 # %% auto 0
 __all__ = []
 
-# %% ../../nbs/audio.embeddings.ipynb 3
+# %% ../../nbs/audio.embeddings.ipynb 4
 from encodec import EncodecModel
+from encodec.utils import convert_audio
+import torchaudio
+import torch
+from matplotlib import pyplot as plt
+# from audio.utils import plot_waveform

@@ -211,7 +211,8 @@ class LibriSpeechDataModule(LightningDataModule):
     def __init__(self,
         target_dir="/data/en", # where data will be saved / retrieved
         dataset_parts="mini_librispeech", # either full librispeech or mini subset
-        output_dir="." # where to save manifest
+        output_dir="../recipes/stt/librispeech/data", # where to save manifest
+        num_jobs=1 # num_jobs depending on number of cpus available
     ):
         super().__init__()
         self.save_hyperparameters(logger=False)
@@ -220,58 +221,7 @@ class LibriSpeechDataModule(LightningDataModule):
         download_librispeech(target_dir=self.hparams.target_dir, dataset_parts=self.hparams.dataset_parts)
 
     def setup(self, stage = None):
-        libri = prepare_librispeech(corpus_dir=Path(self.hparams.target_dir) / "LibriSpeech", output_dir=self.hparams.output_dir)
-        self.cuts_train = CutSet.from_manifests(**libri["train-clean-5"])
-        self.cuts_test = CutSet.from_manifests(**libri["dev-clean-2"])
-        self.tokenizer = TokenCollater(self.cuts_train)
-        self.tokenizer(self.cuts_test.subset(first=2))
-        self.tokenizer.inverse(*self.tokenizer(self.cuts_test.subset(first=2)))
-
-    def train_dataloader(self):
-        train_sampler = BucketingSampler(self.cuts_train, max_duration=300, shuffle=True, bucket_method="equal_duration")
-        return DataLoader(STTDataset(self.tokenizer), sampler=train_sampler, batch_size=None, num_workers=2)
-
-    def test_dataloader(self):
-        test_sampler = BucketingSampler(self.cuts_test, max_duration=400, shuffle=False, bucket_method="equal_duration")
-        return DataLoader(STTDataset(self.tokenizer), sampler=test_sampler, batch_size=None, num_workers=2)
-
-    @property
-    def model_kwargs(self):
-        return {
-            "odim": len(self.tokenizer.idx2token),
-        }
-
-# %% ../../nbs/data.datasets.ipynb 27
-class TTSDataset(Dataset):
-    def __init__(self,
-        tokenizer:TokenCollater, # text tokenizer
-        num_mel_bins:int=80 # number of mel spectrogram bins
-        ):
-        self.extractor = OnTheFlyFeatures(Fbank(FbankConfig(num_mel_bins=num_mel_bins)))
-        self.tokenizer = tokenizer
-
-    def __getitem__(self, cuts: CutSet) -> dict:
-        cuts = cuts.sort_by_duration()
-        feats, feat_lens = self.extractor(cuts)
-        tokens, token_lens = self.tokenizer(cuts)
-        return {"feats_pad": feats, "ilens": feat_lens, "tokens_pad": tokens}
-
-
-# %% ../../nbs/data.datasets.ipynb 29
-class LJSpeechDataModule(LightningDataModule):
-    def __init__(self,
-        target_dir="/data/en", # where data will be saved / retrieved
-        dataset_parts="mini_librispeech", # either full librispeech or mini subset
-        output_dir="/home/syl20/slg/nimrod/recipes/" # where to save manifest
-    ):
-        super().__init__()
-        self.save_hyperparameters(logger=False)
-
-    def prepare_data(self,) -> None:
-        download_librispeech(target_dir=self.hparams.target_dir, dataset_parts=self.hparams.dataset_parts)
-
-    def setup(self, stage = None):
-        libri = prepare_librispeech(corpus_dir=Path(self.hparams.target_dir) / "LibriSpeech", output_dir=self.hparams.output_dir)
+        libri = prepare_librispeech(corpus_dir=Path(self.hparams.target_dir) / "LibriSpeech", output_dir=self.hparams.output_dir, num_jobs=self.hparams.num_jobs)
         self.cuts_train = CutSet.from_manifests(**libri["train-clean-5"])
         self.cuts_test = CutSet.from_manifests(**libri["dev-clean-2"])
         self.tokenizer = TokenCollater(self.cuts_train)
@@ -293,9 +243,60 @@ class LJSpeechDataModule(LightningDataModule):
         }
 
 # %% ../../nbs/data.datasets.ipynb 31
+class TTSDataset(Dataset):
+    def __init__(self,
+        tokenizer:TokenCollater, # text tokenizer
+        num_mel_bins:int=80 # number of mel spectrogram bins
+        ):
+        self.extractor = OnTheFlyFeatures(Fbank(FbankConfig(num_mel_bins=num_mel_bins)))
+        self.tokenizer = tokenizer
+
+    def __getitem__(self, cuts: CutSet) -> dict:
+        cuts = cuts.sort_by_duration()
+        feats, feat_lens = self.extractor(cuts)
+        tokens, token_lens = self.tokenizer(cuts)
+        return {"feats_pad": feats, "ilens": feat_lens, "tokens_pad": tokens}
+
+
+# %% ../../nbs/data.datasets.ipynb 33
+class LJSpeechDataModule(LightningDataModule):
+    def __init__(self,
+        target_dir="/data/en", # where data will be saved / retrieved
+        dataset_parts="mini_librispeech", # either full librispeech or mini subset
+        output_dir="../recipes/tts/ljspeech/data" # where to save manifest
+    ):
+        super().__init__()
+        self.save_hyperparameters(logger=False)
+
+    def prepare_data(self,) -> None:
+        download_librispeech(target_dir=self.hparams.target_dir, dataset_parts=self.hparams.dataset_parts)
+
+    def setup(self, stage = None):
+        libri = prepare_librispeech(corpus_dir=Path(self.hparams.target_dir) / "LibriSpeech", output_dir=self.hparams.output_dir)
+        self.cuts_train = CutSet.from_manifests(**libri["train-clean-5"])
+        self.cuts_test = CutSet.from_manifests(**libri["dev-clean-2"])
+        self.tokenizer = TokenCollater(self.cuts_train)
+        self.tokenizer(self.cuts_test.subset(first=2))
+        self.tokenizer.inverse(*self.tokenizer(self.cuts_test.subset(first=2)))
+
+    def train_dataloader(self):
+        train_sampler = BucketingSampler(self.cuts_train, max_duration=300, shuffle=True, bucket_method="equal_duration")
+        return DataLoader(STTDataset(self.tokenizer), sampler=train_sampler, batch_size=None, num_workers=2)
+
+    def test_dataloader(self):
+        test_sampler = BucketingSampler(self.cuts_test, max_duration=400, shuffle=False, bucket_method="equal_duration")
+        return DataLoader(STTDataset(self.tokenizer), sampler=test_sampler, batch_size=None, num_workers=2)
+
+    @property
+    def model_kwargs(self):
+        return {
+            "odim": len(self.tokenizer.idx2token),
+        }
+
+# %% ../../nbs/data.datasets.ipynb 35
 from lhotse.recipes import download_libritts, prepare_libritts
 
-# %% ../../nbs/data.datasets.ipynb 32
+# %% ../../nbs/data.datasets.ipynb 36
 class LibriTTSDataModule(LightningDataModule):
     def __init__(self,
         target_dir="/data/en/libriTTS", # where data will be saved / retrieved
