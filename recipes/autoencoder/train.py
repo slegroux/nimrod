@@ -30,7 +30,7 @@ def main(cfg: DictConfig) -> None:
 
     if cfg.get("train"):
         # trainer.fit(model=autoencoder_pl, train_dataloaders=train_dl, val_dataloaders=dev_dl, ckpt_path=cfg.get("ckpt_path"))
-        trainer.fit(autoencoder_pl, datamodule=datamodule,ckpt_path=cfg.get("ckpt_path"))
+        trainer.fit(autoencoder_pl, datamodule=datamodule, ckpt_path=cfg.get("ckpt_path"))
 
     # TEST
     if cfg.get("test"):
