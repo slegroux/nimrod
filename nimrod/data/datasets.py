@@ -222,11 +222,17 @@ class LibriSpeechDataModule(LightningDataModule):
 
     def setup(self, stage = None):
         libri = prepare_librispeech(corpus_dir=Path(self.hparams.target_dir) / "LibriSpeech", output_dir=self.hparams.output_dir, num_jobs=self.hparams.num_jobs)
-        self.cuts_train = CutSet.from_manifests(**libri["train-clean-5"])
-        self.cuts_test = CutSet.from_manifests(**libri["dev-clean-2"])
-        self.tokenizer = TokenCollater(self.cuts_train)
-        self.tokenizer(self.cuts_test.subset(first=2))
-        self.tokenizer.inverse(*self.tokenizer(self.cuts_test.subset(first=2)))
+        if stage == "fit" or stage == None:
+            self.cuts_train = CutSet.from_manifests(**libri["train-clean-5"])
+            self.cuts_test = CutSet.from_manifests(**libri["dev-clean-2"])
+            self.tokenizer = TokenCollater(self.cuts_train)
+            self.tokenizer(self.cuts_test.subset(first=2))
+            self.tokenizer.inverse(*self.tokenizer(self.cuts_test.subset(first=2)))
+        if stage == "test":
+            self.cuts_test = CutSet.from_manifests(**libri["dev-clean-2"])
+            self.tokenizer = TokenCollater(self.cuts_test)
+            self.tokenizer(self.cuts_test.subset(first=2))
+            self.tokenizer.inverse(*self.tokenizer(self.cuts_test.subset(first=2)))
 
     def train_dataloader(self):
         train_sampler = BucketingSampler(self.cuts_train, max_duration=300, shuffle=True, bucket_method="equal_duration")
@@ -312,11 +318,17 @@ class LibriTTSDataModule(LightningDataModule):
 
     def setup(self, stage = None):
         libri = prepare_libritts(corpus_dir=Path(self.hparams.target_dir) / "LibriTTS", output_dir=self.hparams.output_dir)
-        self.cuts_train = CutSet.from_manifests(**libri["dev-clean"])
-        self.cuts_test = CutSet.from_manifests(**libri["test-clean"])
-        self.tokenizer = TokenCollater(self.cuts_train)
-        self.tokenizer(self.cuts_test.subset(first=2))
-        self.tokenizer.inverse(*self.tokenizer(self.cuts_test.subset(first=2)))
+        if stage == 'fit' or stage == None:
+            self.cuts_train = CutSet.from_manifests(**libri["dev-clean"])
+            self.cuts_test = CutSet.from_manifests(**libri["test-clean"])
+            self.tokenizer = TokenCollater(self.cuts_train)
+            self.tokenizer(self.cuts_test.subset(first=2))
+            self.tokenizer.inverse(*self.tokenizer(self.cuts_test.subset(first=2)))
+        if stage == "test":
+            self.cuts_test = CutSet.from_manifests(**libri["test-clean"])
+            self.tokenizer = TokenCollater(self.cuts_test)
+            self.tokenizer(self.cuts_test.subset(first=2))
+            self.tokenizer.inverse(*self.tokenizer(self.cuts_test.subset(first=2)))
 
     def train_dataloader(self):
         train_sampler = BucketingSampler(self.cuts_train, max_duration=300, shuffle=True, bucket_method="equal_duration")
