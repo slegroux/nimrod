@@ -307,7 +307,8 @@ class LibriTTSDataModule(LightningDataModule):
     def __init__(self,
         target_dir="/data/en/libriTTS", # where data will be saved / retrieved
         dataset_parts=["dev-clean", "test-clean"], # either full libritts or subset
-        output_dir="/home/syl20/slg/nimrod/recipes/libritts/data" # where to save manifest
+        output_dir="/home/syl20/slg/nimrod/recipes/libritts/data", # where to save manifest
+        num_jobs=1 # num_jobs depending on number of cpus available
     ):
         super().__init__()
         self.save_hyperparameters(logger=False)
@@ -317,7 +318,7 @@ class LibriTTSDataModule(LightningDataModule):
         download_libritts(target_dir=self.hparams.target_dir, dataset_parts=self.hparams.dataset_parts)
 
     def setup(self, stage = None):
-        libri = prepare_libritts(corpus_dir=Path(self.hparams.target_dir) / "LibriTTS", output_dir=self.hparams.output_dir)
+        libri = prepare_libritts(corpus_dir=Path(self.hparams.target_dir) / "LibriTTS", output_dir=self.hparams.output_dir, num_jobs=self.hparams.num_jobs)
         if stage == 'fit' or stage == None:
             self.cuts_train = CutSet.from_manifests(**libri["dev-clean"])
             self.cuts_test = CutSet.from_manifests(**libri["test-clean"])
