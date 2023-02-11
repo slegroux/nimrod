@@ -2,6 +2,9 @@ website:
   sidebar:
     contents:
       - index.ipynb
+      - audio.embeddings.ipynb
+      - audio.utils.ipynb
       - data.datasets.ipynb
+      - lm.tokenizers.ipynb
       - models.autoencoders.ipynb
       - modules.ipynb
