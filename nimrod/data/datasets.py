@@ -216,20 +216,21 @@ class LibriSpeechDataModule(LightningDataModule):
     ):
         super().__init__()
         self.save_hyperparameters(logger=False)
+        self.libri = {}
 
     def prepare_data(self,) -> None:
         download_librispeech(target_dir=self.hparams.target_dir, dataset_parts=self.hparams.dataset_parts)
 
     def setup(self, stage = None):
-        libri = prepare_librispeech(corpus_dir=Path(self.hparams.target_dir) / "LibriSpeech", output_dir=self.hparams.output_dir, num_jobs=self.hparams.num_jobs)
+        self.libri = prepare_librispeech(corpus_dir=Path(self.hparams.target_dir) / "LibriSpeech", output_dir=self.hparams.output_dir, num_jobs=self.hparams.num_jobs)
         if stage == "fit" or stage == None:
-            self.cuts_train = CutSet.from_manifests(**libri["train-clean-5"])
-            self.cuts_test = CutSet.from_manifests(**libri["dev-clean-2"])
+            self.cuts_train = CutSet.from_manifests(**self.libri["train-clean-5"])
+            self.cuts_test = CutSet.from_manifests(**self.libri["dev-clean-2"])
             self.tokenizer = TokenCollater(self.cuts_train)
             self.tokenizer(self.cuts_test.subset(first=2))
             self.tokenizer.inverse(*self.tokenizer(self.cuts_test.subset(first=2)))
         if stage == "test":
-            self.cuts_test = CutSet.from_manifests(**libri["dev-clean-2"])
+            self.cuts_test = CutSet.from_manifests(**self.libri["dev-clean-2"])
             self.tokenizer = TokenCollater(self.cuts_test)
             self.tokenizer(self.cuts_test.subset(first=2))
             self.tokenizer.inverse(*self.tokenizer(self.cuts_test.subset(first=2)))
@@ -248,7 +249,7 @@ class LibriSpeechDataModule(LightningDataModule):
             "odim": len(self.tokenizer.idx2token),
         }
 
-# %% ../../nbs/data.datasets.ipynb 31
+# %% ../../nbs/data.datasets.ipynb 32
 class TTSDataset(Dataset):
     def __init__(self,
         tokenizer:TokenCollater, # text tokenizer
@@ -264,7 +265,7 @@ class TTSDataset(Dataset):
         return {"feats_pad": feats, "ilens": feat_lens, "tokens_pad": tokens}
 
 
-# %% ../../nbs/data.datasets.ipynb 33
+# %% ../../nbs/data.datasets.ipynb 34
 class LJSpeechDataModule(LightningDataModule):
     def __init__(self,
         target_dir="/data/en", # where data will be saved / retrieved
@@ -299,10 +300,10 @@ class LJSpeechDataModule(LightningDataModule):
             "odim": len(self.tokenizer.idx2token),
         }
 
-# %% ../../nbs/data.datasets.ipynb 35
+# %% ../../nbs/data.datasets.ipynb 36
 from lhotse.recipes import download_libritts, prepare_libritts
 
-# %% ../../nbs/data.datasets.ipynb 36
+# %% ../../nbs/data.datasets.ipynb 37
 class LibriTTSDataModule(LightningDataModule):
     def __init__(self,
         target_dir="/data/en/libriTTS", # where data will be saved / retrieved
@@ -318,15 +319,15 @@ class LibriTTSDataModule(LightningDataModule):
         download_libritts(target_dir=self.hparams.target_dir, dataset_parts=self.hparams.dataset_parts)
 
     def setup(self, stage = None):
-        libri = prepare_libritts(corpus_dir=Path(self.hparams.target_dir) / "LibriTTS", output_dir=self.hparams.output_dir, num_jobs=self.hparams.num_jobs)
+        self.libri = prepare_libritts(corpus_dir=Path(self.hparams.target_dir) / "LibriTTS", output_dir=self.hparams.output_dir, num_jobs=self.hparams.num_jobs)
         if stage == 'fit' or stage == None:
-            self.cuts_train = CutSet.from_manifests(**libri["dev-clean"])
-            self.cuts_test = CutSet.from_manifests(**libri["test-clean"])
+            self.cuts_train = CutSet.from_manifests(**self.libri["dev-clean"])
+            self.cuts_test = CutSet.from_manifests(**self.libri["test-clean"])
             self.tokenizer = TokenCollater(self.cuts_train)
             self.tokenizer(self.cuts_test.subset(first=2))
             self.tokenizer.inverse(*self.tokenizer(self.cuts_test.subset(first=2)))
         if stage == "test":
-            self.cuts_test = CutSet.from_manifests(**libri["test-clean"])
+            self.cuts_test = CutSet.from_manifests(**self.libri["test-clean"])
             self.tokenizer = TokenCollater(self.cuts_test)
             self.tokenizer(self.cuts_test.subset(first=2))
             self.tokenizer.inverse(*self.tokenizer(self.cuts_test.subset(first=2)))
