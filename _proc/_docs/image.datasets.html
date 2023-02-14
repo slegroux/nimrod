@@ -6,9 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="Collection of Autoencoder models">
+<meta name="description" content="Image datasets">
 
-<title>nimrod - Autoencoders</title>
+<title>nimrod - Image Datasets</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -125,11 +125,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 
 <link rel="stylesheet" href="styles.css">
-<meta property="og:title" content="nimrod - Autoencoders">
-<meta property="og:description" content="Collection of Autoencoder models">
+<meta property="og:title" content="nimrod - Image Datasets">
+<meta property="og:description" content="Image datasets">
 <meta property="og:site-name" content="nimrod">
-<meta name="twitter:title" content="nimrod - Autoencoders">
-<meta name="twitter:description" content="Collection of Autoencoder models">
+<meta name="twitter:title" content="nimrod - Image Datasets">
+<meta name="twitter:description" content="Image datasets">
 <meta name="twitter:card" content="summary">
 </head>
 
@@ -149,7 +149,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     </nav>
   <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
     <div class="container-fluid d-flex justify-content-between">
-      <h1 class="quarto-secondary-nav-title">Autoencoders</h1>
+      <h1 class="quarto-secondary-nav-title">Image Datasets</h1>
       <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
         <i class="bi bi-chevron-right"></i>
       </button>
@@ -184,7 +184,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./image.datasets.html" class="sidebar-item-text sidebar-link">Image Datasets</a>
+  <a href="./image.datasets.html" class="sidebar-item-text sidebar-link active">Image Datasets</a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -199,7 +199,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./models.autoencoders.html" class="sidebar-item-text sidebar-link active">Autoencoders</a>
+  <a href="./models.autoencoders.html" class="sidebar-item-text sidebar-link">Autoencoders</a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -221,8 +221,19 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#autoencoder" id="toc-autoencoder" class="nav-link active" data-scroll-target="#autoencoder">AutoEncoder</a></li>
-  <li><a href="#autoencoderpl" id="toc-autoencoderpl" class="nav-link" data-scroll-target="#autoencoderpl">AutoEncoderPL</a></li>
+  <li><a href="#imagedataset-base-class" id="toc-imagedataset-base-class" class="nav-link active" data-scroll-target="#imagedataset-base-class">ImageDataset base class</a>
+  <ul class="collapse">
+  <li><a href="#imagedataset" id="toc-imagedataset" class="nav-link" data-scroll-target="#imagedataset">ImageDataset</a></li>
+  </ul></li>
+  <li><a href="#mnist" id="toc-mnist" class="nav-link" data-scroll-target="#mnist">MNIST</a>
+  <ul class="collapse">
+  <li><a href="#mnist-dataset" id="toc-mnist-dataset" class="nav-link" data-scroll-target="#mnist-dataset">MNIST dataset</a></li>
+  <li><a href="#mnistdataset" id="toc-mnistdataset" class="nav-link" data-scroll-target="#mnistdataset">MNISTDataset</a></li>
+  <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
+  <li><a href="#mnist-datamodule" id="toc-mnist-datamodule" class="nav-link" data-scroll-target="#mnist-datamodule">MNIST DataModule</a></li>
+  <li><a href="#mnistdatamodule" id="toc-mnistdatamodule" class="nav-link" data-scroll-target="#mnistdatamodule">MNISTDataModule</a></li>
+  <li><a href="#usage-1" id="toc-usage-1" class="nav-link" data-scroll-target="#usage-1">Usage</a></li>
+  </ul></li>
   </ul>
 <div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/slegroux/nimrod/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
@@ -231,12 +242,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title d-none d-lg-block">Autoencoders</h1>
+<h1 class="title d-none d-lg-block">Image Datasets</h1>
 </div>
 
 <div>
   <div class="description">
-    Collection of Autoencoder models
+    Image datasets
   </div>
 </div>
 
@@ -252,93 +263,148 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </header>
 
 <!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<section id="imagedataset-base-class" class="level2">
+<h2 class="anchored" data-anchor-id="imagedataset-base-class">ImageDataset base class</h2>
 <hr>
-<p><a href="https://github.com/slegroux/nimrod/blob/main/nimrod/models/autoencoders.py#L16" target="_blank" style="float:right; font-size:smaller">source</a></p>
-<section id="autoencoder" class="level3">
-<h3 class="anchored" data-anchor-id="autoencoder">AutoEncoder</h3>
+<p><a href="https://github.com/slegroux/nimrod/blob/main/nimrod/image/datasets.py#L20" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="imagedataset" class="level3">
+<h3 class="anchored" data-anchor-id="imagedataset">ImageDataset</h3>
 <blockquote class="blockquote">
-<pre><code> AutoEncoder (encoder:nimrod.modules.Encoder,
-              decoder:nimrod.modules.Decoder)</code></pre>
+<pre><code> ImageDataset ()</code></pre>
 </blockquote>
-<p>Base class for all neural network modules.</p>
-<p>Your models should also subclass this class.</p>
-<p>Modules can also contain other Modules, allowing to nest them in a tree structure. You can assign the submodules as regular attributes::</p>
-<pre><code>import torch.nn as nn
-import torch.nn.functional as F
-
-class Model(nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.conv1 = nn.Conv2d(1, 20, 5)
-        self.conv2 = nn.Conv2d(20, 20, 5)
-
-    def forward(self, x):
-        x = F.relu(self.conv1(x))
-        return F.relu(self.conv2(x))</code></pre>
-<p>Submodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:<code>to</code>, etc.</p>
-<p>.. note:: As per the example above, an <code>__init__()</code> call to the parent class must be made before assignment on the child.</p>
+<p>Base class for image datasets providing visualization of (image, label) samples</p>
+</section>
+</section>
+<section id="mnist" class="level2">
+<h2 class="anchored" data-anchor-id="mnist">MNIST</h2>
+<section id="mnist-dataset" class="level3">
+<h3 class="anchored" data-anchor-id="mnist-dataset">MNIST dataset</h3>
+<hr>
+<p><a href="https://github.com/slegroux/nimrod/blob/main/nimrod/image/datasets.py#L57" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="mnistdataset" class="level3">
+<h3 class="anchored" data-anchor-id="mnistdataset">MNISTDataset</h3>
+<blockquote class="blockquote">
+<pre><code> MNISTDataset (data_dir:str='~/Data', train=True, transform:&lt;module'torchv
+               ision.transforms.transforms'from'/home/syl20/anaconda3/envs
+               /nimrod/lib/python3.9/site-
+               packages/torchvision/transforms/transforms.py'&gt;=ToTensor())</code></pre>
+</blockquote>
+<p>MNIST digit dataset</p>
 <table class="table">
-<caption>ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool</caption>
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
 <thead>
 <tr class="header">
 <th></th>
 <th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
 <th><strong>Details</strong></th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>encoder</td>
-<td>Encoder</td>
-<td>Encoder layer</td>
+<td>data_dir</td>
+<td>str</td>
+<td>~/Data</td>
+<td>path where data is saved</td>
 </tr>
 <tr class="even">
-<td>decoder</td>
-<td>Decoder</td>
-<td>Decoder layer</td>
+<td>train</td>
+<td>bool</td>
+<td>True</td>
+<td>train or test dataset</td>
+</tr>
+<tr class="odd">
+<td>transform</td>
+<td>torchvision.transforms.transforms</td>
+<td>ToTensor()</td>
+<td>data formatting</td>
 </tr>
 </tbody>
 </table>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>enc <span class="op">=</span> Encoder()</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>dec <span class="op">=</span> Decoder()</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> AutoEncoder(enc, dec)</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>batch <span class="op">=</span> torch.rand((<span class="dv">10</span>, <span class="dv">28</span><span class="op">*</span><span class="dv">28</span>))</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> a(batch)</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(y.shape)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>torch.Size([10, 784])</code></pre>
-</div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>ds <span class="op">=</span> MNISTDataset()</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>dl <span class="op">=</span> DataLoader(ds)</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> <span class="bu">next</span>(<span class="bu">iter</span>(dl))</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">len</span>(b), b[<span class="dv">0</span>].shape, b[<span class="dv">1</span>].shape)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>2 torch.Size([1, 1, 28, 28]) torch.Size([1])</code></pre>
-</div>
-</div>
-<hr>
-<p><a href="https://github.com/slegroux/nimrod/blob/main/nimrod/models/autoencoders.py#L33" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
-<section id="autoencoderpl" class="level3">
-<h3 class="anchored" data-anchor-id="autoencoderpl">AutoEncoderPL</h3>
-<blockquote class="blockquote">
-<pre><code> AutoEncoderPL (autoencoder:__main__.AutoEncoder)</code></pre>
-</blockquote>
-<p>Hooks to be used in LightningModule.</p>
+<section id="usage" class="level3">
+<h3 class="anchored" data-anchor-id="usage">Usage</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>autoencoder_pl <span class="op">=</span> AutoEncoderPL(a)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> torch.rand((<span class="dv">5</span>,<span class="dv">28</span><span class="op">*</span><span class="dv">28</span>))</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> autoencoder_pl(b)</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(y.shape)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>ds <span class="op">=</span> MNISTDataset(<span class="st">'~/Data'</span>, train<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Number of samples in the dataset: </span><span class="sc">{</span><span class="bu">len</span>(ds)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>X, y <span class="op">=</span> ds[<span class="dv">0</span>]</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(X.shape, y, X.<span class="bu">type</span>())</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>ds.show_idx(<span class="dv">0</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>train, dev <span class="op">=</span> ds.train_dev_split(<span class="fl">0.8</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>torch.Size([5, 784])</code></pre>
+<pre><code>Number of samples in the dataset: 10000
+torch.Size([1, 28, 28]) 7 torch.FloatTensor</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="image.datasets_files/figure-html/cell-4-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="mnist-datamodule" class="level3">
+<h3 class="anchored" data-anchor-id="mnist-datamodule">MNIST DataModule</h3>
+<hr>
+<p><a href="https://github.com/slegroux/nimrod/blob/main/nimrod/image/datasets.py#L99" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="mnistdatamodule" class="level3">
+<h3 class="anchored" data-anchor-id="mnistdatamodule">MNISTDataModule</h3>
+<blockquote class="blockquote">
+<pre><code> MNISTDataModule (data_dir:str='~/Data/',
+                  train_val_test_split:List[float]=[0.8, 0.1, 0.1],
+                  batch_size:int=64, num_workers:int=0,
+                  pin_memory:bool=False)</code></pre>
+</blockquote>
+<p>A DataModule standardizes the training, val, test splits, data preparation and transforms. The main advantage is consistent data splits, data preparation and transforms across models.</p>
+<p>Example::</p>
+<pre><code>class MyDataModule(LightningDataModule):
+    def __init__(self):
+        super().__init__()
+    def prepare_data(self):
+        # download, split, etc...
+        # only called on 1 GPU/TPU in distributed
+    def setup(self, stage):
+        # make assignments here (val/train/test split)
+        # called on every process in DDP
+    def train_dataloader(self):
+        train_split = Dataset(...)
+        return DataLoader(train_split)
+    def val_dataloader(self):
+        val_split = Dataset(...)
+        return DataLoader(val_split)
+    def test_dataloader(self):
+        test_split = Dataset(...)
+        return DataLoader(test_split)
+    def teardown(self):
+        # clean up after fit or test
+        # called on every process in DDP</code></pre>
+</section>
+<section id="usage-1" class="level3">
+<h3 class="anchored" data-anchor-id="usage-1">Usage</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>dm <span class="op">=</span> MNISTDataModule(</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    data_dir<span class="op">=</span><span class="st">"~/Data/"</span>,train_val_test_split<span class="op">=</span>[<span class="fl">0.8</span>, <span class="fl">0.1</span>, <span class="fl">0.1</span>],</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    batch_size <span class="op">=</span> <span class="dv">64</span>,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    num_workers <span class="op">=</span> <span class="dv">0</span>,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    pin_memory<span class="op">=</span> <span class="va">False</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>dm.prepare_data()</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>dm.setup()</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>test_dl <span class="op">=</span> dm.test_dataloader()</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="bu">len</span>(dm.data_test[<span class="dv">0</span>])</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>imgs <span class="op">=</span> [dm.data_test[i][<span class="dv">0</span>] <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">5</span>)]</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>ImageDataset.show_grid(imgs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="image.datasets_files/figure-html/cell-6-output-1.png" class="img-fluid"></p>
 </div>
 </div>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
