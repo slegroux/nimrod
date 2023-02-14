@@ -6,5 +6,7 @@ website:
       - audio.utils.ipynb
       - data.datasets.ipynb
       - lm.tokenizers.ipynb
+      - models.aligners.ipynb
       - models.autoencoders.ipynb
       - modules.ipynb
+      - text.utils.ipynb
