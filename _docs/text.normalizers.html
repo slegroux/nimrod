@@ -6,9 +6,8 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="Datasets">
 
-<title>nimrod - Datasets</title>
+<title>nimrod - Text Normalizers</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -125,11 +124,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 
 <link rel="stylesheet" href="styles.css">
-<meta property="og:title" content="nimrod - Datasets">
-<meta property="og:description" content="Datasets">
+<meta property="og:title" content="nimrod - Text Normalizers">
+<meta property="og:description" content="source">
 <meta property="og:site-name" content="nimrod">
-<meta name="twitter:title" content="nimrod - Datasets">
-<meta name="twitter:description" content="Datasets">
+<meta name="twitter:title" content="nimrod - Text Normalizers">
+<meta name="twitter:description" content="source">
 <meta name="twitter:card" content="summary">
 </head>
 
@@ -149,7 +148,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     </nav>
   <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
     <div class="container-fluid d-flex justify-content-between">
-      <h1 class="quarto-secondary-nav-title">Datasets</h1>
+      <h1 class="quarto-secondary-nav-title">Text Normalizers</h1>
       <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
         <i class="bi bi-chevron-right"></i>
       </button>
@@ -164,17 +163,40 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./index.html" class="sidebar-item-text sidebar-link">nimrod</a>
+  <a href="./index.html" class="sidebar-item-text sidebar-link"></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  audio - audio.datasets.ipynb - audio.embeddings.ipynb - audio.utils.ipynb
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./image.datasets.html" class="sidebar-item-text sidebar-link">Image Datasets</a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./core.html" class="sidebar-item-text sidebar-link">core</a>
+  <a href="./lm.tokenizers.html" class="sidebar-item-text sidebar-link">Tokenizers</a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./data.datasets.html" class="sidebar-item-text sidebar-link active">Datasets</a>
+  <a href="./models.aligners.html" class="sidebar-item-text sidebar-link">Aligners</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./models.autoencoders.html" class="sidebar-item-text sidebar-link">Autoencoders</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./modules.html" class="sidebar-item-text sidebar-link">Modules</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./text.normalizers.html" class="sidebar-item-text sidebar-link active">Text Normalizers</a>
   </div>
 </li>
     </ul>
@@ -186,8 +208,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#imagedataset" id="toc-imagedataset" class="nav-link active" data-scroll-target="#imagedataset">ImageDataset</a></li>
-  <li><a href="#mnistdataset" id="toc-mnistdataset" class="nav-link" data-scroll-target="#mnistdataset">MNISTDataset</a></li>
+  <li><a href="#tts-cleaning-normalization" id="toc-tts-cleaning-normalization" class="nav-link active" data-scroll-target="#tts-cleaning-normalization">TTS Cleaning &amp; Normalization</a>
+  <ul class="collapse">
+  <li><a href="#ttstextnormalizer" id="toc-ttstextnormalizer" class="nav-link" data-scroll-target="#ttstextnormalizer">TTSTextNormalizer</a></li>
+  <li><a href="#punctuation" id="toc-punctuation" class="nav-link" data-scroll-target="#punctuation">Punctuation</a></li>
+  <li><a href="#puncposition" id="toc-puncposition" class="nav-link" data-scroll-target="#puncposition">PuncPosition</a></li>
+  </ul></li>
   </ul>
 <div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/slegroux/nimrod/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
@@ -196,14 +222,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title d-none d-lg-block">Datasets</h1>
+<h1 class="title d-none d-lg-block">Text Normalizers</h1>
 </div>
 
-<div>
-  <div class="description">
-    Datasets
-  </div>
-</div>
 
 
 <div class="quarto-title-meta">
@@ -217,42 +238,73 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </header>
 
 <!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<section id="tts-cleaning-normalization" class="level2">
+<h2 class="anchored" data-anchor-id="tts-cleaning-normalization">TTS Cleaning &amp; Normalization</h2>
 <hr>
-<p><a href="https://github.com/slegroux/nimrod/blob/main/nimrod/data/datasets.py#L14" target="_blank" style="float:right; font-size:smaller">source</a></p>
-<section id="imagedataset" class="level3">
-<h3 class="anchored" data-anchor-id="imagedataset">ImageDataset</h3>
+<p><a href="https://github.com/slegroux/nimrod/blob/main/nimrod/text/utils.py#L13" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="ttstextnormalizer" class="level3">
+<h3 class="anchored" data-anchor-id="ttstextnormalizer">TTSTextNormalizer</h3>
 <blockquote class="blockquote">
-<pre><code> ImageDataset ()</code></pre>
+<pre><code> TTSTextNormalizer ()</code></pre>
 </blockquote>
-<p>Base class for image datasets providing visualization of (image, label) samples</p>
-<hr>
-<p><a href="https://github.com/slegroux/nimrod/blob/main/nimrod/data/datasets.py#L27" target="_blank" style="float:right; font-size:smaller">source</a></p>
-</section>
-<section id="mnistdataset" class="level3">
-<h3 class="anchored" data-anchor-id="mnistdataset">MNISTDataset</h3>
-<blockquote class="blockquote">
-<pre><code> MNISTDataset (data_root:str='~/Data', train=True, transform=ToTensor())</code></pre>
-</blockquote>
-<p>MNIST digit dataset</p>
+<p>Initialize self. See help(type(self)) for accurate signature.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>ds <span class="op">=</span> MNISTDataset(<span class="st">'~/Data'</span>, train<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Number of samples in the dataset: </span><span class="sc">{</span><span class="bu">len</span>(ds)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>X,y <span class="op">=</span> ds[<span class="dv">0</span>]</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Shape of image: </span><span class="sc">{</span>X<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">, corresponding digit: </span><span class="sc">{</span><span class="bu">int</span>(y)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"types: </span><span class="sc">{</span>X<span class="sc">.</span><span class="bu">type</span>()<span class="sc">}</span><span class="ss">, </span><span class="sc">{</span>y<span class="sc">.</span><span class="bu">type</span>()<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>ds.show(<span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>cleaner <span class="op">=</span> TTSTextNormalizer()</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(cleaner.en_normalize_numbers(<span class="st">"$350"</span>))</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(cleaner.expand_time_english(<span class="st">"12:05pm"</span>))</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(cleaner.english_cleaners(<span class="st">"Oh my dear! this is $5 too soon... It's 1:04 am!"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Number of samples in the dataset: 10000
-Shape of image: torch.Size([784]), corresponding digit: 7
-types: torch.FloatTensor, torch.LongTensor</code></pre>
+<pre><code>three hundred fifty dollars
+twelve oh five p m
+oh my dear! this is five dollars too soon... it's one oh four a m!</code></pre>
 </div>
-<div class="cell-output cell-output-display">
-<p><img src="00_data.datasets_files/figure-html/cell-4-output-2.png" class="img-fluid"></p>
+</div>
+<hr>
+<p><a href="https://github.com/slegroux/nimrod/blob/main/nimrod/text/utils.py#L295" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="punctuation" class="level3">
+<h3 class="anchored" data-anchor-id="punctuation">Punctuation</h3>
+<blockquote class="blockquote">
+<pre><code> Punctuation (puncs:str=';:,.!?¡¿—…"«»“”')</code></pre>
+</blockquote>
+<p>Handle punctuations in text.</p>
+<p>Just strip punctuations from text or strip and restore them later.</p>
+<p>Args: puncs (str): The punctuations to be processed. Defaults to <code>_DEF_PUNCS</code>.</p>
+<p>Example: &gt;&gt;&gt; punc = Punctuation() &gt;&gt;&gt; punc.strip(“This is. example !”) ‘This is example’</p>
+<pre><code>&gt;&gt;&gt; text_striped, punc_map = punc.strip_to_restore("This is. example !")
+&gt;&gt;&gt; ' '.join(text_striped)
+'This is example'
+
+&gt;&gt;&gt; text_restored = punc.restore(text_striped, punc_map)
+&gt;&gt;&gt; text_restored[0]
+'This is. example !'</code></pre>
+<hr>
+<p><a href="https://github.com/slegroux/nimrod/blob/main/nimrod/text/utils.py#L287" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="puncposition" class="level3">
+<h3 class="anchored" data-anchor-id="puncposition">PuncPosition</h3>
+<blockquote class="blockquote">
+<pre><code> PuncPosition (value, names=None, module=None, qualname=None, type=None,
+               start=1)</code></pre>
+</blockquote>
+<p>Enum for the punctuations positions</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>punc <span class="op">=</span> Punctuation()</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>text <span class="op">=</span> <span class="st">"This is. This is, example!"</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(punc.strip(text))</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>split_text, puncs <span class="op">=</span> punc.strip_to_restore(text)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(split_text, <span class="st">" ---- "</span>, puncs)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>restored_text <span class="op">=</span> punc.restore(split_text, puncs)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(restored_text)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>This is This is example
+['This is', 'This is', 'example']  ----  [_punc_index(punc='. ', position=&lt;PuncPosition.MIDDLE: 2&gt;), _punc_index(punc=', ', position=&lt;PuncPosition.MIDDLE: 2&gt;), _punc_index(punc='!', position=&lt;PuncPosition.END: 1&gt;)]
+['This is. This is, example!']</code></pre>
 </div>
 </div>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
