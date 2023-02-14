@@ -3,14 +3,14 @@
 # %% auto 0
 __all__ = ['Segment', 'Point', 'AlignerWAV2VEC2']
 
-# %% ../../nbs/models.aligners.ipynb 3
-from ..text.utils import TTSTextNormalizer
-from ..text.utils import Punctuation
+# %% ../../nbs/models.aligners.ipynb 4
+from ..text.normalizers import TTSTextNormalizer
+from ..text.normalizers import Punctuation
 import torch
 import torchaudio
 from dataclasses import dataclass
 
-# %% ../../nbs/models.aligners.ipynb 4
+# %% ../../nbs/models.aligners.ipynb 5
 @dataclass
 class Segment:
     label: str

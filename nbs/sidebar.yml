@@ -2,11 +2,12 @@ website:
   sidebar:
     contents:
       - index.ipynb
+      - audio.datasets.ipynb
       - audio.embeddings.ipynb
       - audio.utils.ipynb
-      - data.datasets.ipynb
+      - image.datasets.ipynb
       - lm.tokenizers.ipynb
       - models.aligners.ipynb
       - models.autoencoders.ipynb
       - modules.ipynb
-      - text.utils.ipynb
+      - text.normalizers.ipynb
