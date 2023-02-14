@@ -179,13 +179,11 @@ class MNISTDataModule(LightningDataModule):
 
 
 # %% ../../nbs/data.datasets.ipynb 15
-from lhotse.dataset import BucketingSampler
+from lhotse.dataset import BucketingSampler, OnTheFlyFeatures
 from lhotse.dataset.collation import TokenCollater
 from lhotse.recipes import download_librispeech, prepare_librispeech
 from lhotse.dataset.vis import plot_batch
-from lhotse import CutSet
-from lhotse import Fbank, FbankConfig
-from lhotse.dataset import OnTheFlyFeatures
+from lhotse import CutSet, RecordingSet, SupervisionSet, Fbank, FbankConfig
 from pathlib import Path
 from pprint import pprint
 
@@ -345,3 +343,28 @@ class LibriTTSDataModule(LightningDataModule):
         return {
             "odim": len(self.tokenizer.idx2token),
         }
+
+# %% ../../nbs/data.datasets.ipynb 43
+import os
+from pathlib import Path
+from pprint import pprint
+from dataclasses import asdict
+from lhotse import CutSet, Mfcc, Fbank
+from lhotse.recipes import download_librispeech, prepare_librispeech
+from lhotse.dataset.speech_synthesis import SpeechSynthesisDataset
+from lhotse import SupervisionSegment
+from lhotse.utils import fastcopy
+import re
+from lhotse.dataset import (
+    CutMix,
+    DynamicBucketingSampler,
+    K2SpeechRecognitionDataset,
+    OnTheFlyFeatures,
+    PerturbSpeed,
+    PerturbVolume,
+    RandomizedSmoothing,
+    ReverbWithImpulseResponse,
+    SpecAugment,
+)
+from lhotse import CutSet, Fbank, RecordingSet
+from lhotse.dataset.signal_transforms import GlobalMVN

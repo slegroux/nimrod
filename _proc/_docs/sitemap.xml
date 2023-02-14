@@ -2,30 +2,38 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://slegroux.github.io/nimrod/index.html</loc>
-    <lastmod>2023-02-11T04:43:04.160Z</lastmod>
+    <lastmod>2023-02-13T23:58:49.477Z</lastmod>
+  </url>
+  <url>
+    <loc>https://slegroux.github.io/nimrod/text.utils.html</loc>
+    <lastmod>2023-02-13T23:58:49.961Z</lastmod>
   </url>
   <url>
     <loc>https://slegroux.github.io/nimrod/modules.html</loc>
-    <lastmod>2023-02-11T04:44:05.726Z</lastmod>
+    <lastmod>2023-02-13T23:58:50.438Z</lastmod>
+  </url>
+  <url>
+    <loc>https://slegroux.github.io/nimrod/models.aligners.html</loc>
+    <lastmod>2023-02-14T00:01:03.341Z</lastmod>
   </url>
   <url>
     <loc>https://slegroux.github.io/nimrod/audio.embeddings.html</loc>
-    <lastmod>2023-02-11T04:42:07.811Z</lastmod>
+    <lastmod>2023-02-13T23:58:51.578Z</lastmod>
   </url>
   <url>
     <loc>https://slegroux.github.io/nimrod/audio.utils.html</loc>
-    <lastmod>2023-02-11T04:43:16.600Z</lastmod>
+    <lastmod>2023-02-13T23:58:52.046Z</lastmod>
   </url>
   <url>
     <loc>https://slegroux.github.io/nimrod/lm.tokenizers.html</loc>
-    <lastmod>2023-02-11T04:43:51.161Z</lastmod>
+    <lastmod>2023-02-13T23:58:52.462Z</lastmod>
   </url>
   <url>
     <loc>https://slegroux.github.io/nimrod/models.autoencoders.html</loc>
-    <lastmod>2023-02-11T04:43:53.933Z</lastmod>
+    <lastmod>2023-02-13T23:58:52.926Z</lastmod>
   </url>
   <url>
     <loc>https://slegroux.github.io/nimrod/data.datasets.html</loc>
-    <lastmod>2023-02-11T04:43:00.836Z</lastmod>
+    <lastmod>2023-02-13T23:58:53.850Z</lastmod>
   </url>
 </urlset>
