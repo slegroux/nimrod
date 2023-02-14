@@ -1,13 +1,23 @@
 website:
   sidebar:
+    style: "docked"
     contents:
       - index.ipynb
-      - audio.datasets.ipynb
-      - audio.embeddings.ipynb
-      - audio.utils.ipynb
-      - image.datasets.ipynb
-      - lm.tokenizers.ipynb
-      - models.aligners.ipynb
-      - models.autoencoders.ipynb
-      - modules.ipynb
-      - text.normalizers.ipynb
+      - section: "Audio"
+        contents:
+          - audio.datasets.ipynb
+          - audio.embeddings.ipynb
+          - audio.utils.ipynb
+      - section: "Text"
+        contents:
+          - text.normalizers.ipynb
+      - section: "Image"
+        contents:
+          - image.datasets.ipynb
+      - section: "Models"
+        contents:
+          - models.aligners.ipynb
+          - models.autoencoders.ipynb
+      - section: "Modules"
+        contents:
+          - modules.ipynb
