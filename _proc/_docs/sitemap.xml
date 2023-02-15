@@ -2,42 +2,46 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://slegroux.github.io/nimrod/index.html</loc>
-    <lastmod>2023-02-14T21:03:40.549Z</lastmod>
+    <lastmod>2023-02-15T01:54:12.830Z</lastmod>
   </url>
   <url>
     <loc>https://slegroux.github.io/nimrod/text.normalizers.html</loc>
-    <lastmod>2023-02-14T20:55:06.007Z</lastmod>
+    <lastmod>2023-02-15T01:54:13.350Z</lastmod>
+  </url>
+  <url>
+    <loc>https://slegroux.github.io/nimrod/text.tokenizers.html</loc>
+    <lastmod>2023-02-15T01:54:13.830Z</lastmod>
   </url>
   <url>
     <loc>https://slegroux.github.io/nimrod/modules.html</loc>
-    <lastmod>2023-02-14T20:55:06.491Z</lastmod>
+    <lastmod>2023-02-15T01:54:14.338Z</lastmod>
   </url>
   <url>
     <loc>https://slegroux.github.io/nimrod/models.aligners.html</loc>
-    <lastmod>2023-02-14T20:55:07.011Z</lastmod>
+    <lastmod>2023-02-15T01:54:14.822Z</lastmod>
   </url>
   <url>
     <loc>https://slegroux.github.io/nimrod/audio.utils.html</loc>
-    <lastmod>2023-02-14T20:55:07.475Z</lastmod>
+    <lastmod>2023-02-15T01:54:15.314Z</lastmod>
   </url>
   <url>
     <loc>https://slegroux.github.io/nimrod/audio.embeddings.html</loc>
-    <lastmod>2023-02-14T20:55:08.083Z</lastmod>
+    <lastmod>2023-02-15T01:54:15.994Z</lastmod>
   </url>
   <url>
     <loc>https://slegroux.github.io/nimrod/lm.tokenizers.html</loc>
-    <lastmod>2023-02-14T20:55:08.511Z</lastmod>
+    <lastmod>2023-02-15T01:54:16.486Z</lastmod>
   </url>
   <url>
     <loc>https://slegroux.github.io/nimrod/models.autoencoders.html</loc>
-    <lastmod>2023-02-14T20:55:08.963Z</lastmod>
+    <lastmod>2023-02-15T01:54:16.986Z</lastmod>
   </url>
   <url>
     <loc>https://slegroux.github.io/nimrod/audio.datasets.html</loc>
-    <lastmod>2023-02-14T21:04:27.006Z</lastmod>
+    <lastmod>2023-02-15T01:54:17.850Z</lastmod>
   </url>
   <url>
     <loc>https://slegroux.github.io/nimrod/image.datasets.html</loc>
-    <lastmod>2023-02-14T20:55:10.311Z</lastmod>
+    <lastmod>2023-02-15T01:54:18.346Z</lastmod>
   </url>
 </urlset>
