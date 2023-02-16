@@ -10,6 +10,7 @@ from phonemizer.backend.espeak.words_mismatch import WordMismatch
 from phonemizer.punctuation import Punctuation
 from phonemizer.separator import Separator
 from phonemizer import phonemize
+from torch.utils.data import DataLoader
 
 # %% ../../nbs/text.tokenizers.ipynb 6
 class Phonemizer():
@@ -40,19 +41,14 @@ class Phonemizer():
         )
 
 # %% ../../nbs/text.tokenizers.ipynb 12
-import torchtext
 import torch
 from collections import Counter
 from torchtext.data.utils import get_tokenizer
 from torchtext.vocab import build_vocab_from_iterator
 from collections import Counter
-from torchtext.vocab import Vocab
-from torchtext.utils import download_from_url, extract_archive
-import spacy
 from torchtext.datasets import AG_NEWS
 from typing import Iterable
 from torch.nn.utils.rnn import pad_sequence
-# import io
 
 # %% ../../nbs/text.tokenizers.ipynb 13
 class Tokenizer:

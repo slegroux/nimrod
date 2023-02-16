@@ -34,6 +34,8 @@ class TTSDataset(Dataset):
 
 # %% ../../../nbs/audio.datasets.tts.ipynb 10
 from lhotse.recipes import download_libritts, prepare_libritts
+from ...text.tokenizers import Tokenizer
+from ..embedding import EncoDec
 
 # %% ../../../nbs/audio.datasets.tts.ipynb 11
 class LibriTTSDataModule(LightningDataModule):
