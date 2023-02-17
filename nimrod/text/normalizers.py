@@ -5,9 +5,10 @@ __all__ = ['TTSTextNormalizer', 'PuncPosition', 'Punctuation']
 
 # %% ../../nbs/text.normalizers.ipynb 3
 import re
-from typing import Dict
+from typing import Dict, List
 import inflect
 from anyascii import anyascii
+from multipledispatch import dispatch
 
 # %% ../../nbs/text.normalizers.ipynb 5
 class TTSTextNormalizer:
@@ -227,7 +228,19 @@ class TTSTextNormalizer:
         text = self.collapse_whitespace(text)
         return text
 
-    def english_cleaners(self, text):
+    def _clean_english(self, text):
+        # text = convert_to_ascii(text)
+        text = self.lowercase(text)
+        text = self.expand_time_english(text)
+        text = self.en_normalize_numbers(text)
+        text = self.expand_abbreviations(text)
+        text = self.replace_symbols(text)
+        text = self.remove_aux_symbols(text)
+        text = self.collapse_whitespace(text)
+        return(text)
+
+    @dispatch(str)
+    def english_cleaners(self, text:str)->str:
         """Pipeline for English text, including number and abbreviation expansion."""
         # text = convert_to_ascii(text)
         text = self.lowercase(text)
@@ -238,6 +251,11 @@ class TTSTextNormalizer:
         text = self.remove_aux_symbols(text)
         text = self.collapse_whitespace(text)
         return text
+    
+    @dispatch(list)
+    def english_cleaners(self, texts:List[str])->str:
+        """Pipeline for English text, including number and abbreviation expansion."""
+        return [self._clean_english(text) for text in texts]
 
     def phoneme_cleaners(self, text):
         """Pipeline for phonemes mode, including number and abbreviation expansion."""
