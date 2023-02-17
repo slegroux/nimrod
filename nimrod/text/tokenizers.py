@@ -12,6 +12,7 @@ from phonemizer.separator import Separator
 from phonemizer import phonemize
 from torch.utils.data import DataLoader
 from multipledispatch import dispatch
+from typing import List, Tuple
 
 # %% ../../nbs/text.tokenizers.ipynb 6
 class Phonemizer():
@@ -28,7 +29,8 @@ class Phonemizer():
         self.strip = strip
         self.preserve_punctuation = preserve_punctuation
     
-    def __call__(self, text, n_jobs=1):
+    @dispatch(str)
+    def __call__(self, text:str, n_jobs=1)->str:
         return(
             phonemize(
                 text,
@@ -41,6 +43,20 @@ class Phonemizer():
                 )
         )
 
+    @dispatch(list)
+    def __call__(self, texts:List[str], n_jobs=1)->List[str]:
+        return(
+            [phonemize(
+                text,
+                language=self.language,
+                backend=self.backend,
+                separator=self.separator,
+                strip=self.strip,
+                preserve_punctuation=self.preserve_punctuation,
+                njobs=n_jobs
+                )
+        for text in texts])
+
 # %% ../../nbs/text.tokenizers.ipynb 12
 import torch
 from collections import Counter
@@ -48,9 +64,8 @@ from torchtext.data.utils import get_tokenizer
 from torchtext.vocab import build_vocab_from_iterator
 from collections import Counter
 from torchtext.datasets import AG_NEWS
-from typing import Iterable, List
+from typing import Iterable, List, Tuple
 from torch.nn.utils.rnn import pad_sequence
-from typing import List
 
 # %% ../../nbs/text.tokenizers.ipynb 13
 class Tokenizer:
@@ -59,12 +74,19 @@ class Tokenizer:
             language = 'en_core_web_sm'
         self.tokenizer = get_tokenizer(backend, language=language)
 
-    def __call__(self, text:str):
+    @dispatch(str)
+    def __call__(self, text:str)->str:
         return self.tokenizer(text)
     
-    def tokenize_iter(self, data_iter:Iterable):
+    @dispatch(object) # to replace Iterable
+    # works with agnews type of dataset [(index, text)]
+    def __call__(self, data_iter:Iterable)->Iterable:
         for _, text in data_iter:
             yield self.tokenizer(text)
+    
+    @dispatch(list)
+    def __call__(self, texts:List[str])->List[str]:
+        return [self.tokenizer(text) for text in texts]
 
     def inverse(self, tokens:List[int]):
         # TODO: take care of white spaces
@@ -108,7 +130,13 @@ class TextCollater:
         self._numericalizer = numericalizer
         self.padding_value = padding_value
 
-    def collate_fn(self, batch):
+    def collate_list(self, texts:List[str])->Tuple[torch.Tensor, torch.Tensor]:
+        tokens = self._numericalizer(texts)
+        text_lens = torch.LongTensor([token.shape[0] for token in tokens])
+        text_pad = pad_sequence(tokens, batch_first=True, padding_value=self.padding_value)
+        return text_pad, text_lens
+
+    def collate_agnews(self, batch)->Tuple[torch.Tensor, torch.Tensor]:
         texts = [row[1] for row in batch]
         tokens = self._numericalizer(texts)
         text_lens = torch.LongTensor([token.shape[0] for token in tokens])
