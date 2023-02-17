@@ -12,7 +12,8 @@ from multipledispatch import dispatch
 
 # %% ../../nbs/text.normalizers.ipynb 5
 class TTSTextNormalizer:
-    def __init__(self):
+    def __init__(self, language='en'):
+        self.language = language
         # ABBREVIATIONS
         self.abbreviations_en = [
             (re.compile("\\b%s\\." % x[0], re.IGNORECASE), x[1])
@@ -228,18 +229,6 @@ class TTSTextNormalizer:
         text = self.collapse_whitespace(text)
         return text
 
-    def _clean_english(self, text):
-        # text = convert_to_ascii(text)
-        text = self.lowercase(text)
-        text = self.expand_time_english(text)
-        text = self.en_normalize_numbers(text)
-        text = self.expand_abbreviations(text)
-        text = self.replace_symbols(text)
-        text = self.remove_aux_symbols(text)
-        text = self.collapse_whitespace(text)
-        return(text)
-
-    @dispatch(str)
     def english_cleaners(self, text:str)->str:
         """Pipeline for English text, including number and abbreviation expansion."""
         # text = convert_to_ascii(text)
@@ -251,11 +240,6 @@ class TTSTextNormalizer:
         text = self.remove_aux_symbols(text)
         text = self.collapse_whitespace(text)
         return text
-    
-    @dispatch(list)
-    def english_cleaners(self, texts:List[str])->str:
-        """Pipeline for English text, including number and abbreviation expansion."""
-        return [self._clean_english(text) for text in texts]
 
     def phoneme_cleaners(self, text):
         """Pipeline for phonemes mode, including number and abbreviation expansion."""
@@ -291,6 +275,32 @@ class TTSTextNormalizer:
         text = self.remove_aux_symbols(text)
         text = self.collapse_whitespace(text)
         return text
+    
+    @dispatch(str)
+    def __call__(self, text:str)->str:
+        if self.language == 'en':
+            cleaner = self.english_cleaners
+        elif self.language == 'fr':
+            cleaner = self.french_cleaners
+        elif self.language == 'pt':
+            cleaner = self.portuguese_cleaners
+        else:
+            cleaner = self.multilingual_cleaners
+        return cleaner(text)
+    
+    @dispatch(list)
+    def __call__(self, texts:List[str])->List[str]:
+        if self.language == 'en':
+            cleaner = self.english_cleaners
+        elif self.language == 'fr':
+            cleaner = self.french_cleaners
+        elif self.language == 'pt':
+            cleaner = self.portuguese_cleaners
+        else:
+            cleaner = self.multilingual_cleaners
+        return [cleaner(text) for text in texts]
+
+    
 
 
 # %% ../../nbs/text.normalizers.ipynb 7
