@@ -8,7 +8,7 @@ import re
 from typing import Dict, List
 import inflect
 from anyascii import anyascii
-from multipledispatch import dispatch
+from plum import dispatch
 
 # %% ../../nbs/text.normalizers.ipynb 5
 class TTSTextNormalizer:
@@ -276,7 +276,7 @@ class TTSTextNormalizer:
         text = self.collapse_whitespace(text)
         return text
     
-    @dispatch(str)
+    @dispatch
     def __call__(self, text:str)->str:
         if self.language == 'en':
             cleaner = self.english_cleaners
@@ -288,7 +288,7 @@ class TTSTextNormalizer:
             cleaner = self.multilingual_cleaners
         return cleaner(text)
     
-    @dispatch(list)
+    @dispatch
     def __call__(self, texts:List[str])->List[str]:
         if self.language == 'en':
             cleaner = self.english_cleaners

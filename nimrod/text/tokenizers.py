@@ -104,7 +104,7 @@ class Tokenizer:
 # %% ../../nbs/text.tokenizers.ipynb 17
 # TODO: add more special characters
 class Numericalizer():
-    def __init__(self, tokens_iter:Iterable, specials=["<unk>", "<pad>", "<bos>", "<eos>"]):
+    def __init__(self, tokens_iter:Iterable, specials=["<pad>", "<unk>", "<bos>", "<eos>"]):
         self._vocab = self.build_map_from_iter(tokens_iter, specials)
     
     def build_map_from_iter(self,data_iter:Iterable, specials=None):
@@ -143,12 +143,12 @@ class Numericalizer():
         return [self._vocab.get_itos()[i] for i in indices]
     
 
-# %% ../../nbs/text.tokenizers.ipynb 22
+# %% ../../nbs/text.tokenizers.ipynb 23
 class TextCollater:
     def __init__(self,
                  tokenizer,
                  numericalizer,
-                 padding_value:int= -1
+                 padding_value:int=0
                 ):
         self._numericalizer = numericalizer
         self._tokenizer = tokenizer
