@@ -11,7 +11,7 @@ from phonemizer.punctuation import Punctuation
 from phonemizer.separator import Separator
 from phonemizer import phonemize
 from torch.utils.data import DataLoader
-from multipledispatch import dispatch
+from plum import dispatch
 from typing import List, Tuple
 
 # %% ../../nbs/text.tokenizers.ipynb 6
@@ -29,7 +29,7 @@ class Phonemizer():
         self.strip = strip
         self.preserve_punctuation = preserve_punctuation
     
-    @dispatch(str)
+    @dispatch
     def __call__(self, text:str, n_jobs=1)->str:
         return(
             phonemize(
@@ -43,7 +43,7 @@ class Phonemizer():
                 )
         )
 
-    @dispatch(list)
+    @dispatch
     def __call__(self, texts:List[str], n_jobs=1)->List[str]:
         return(
             [phonemize(
@@ -57,9 +57,10 @@ class Phonemizer():
                 )
         for text in texts])
 
-# %% ../../nbs/text.tokenizers.ipynb 12
+# %% ../../nbs/text.tokenizers.ipynb 11
 import torch
 from collections import Counter
+import torchtext
 from torchtext.data.utils import get_tokenizer
 from torchtext.vocab import build_vocab_from_iterator
 from collections import Counter
@@ -67,78 +68,103 @@ from torchtext.datasets import AG_NEWS
 from typing import Iterable, List, Tuple
 from torch.nn.utils.rnn import pad_sequence
 
-# %% ../../nbs/text.tokenizers.ipynb 13
+# %% ../../nbs/text.tokenizers.ipynb 12
 class Tokenizer:
     def __init__(self, backend='spacy', language='en'):
         if language == 'en':
             language = 'en_core_web_sm'
         self.tokenizer = get_tokenizer(backend, language=language)
 
-    @dispatch(str)
-    def __call__(self, text:str)->str:
+    @dispatch
+    def __call__(self, text:str)->List[str]:
         return self.tokenizer(text)
     
-    @dispatch(object) # to replace Iterable
+    @dispatch
+    def __call__(self, texts:List[str])->List[List[str]]:
+        return [self.tokenizer(text) for text in texts]
+    
+    @dispatch # to replace Iterable
     # works with agnews type of dataset [(index, text)]
     def __call__(self, data_iter:Iterable)->Iterable:
         for _, text in data_iter:
             yield self.tokenizer(text)
-    
-    @dispatch(list)
-    def __call__(self, texts:List[str])->List[str]:
-        return [self.tokenizer(text) for text in texts]
 
-    def inverse(self, tokens:List[int]):
+    @dispatch    
+    def inverse(self, tokens:List[str])->str:
         # TODO: take care of white spaces
         return ' '.join(tokens)
+
+    @dispatch
+    def inverse(self, list_of_tokens:List[List[str]])->List[str]:
+        s = []
+        for tokens in list_of_tokens:
+            s.append(' '.join(tokens)) 
+        return s
 
 # %% ../../nbs/text.tokenizers.ipynb 17
 # TODO: add more special characters
 class Numericalizer():
-    def __init__(self, tokenizer:Tokenizer, data_iter:Iterable, specials=["<unk>"]):
-        self._tokenizer = tokenizer
-        self._vocab = self.build_map_from_iter(data_iter, specials=specials)
+    def __init__(self, tokens_iter:Iterable, specials=["<unk>", "<pad>", "<bos>", "<eos>"]):
+        self._vocab = self.build_map_from_iter(tokens_iter, specials)
     
-    def build_map_from_iter(self,data_iter:Iterable, specials = ["<unk>"]):
-        self._vocab = build_vocab_from_iterator(self._tokenizer.tokenize_iter(data_iter), specials=specials)
+    def build_map_from_iter(self,data_iter:Iterable, specials=None):
+        self._vocab = torchtext.vocab.build_vocab_from_iterator(data_iter, specials=specials)
         if "<unk>" in specials:
             self._vocab.set_default_index(self._vocab["<unk>"])
         return self._vocab
 
-    @dispatch(list, type=torch.LongTensor)
-    def __call__(self, texts:List[str], type=torch.LongTensor)->List[List[int]]:
-        return [type(self._vocab(self._tokenizer(text))) for text in texts]
+    @dispatch
+    def __call__(self, texts:List[str])->List[List[int]]:
+        # TODO: check self._vocab has been built
+        return [self._vocab[text] for text in texts]
+    
+    @dispatch
+    def __call__(self, texts:List[List[str]]):
+        # TODO: use nested list comprehension
+        res = []
+        for row in texts:
+            res.append([self._vocab[text] for text in row])
+        return res
         
-    @dispatch(str)
-    def __call__(self, text:str)->List[int]:
-        return self._vocab(self._tokenizer(text))
+    @dispatch
+    def __call__(self, text:str)->int:
+        return self._vocab[text]
     
     @property
     def vocab(self):
         return(self._vocab)
     
-    def inverse(self, indices:List[int]):
-        return self._tokenizer.inverse([self._vocab.get_itos()[i] for i in indices])
+    @dispatch
+    def inverse(self, idx:int)->str:
+        return self._vocab.get_itos()[idx]
+
+    @dispatch
+    def inverse(self, indices:List[int])->List[str]:
+        return [self._vocab.get_itos()[i] for i in indices]
     
 
-# %% ../../nbs/text.tokenizers.ipynb 21
+# %% ../../nbs/text.tokenizers.ipynb 22
 class TextCollater:
     def __init__(self,
+                 tokenizer,
                  numericalizer,
                  padding_value:int= -1
-                 ):
+                ):
         self._numericalizer = numericalizer
+        self._tokenizer = tokenizer
         self.padding_value = padding_value
 
     def collate_list(self, texts:List[str])->Tuple[torch.Tensor, torch.Tensor]:
-        tokens = self._numericalizer(texts)
-        text_lens = torch.LongTensor([token.shape[0] for token in tokens])
-        text_pad = pad_sequence(tokens, batch_first=True, padding_value=self.padding_value)
+        token_list = self._tokenizer(texts)
+        token_list = [torch.LongTensor(tokens) for tokens in self._numericalizer(token_list)]
+        text_lens = torch.LongTensor([tokens.shape[0] for tokens in token_list])
+        text_pad = pad_sequence(token_list, batch_first=True, padding_value=self.padding_value)
         return text_pad, text_lens
 
     def collate_agnews(self, batch)->Tuple[torch.Tensor, torch.Tensor]:
-        texts = [row[1] for row in batch]
-        tokens = self._numericalizer(texts)
-        text_lens = torch.LongTensor([token.shape[0] for token in tokens])
-        text_pad = pad_sequence(tokens, batch_first=True, padding_value=self.padding_value)
+        texts = [item[1] for item in batch]
+        token_list = self._tokenizer(texts)
+        token_list = [torch.LongTensor(tokens) for tokens in self._numericalizer(token_list)]
+        text_lens = torch.LongTensor([tokens.shape[0] for tokens in token_list])
+        text_pad = pad_sequence(token_list, batch_first=True, padding_value=self.padding_value)
         return text_pad, text_lens
