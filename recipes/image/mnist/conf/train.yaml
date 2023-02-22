@@ -1,0 +1,132 @@
+# @package _global_
+
+run_id: ${now:%Y-%m-%d}_${now:%H-%M-%S}
+project: "mnist"
+ckpt_path: null # ckpt to resume training from
+seed: 42
+test: True
+train: True
+ignore_warnings: True
+tags: ["dev"]
+datamodules:
+  batch_size: 2048
+
+paths:
+  root_dir: .
+  data_dir: ${paths.root_dir}/data/
+  log_dir: ${paths.root_dir}/logs/
+  output_dir: ${hydra:runtime.output_dir}
+  work_dir: ${hydra:runtime.cwd}
+
+hydra:
+  defaults:
+    - override hydra_logging: colorlog
+    - override job_logging: colorlog
+  run:
+    dir: ${paths.log_dir}/runs/${run_id}
+  sweep:
+    dir: ${paths.log_dir}/multiruns/${now:%Y-%m-%d}_${now:%H-%M-%S}
+    subdir: ${hydra.job.num}
+
+datasets:
+  train:
+    _target_: nimrod.data.datasets.MNISTDataset
+    data_dir: "~/Data"
+    train: True
+    transform:
+      _target_: torchvision.transforms.ToTensor
+  test:
+    _target_: nimrod.data.datasets.MNISTDataset
+    data_dir: "~/Data"
+    train: False
+    transform:
+      _target_: torchvision.transforms.ToTensor
+
+datamodule:
+  _target_: nimrod.data.datasets.MNISTDataModule
+  data_dir: "~/Data"
+  train_val_test_split: [0.8, 0.1, 0.1]
+  batch_size: 1024
+  num_workers: 0
+  pin_memory: False
+
+dataloaders:
+  train:
+    _target_: torch.utils.data.DataLoader
+    batch_size: 256
+    num_workers: 10
+    shuffle: True
+    pin_memory: True
+    drop_last: True
+    sampler: null
+    batch_sampler: null
+    collate_fn: null
+  test:
+    _target_: torch.utils.data.DataLoader
+    batch_size: 256
+    num_workers: 10
+    shuffle: False
+    pin_memory: False
+    drop_last: False
+
+model:
+  _target_: nimrod.models.autoencoders.AutoEncoderPL
+  autoencoder:
+    _target_: nimrod.models.autoencoders.AutoEncoder
+    encoder:
+      _target_: nimrod.models.autoencoders.Encoder
+    decoder:
+      _target_: nimrod.models.autoencoders.Decoder
+
+trainer:
+  _target_: pytorch_lightning.Trainer
+  default_root_dir: ${paths.output_dir}
+  min_epochs: 1 # prevents early stopping
+  max_epochs: 250
+  devices: auto
+  accelerator: gpu
+  strategy: ddp
+  # mixed precision for extra speed-up
+  precision: 16
+  # perform a validation loop every N training epochs
+  check_val_every_n_epoch: 1
+  # set True to to ensure deterministic results
+  # makes training slower but gives more reproducibility than just setting seeds
+  deterministic: False
+
+callbacks:
+  early_stopping:
+    _target_: pytorch_lightning.callbacks.EarlyStopping
+    monitor: val/loss
+    mode: min
+    patience: 10
+    min_delta: 0
+  model_checkpoint:
+    _target_: pytorch_lightning.callbacks.ModelCheckpoint
+    monitor: "val/loss"
+    mode: min
+    save_top_k: 1
+    save_last: True
+    verbose: True
+    dirpath: ${paths.output_dir}/checkpoints
+    filename: "epoch{epoch:03d}-val_loss{val/loss:.2f}"
+    auto_insert_metric_name: False
+
+logger:
+  _target_: pytorch_lightning.loggers.wandb.WandbLogger
+  project: ${project}
+  name: ${run_id}
+  save_dir: ${paths.output_dir}
+  offline: False # store only locally
+  id: null # give id to resume experiment
+  entity: "slegroux"
+  log_model: False
+  prefix: ""
+  group: ""
+  tags: ${tags}
+
+profiler:
+  _target_: pytorch_lightning.profilers.SimpleProfiler
+  dirpath: ${paths.output_dir}
+  filename: "simple_perf_logs"
+  extended: True
