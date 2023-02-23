@@ -2,7 +2,7 @@ project:
   output-dir: _docs
 
 website:
-  title: "nimrod"
+  title: "slg_nimrod"
   site-url: "https://slegroux.github.io/nimrod"
   description: "minimal deep learning framework"
   repo-branch: main
