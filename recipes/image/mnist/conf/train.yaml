@@ -8,8 +8,6 @@ test: True
 train: True
 ignore_warnings: True
 tags: ["dev"]
-datamodules:
-  batch_size: 2048
 
 paths:
   root_dir: .
@@ -25,22 +23,8 @@ hydra:
   run:
     dir: ${paths.log_dir}/runs/${run_id}
   sweep:
-    dir: ${paths.log_dir}/multiruns/${now:%Y-%m-%d}_${now:%H-%M-%S}
+    dir: ${paths.log_dir}/multiruns/${run_id}
     subdir: ${hydra.job.num}
-
-datasets:
-  train:
-    _target_: nimrod.data.datasets.MNISTDataset
-    data_dir: "~/Data"
-    train: True
-    transform:
-      _target_: torchvision.transforms.ToTensor
-  test:
-    _target_: nimrod.data.datasets.MNISTDataset
-    data_dir: "~/Data"
-    train: False
-    transform:
-      _target_: torchvision.transforms.ToTensor
 
 datamodule:
   _target_: nimrod.data.datasets.MNISTDataModule
@@ -50,33 +34,13 @@ datamodule:
   num_workers: 0
   pin_memory: False
 
-dataloaders:
-  train:
-    _target_: torch.utils.data.DataLoader
-    batch_size: 256
-    num_workers: 10
-    shuffle: True
-    pin_memory: True
-    drop_last: True
-    sampler: null
-    batch_sampler: null
-    collate_fn: null
-  test:
-    _target_: torch.utils.data.DataLoader
-    batch_size: 256
-    num_workers: 10
-    shuffle: False
-    pin_memory: False
-    drop_last: False
-
 model:
-  _target_: nimrod.models.autoencoders.AutoEncoderPL
-  autoencoder:
-    _target_: nimrod.models.autoencoders.AutoEncoder
-    encoder:
-      _target_: nimrod.models.autoencoders.Encoder
-    decoder:
-      _target_: nimrod.models.autoencoders.Decoder
+  _target_: nimrod.models.mlp.MLP_PL
+  mlp:
+    _target_: nimrod.models.mlp.MLP
+    n_in: 784
+    n_h: 64
+    n_out: 10
 
 trainer:
   _target_: pytorch_lightning.Trainer
@@ -86,13 +50,14 @@ trainer:
   devices: auto
   accelerator: gpu
   strategy: ddp
-  # mixed precision for extra speed-up
   precision: 16
+  auto_lr_find: False
   # perform a validation loop every N training epochs
   check_val_every_n_epoch: 1
-  # set True to to ensure deterministic results
-  # makes training slower but gives more reproducibility than just setting seeds
+  # set True to to ensure deterministic results makes training slower but gives more reproducibility than just setting seeds
   deterministic: False
+  benchmark: False
+  fast_dev_run: False
 
 callbacks:
   early_stopping:
