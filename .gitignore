@@ -136,3 +136,4 @@ tests/
 *.pt
 *.onnx
 *.ckpt
+logs/
