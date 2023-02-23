@@ -4,17 +4,23 @@
 __all__ = ['ImageDataset', 'MNISTDataset', 'MNISTDataModule']
 
 # %% ../../nbs/image.datasets.ipynb 3
-import pandas as pd
-import torchvision
 import torch
-from matplotlib import pyplot as plt
 import torch.utils.data as data
-from torchvision.utils import make_grid
-from pytorch_lightning import LightningDataModule
 from torch.utils.data import ConcatDataset, DataLoader, Dataset, random_split
+import torchvision
 from torchvision.transforms import transforms
 from torchvision.datasets import MNIST
+from torchvision.utils import make_grid
+from pytorch_lightning import LightningDataModule
+
+import pandas as pd
+from matplotlib import pyplot as plt
+
+from omegaconf import OmegaConf
+from hydra.utils import instantiate
+
 from typing import Any, Dict, Optional, Tuple, List
+
 
 # %% ../../nbs/image.datasets.ipynb 5
 class ImageDataset(Dataset):
@@ -95,7 +101,7 @@ class MNISTDataset(ImageDataset):
 
 
 
-# %% ../../nbs/image.datasets.ipynb 12
+# %% ../../nbs/image.datasets.ipynb 14
 class MNISTDataModule(LightningDataModule):
     def __init__(
         self,
