@@ -15,14 +15,15 @@ from lhotse.dataset.vis import plot_batch
 from lhotse import CutSet, RecordingSet, SupervisionSet, Fbank, FbankConfig
 from pathlib import Path
 from pprint import pprint
+from typing import List, Dict, Optional, Union
 
 # %% ../../../nbs/audio.datasets.tts.ipynb 6
 class LhotseTTSDataset(Dataset):
     def __init__(self,
-        tokenizer:TokenCollater, # text tokenizer
-        num_mel_bins:int=80 # number of mel spectrogram bins
-        ):
-        self.extractor = OnTheFlyFeatures(Fbank(FbankConfig(num_mel_bins=num_mel_bins)))
+                 tokenizer=TokenCollater, # text tokenizer
+                 extractor=OnTheFlyFeatures(Fbank(FbankConfig(num_mel_bins=80))) # feature extractor
+                 ):
+        self.extractor = extractor
         self.tokenizer = tokenizer
 
     def __getitem__(self, cuts: CutSet) -> dict:
