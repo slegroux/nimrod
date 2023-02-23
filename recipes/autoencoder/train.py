@@ -9,7 +9,7 @@ import wandb
 def main(cfg: DictConfig) -> None:
 
     # PARAMS
-    # print(OmegaConf.to_yaml(cfg))
+    print(OmegaConf.to_yaml(cfg))
 
     # SEED
     pl.seed_everything(cfg.seed, workers=True)
@@ -18,29 +18,24 @@ def main(cfg: DictConfig) -> None:
     autoencoder_pl = instantiate(cfg.model)
 
     # DATA
-    full_train = instantiate(cfg.datasets.train)
-    test = instantiate(cfg.datasets.test)
-    train, dev = full_train.train_dev_split(0.8)
-    train_dl = instantiate(cfg.dataloaders.train, dataset=train)
-    dev_dl = instantiate(cfg.dataloaders.dev, dataset=dev)
-    test_dl = instantiate(cfg.dataloaders.dev, dataset=test)
+    datamodule = instantiate(cfg.datamodules)
 
     # TRAIN
     callbacks = []
     for _, cb_conf in cfg.callbacks.items():
         callbacks.append(instantiate(cb_conf))
-
     logger = instantiate(cfg.logger)
     profiler = instantiate(cfg.profiler)
-
     trainer = instantiate(cfg.trainer, callbacks=callbacks, profiler=profiler, logger=[logger])
 
     if cfg.get("train"):
-        trainer.fit(model=autoencoder_pl, train_dataloaders=train_dl, val_dataloaders=dev_dl, ckpt_path=cfg.get("ckpt_path"))
+        # trainer.fit(model=autoencoder_pl, train_dataloaders=train_dl, val_dataloaders=dev_dl, ckpt_path=cfg.get("ckpt_path"))
+        trainer.fit(autoencoder_pl, datamodule=datamodule, ckpt_path=cfg.get("ckpt_path"))
 
     # TEST
     if cfg.get("test"):
-        trainer.test(autoencoder_pl, dataloaders=test_dl)
+        # trainer.test(autoencoder_pl, dataloaders=test_dl)
+        trainer.test(datamodule=datamodule)
 
     wandb.finish()
 

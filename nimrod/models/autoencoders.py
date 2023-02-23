@@ -9,7 +9,7 @@ import torch.nn as nn
 import torch
 from ..modules import Encoder, Decoder
 from pytorch_lightning import LightningModule
-from ..data.datasets import MNISTDataset
+from ..image.datasets import MNISTDataset
 from torch.utils.data import DataLoader
 
 # %% ../../nbs/models.autoencoders.ipynb 4
@@ -67,7 +67,4 @@ class AutoEncoderPL(LightningModule):
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=1e-3)
         return optimizer
-    
-   
-
 

@@ -4,6 +4,7 @@ defaults:
   - _self_
   - callbacks: default
   - datasets: mnist
+  - datamodules: mnist
   - dataloaders: default
   - trainer: default
   - paths: default
@@ -20,3 +21,5 @@ test: True
 train: True
 ignore_warnings: True
 tags: ["dev"]
+datamodules:
+  batch_size: 2048
