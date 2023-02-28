@@ -1,4 +1,0 @@
-defaults:
-  - model_checkpoint
-  - early_stopping
-  - _self_
