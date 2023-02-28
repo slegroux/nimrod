@@ -1,1 +1,0 @@
-Sitemap: https://slegroux.github.io/nimrod/sitemap.xml
