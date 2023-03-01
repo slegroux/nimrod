@@ -45,10 +45,10 @@ class EncoDec():
     
     @dispatch
     def __call__(self, wav:np.ndarray, sr:int)->torch.Tensor:
-        wav = torch.from_numpy(wav).float()
+        wav = torch.from_numpy(wav).float().unsqueeze(0)
         if sr != self.model.sample_rate:
             wav = convert_audio(wav, sr, self.model.sample_rate, self.model.channels) # model.sample_rate=24kHz
-        wav = wav.unsqueeze(0)
+        # wav = wav.unsqueeze(0)
         with torch.no_grad():
             encoded_frames = self.model.encode(wav.to(self._device))
         codes = torch.cat([encoded[0] for encoded in encoded_frames], dim=-1)
@@ -68,14 +68,17 @@ class EncoDec():
         return self._device
 
 # %% ../../nbs/audio.embeddings.ipynb 10
+# https://lhotse.readthedocs.io/en/v0.6_ba/features.html#creating-custom-feature-extractor
 @dataclass
 class EncoDecConfig:
     # The encoder produces embeddings at 75 Hz for input waveforms at 24 kHz,
     # which is a 320-fold reduction in the sampling rate.
     frame_shift: float = 320.0 / 24000
-    n_qs: int = 8
+    n_q: int = 8
 
 class EncoDecExtractor(FeatureExtractor):
+    name = 'encodec'
+    config_type = EncoDecConfig
     def __init__(self, config=EncoDecConfig()):
         super().__init__(config)
         self.encodec = EncoDec()
