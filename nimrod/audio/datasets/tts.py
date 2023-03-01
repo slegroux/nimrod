@@ -7,12 +7,15 @@ __all__ = ['LhotseTTSDataset', 'TTSDataset', 'LibriTTSDataModule']
 import torch
 from torch.utils.data import DataLoader, Dataset
 from pytorch_lightning import LightningDataModule, LightningModule
+
 from matplotlib import pyplot as plt
+
+from lhotse import CutSet, RecordingSet, SupervisionSet, Fbank, FbankConfig
 from lhotse.dataset import BucketingSampler, OnTheFlyFeatures
 from lhotse.dataset.collation import TokenCollater
-from lhotse.recipes import download_librispeech, prepare_librispeech
 from lhotse.dataset.vis import plot_batch
-from lhotse import CutSet, RecordingSet, SupervisionSet, Fbank, FbankConfig
+from lhotse.recipes import download_librispeech, prepare_librispeech
+
 from pathlib import Path
 from pprint import pprint
 from typing import List, Dict, Optional, Union
@@ -20,9 +23,9 @@ from typing import List, Dict, Optional, Union
 # %% ../../../nbs/audio.datasets.tts.ipynb 6
 class LhotseTTSDataset(Dataset):
     def __init__(self,
-                 tokenizer=TokenCollater, # text tokenizer
-                 extractor=OnTheFlyFeatures(Fbank(FbankConfig(num_mel_bins=80))) # feature extractor
-                 ):
+                tokenizer=TokenCollater, # text tokenizer
+                extractor=OnTheFlyFeatures(Fbank(FbankConfig(num_mel_bins=80))) # feature extractor
+                ):
         self.extractor = extractor
         self.tokenizer = tokenizer
 
