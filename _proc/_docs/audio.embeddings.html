@@ -167,7 +167,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./index.html" class="sidebar-item-text sidebar-link"></a>
+  <a href="./index.html" class="sidebar-item-text sidebar-link">Description</a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -296,13 +296,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <section id="lhotse-feature-extractor" class="level3">
 <h3 class="anchored" data-anchor-id="lhotse-feature-extractor">Lhotse Feature extractor</h3>
 <hr>
-<p><a href="https://github.com/slegroux/nimrod/blob/main/nimrod/audio/embedding.py#L78" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/slegroux/nimrod/blob/main/nimrod/audio/embedding.py#L79" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="encodecextractor" class="level3">
 <h3 class="anchored" data-anchor-id="encodecextractor">EncoDecExtractor</h3>
 <blockquote class="blockquote">
 <pre><code> EncoDecExtractor (config=EncoDecConfig(frame_shift=0.013333333333333334,
-                   n_qs=8))</code></pre>
+                   n_q=8))</code></pre>
 </blockquote>
 <p>The base class for all feature extractors in Lhotse. It is initialized with a config object, specific to a particular feature extraction method. The config is expected to be a dataclass so that it can be easily serialized.</p>
 <p>All derived feature extractors must implement at least the following:</p>
@@ -324,12 +324,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul>
 <p>These methods run a larger feature extraction pipeline that involves data augmentation and disk storage.</p>
 <hr>
-<p><a href="https://github.com/slegroux/nimrod/blob/main/nimrod/audio/embedding.py#L72" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/slegroux/nimrod/blob/main/nimrod/audio/embedding.py#L73" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="encodecconfig" class="level3">
 <h3 class="anchored" data-anchor-id="encodecconfig">EncoDecConfig</h3>
 <blockquote class="blockquote">
-<pre><code> EncoDecConfig (frame_shift:float=0.013333333333333334, n_qs:int=8)</code></pre>
+<pre><code> EncoDecConfig (frame_shift:float=0.013333333333333334, n_q:int=8)</code></pre>
 </blockquote>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>encodec_extractor <span class="op">=</span> EncoDecExtractor()</span>
@@ -340,8 +340,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>torch.set_num_threads(<span class="dv">1</span>)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>torch.set_num_interop_threads(<span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># torch.set_num_threads(1)</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># torch.set_num_interop_threads(1)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="al">TODO</span><span class="co">: make it work with num_jobs&gt;1</span></span>
@@ -355,11 +355,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>cuts[<span class="dv">0</span>].plot_features()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"a58778b449764c9a86a99dc375c386b7","version_major":2,"version_minor":0}
+{"model_id":"c892ec5ecf05433cafe002b69c32727a","version_major":2,"version_minor":0}
 </script>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MonoCut(id='LJ001-0001-0', start=0, duration=9.65501133786848, channel=0, supervisions=[SupervisionSegment(id='LJ001-0001', recording_id='LJ001-0001', start=0.0, duration=9.65501133786848, channel=0, text='Printing, in the only sense with which we are at present concerned, differs from most if not from all the arts and crafts represented in the Exhibition', language='English', speaker=None, gender='female', custom=None, alignment=None)], features=Features(type='None', num_frames=724, num_features=8, frame_shift=0.013333333333333334, sampling_rate=22050, start=0, duration=9.65501134, storage_type='lilcom_chunky', storage_path='../data/en/LJSpeech-1.1/encodec.lca', storage_key='0,8029,3610', recording_id='None', channels=0), recording=Recording(id='LJ001-0001', sources=[AudioSource(type='file', channels=[0], source='/data/en/LJSpeech/LJSpeech-1.1/wavs/LJ001-0001.wav')], sampling_rate=22050, num_samples=212893, duration=9.65501133786848, channel_ids=[0], transforms=None), custom=None)</code></pre>
+<pre><code>MonoCut(id='LJ001-0001-0', start=0, duration=9.65501133786848, channel=0, supervisions=[SupervisionSegment(id='LJ001-0001', recording_id='LJ001-0001', start=0.0, duration=9.65501133786848, channel=0, text='Printing, in the only sense with which we are at present concerned, differs from most if not from all the arts and crafts represented in the Exhibition', language='English', speaker=None, gender='female', custom=None, alignment=None)], features=Features(type='encodec', num_frames=724, num_features=8, frame_shift=0.013333333333333334, sampling_rate=22050, start=0, duration=9.65501134, storage_type='lilcom_chunky', storage_path='../data/en/LJSpeech-1.1/encodec.lca', storage_key='0,8029,3610', recording_id='None', channels=0), recording=Recording(id='LJ001-0001', sources=[AudioSource(type='file', channels=[0], source='/data/en/LJSpeech/LJSpeech-1.1/wavs/LJ001-0001.wav')], sampling_rate=22050, num_samples=212893, duration=9.65501133786848, channel_ids=[0], transforms=None), custom=None)</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <pre><code>&lt;matplotlib.image.AxesImage&gt;</code></pre>
@@ -368,12 +368,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p><img src="audio.embeddings_files/figure-html/cell-8-output-4.png" class="img-fluid"></p>
 </div>
 </div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>cuts <span class="op">=</span> CutSet.from_file(<span class="st">"../data/en/LJSpeech-1.1/cuts_encodec.jsonl.gz"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
 </section>
 <section id="audiolm" class="level2">
 <h2 class="anchored" data-anchor-id="audiolm">AudioLM</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># TO DO</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># TO DO</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 
 

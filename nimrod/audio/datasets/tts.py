@@ -78,20 +78,20 @@ class LibriTTSDataModule(LightningDataModule):
             self.cuts_test = CutSet.from_manifests(**self.libri["test-clean"])
             self.tokenizer = TokenCollater(self.cuts_train)
             self.tokenizer(self.cuts_test.subset(first=2))
-            self.tokenizer.inverse(*self.tokenizer(self.cuts_test.subset(first=2)))
+            # self.tokenizer.inverse(*self.tokenizer(self.cuts_test.subset(first=2)))
         if stage == "test":
             self.cuts_test = CutSet.from_manifests(**self.libri["test-clean"])
             self.tokenizer = TokenCollater(self.cuts_test)
             self.tokenizer(self.cuts_test.subset(first=2))
-            self.tokenizer.inverse(*self.tokenizer(self.cuts_test.subset(first=2)))
+            # self.tokenizer.inverse(*self.tokenizer(self.cuts_test.subset(first=2)))
 
     def train_dataloader(self):
         train_sampler = BucketingSampler(self.cuts_train, max_duration=300, shuffle=True, bucket_method="equal_duration")
-        return DataLoader(TTSDataset(self.tokenizer), sampler=train_sampler, batch_size=None, num_workers=100)
+        return DataLoader(TTSDataset(self.tokenizer), sampler=train_sampler, batch_size=None, num_workers=1)
 
     def test_dataloader(self):
         test_sampler = BucketingSampler(self.cuts_test, max_duration=400, shuffle=False, bucket_method="equal_duration")
-        return DataLoader(TTSDataset(self.tokenizer), sampler=test_sampler, batch_size=None, num_workers=2)
+        return DataLoader(TTSDataset(self.tokenizer), sampler=test_sampler, batch_size=None, num_workers=1)
 
     @property
     def model_kwargs(self):
