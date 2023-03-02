@@ -7,22 +7,26 @@ __all__ = ['LhotseTTSDataset', 'TTSDataset', 'LibriTTSDataModule']
 import torch
 from torch.utils.data import DataLoader, Dataset
 from pytorch_lightning import LightningDataModule, LightningModule
+
 from matplotlib import pyplot as plt
+
+from lhotse import CutSet, RecordingSet, SupervisionSet, Fbank, FbankConfig
 from lhotse.dataset import BucketingSampler, OnTheFlyFeatures
 from lhotse.dataset.collation import TokenCollater
-from lhotse.recipes import download_librispeech, prepare_librispeech
 from lhotse.dataset.vis import plot_batch
-from lhotse import CutSet, RecordingSet, SupervisionSet, Fbank, FbankConfig
+from lhotse.recipes import download_librispeech, prepare_librispeech
+
 from pathlib import Path
 from pprint import pprint
+from typing import List, Dict, Optional, Union
 
 # %% ../../../nbs/audio.datasets.tts.ipynb 6
 class LhotseTTSDataset(Dataset):
     def __init__(self,
-        tokenizer:TokenCollater, # text tokenizer
-        num_mel_bins:int=80 # number of mel spectrogram bins
-        ):
-        self.extractor = OnTheFlyFeatures(Fbank(FbankConfig(num_mel_bins=num_mel_bins)))
+                tokenizer=TokenCollater, # text tokenizer
+                extractor=OnTheFlyFeatures(Fbank(FbankConfig(num_mel_bins=80))) # feature extractor
+                ):
+        self.extractor = extractor
         self.tokenizer = tokenizer
 
     def __getitem__(self, cuts: CutSet) -> dict:
@@ -74,20 +78,20 @@ class LibriTTSDataModule(LightningDataModule):
             self.cuts_test = CutSet.from_manifests(**self.libri["test-clean"])
             self.tokenizer = TokenCollater(self.cuts_train)
             self.tokenizer(self.cuts_test.subset(first=2))
-            self.tokenizer.inverse(*self.tokenizer(self.cuts_test.subset(first=2)))
+            # self.tokenizer.inverse(*self.tokenizer(self.cuts_test.subset(first=2)))
         if stage == "test":
             self.cuts_test = CutSet.from_manifests(**self.libri["test-clean"])
             self.tokenizer = TokenCollater(self.cuts_test)
             self.tokenizer(self.cuts_test.subset(first=2))
-            self.tokenizer.inverse(*self.tokenizer(self.cuts_test.subset(first=2)))
+            # self.tokenizer.inverse(*self.tokenizer(self.cuts_test.subset(first=2)))
 
     def train_dataloader(self):
         train_sampler = BucketingSampler(self.cuts_train, max_duration=300, shuffle=True, bucket_method="equal_duration")
-        return DataLoader(TTSDataset(self.tokenizer), sampler=train_sampler, batch_size=None, num_workers=100)
+        return DataLoader(TTSDataset(self.tokenizer), sampler=train_sampler, batch_size=None, num_workers=1)
 
     def test_dataloader(self):
         test_sampler = BucketingSampler(self.cuts_test, max_duration=400, shuffle=False, bucket_method="equal_duration")
-        return DataLoader(TTSDataset(self.tokenizer), sampler=test_sampler, batch_size=None, num_workers=2)
+        return DataLoader(TTSDataset(self.tokenizer), sampler=test_sampler, batch_size=None, num_workers=1)
 
     @property
     def model_kwargs(self):

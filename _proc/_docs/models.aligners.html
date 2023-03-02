@@ -164,7 +164,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./index.html" class="sidebar-item-text sidebar-link"></a>
+  <a href="./index.html" class="sidebar-item-text sidebar-link">Description</a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -287,7 +287,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2 class="anchored" data-anchor-id="usage">Usage</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>text_normalizer <span class="op">=</span> TTSTextNormalizer().english_cleaners</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>aligner <span class="op">=</span> AlignerWAV2VEC2(text_normalizer)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>aligner <span class="op">=</span> AlignerWAV2VEC2(text_normalizer, device<span class="op">=</span><span class="st">'cpu'</span>) <span class="co"># for CI on cpu</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>wav_path <span class="op">=</span> <span class="st">"../data/en/LibriTTS/test-clean/1089/134686/1089_134686_000015_000001.wav"</span></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>txt_path <span class="op">=</span> <span class="st">"../data/en/LibriTTS/test-clean/1089/134686/1089_134686_000015_000001.original.txt"</span></span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>wav, sr <span class="op">=</span> torchaudio.load(wav_path)</span>

@@ -1,8 +1,0 @@
-_target_: nimrod.models.autoencoders.AutoEncoderPL
-
-autoencoder:
-  _target_: nimrod.models.autoencoders.AutoEncoder
-  encoder:
-    _target_: nimrod.models.autoencoders.Encoder
-  decoder:
-    _target_: nimrod.models.autoencoders.Decoder
