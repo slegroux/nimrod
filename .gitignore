@@ -144,3 +144,5 @@ tests/
 *_logs*
 recipes/image/
 data/*
+logs/
+
