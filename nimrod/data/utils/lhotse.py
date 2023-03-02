@@ -6,20 +6,22 @@ __all__ = ['Encoder', 'Decoder', 'PhonemeCollater']
 # %% ../../../nbs/data.utils.lhotse.ipynb 4
 import torch.nn as nn
 import torch
+from torch.utils.data import Dataset, DataLoader
 
-from lhotse.dataset import BucketingSampler, OnTheFlyFeatures
+from lhotse import CutSet, RecordingSet, SupervisionSet, Fbank, FbankConfig, MonoCut, NumpyFilesWriter, NumpyHdf5Writer
+from lhotse.dataset import BucketingSampler, OnTheFlyFeatures, DynamicBucketingSampler
 from lhotse.dataset.collation import TokenCollater
+from lhotse.dataset.input_strategies import BatchIO, PrecomputedFeatures
 from lhotse.dataset.vis import plot_batch
 from lhotse.recipes import download_librispeech, prepare_librispeech, download_ljspeech, prepare_ljspeech
-from lhotse.dataset.input_strategies import BatchIO, PrecomputedFeatures
-from lhotse import CutSet, RecordingSet, SupervisionSet, Fbank, FbankConfig, MonoCut, NumpyFilesWriter, NumpyHdf5Writer
 
+from typing import Tuple, Dict
 import json
+import numpy as np
 
 from ...audio.embedding import EncoDecExtractor
 from ...text.normalizers import TTSTextNormalizer
 from ...text.tokenizers import Phonemizer
-
 
 
 # %% ../../../nbs/data.utils.lhotse.ipynb 5
@@ -40,7 +42,7 @@ class Decoder(nn.Module):
     def forward(self, x):
         return self.l1(x)
 
-# %% ../../../nbs/data.utils.lhotse.ipynb 26
+# %% ../../../nbs/data.utils.lhotse.ipynb 25
 class PhonemeCollater(TokenCollater):
     def __init__(
             self,  cuts: CutSet,

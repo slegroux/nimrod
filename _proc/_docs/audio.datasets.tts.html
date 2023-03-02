@@ -164,7 +164,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./index.html" class="sidebar-item-text sidebar-link"></a>
+  <a href="./index.html" class="sidebar-item-text sidebar-link">Description</a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -264,7 +264,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h3 class="anchored" data-anchor-id="lhotse-based-base-class">Lhotse-based Base Class</h3>
 <p>https://github.com/Lightning-AI/lightning/issues/10358 https://colab.research.google.com/drive/1HKSYPsWx_HoCdrnLpaPdYj5zwlPsM3NH</p>
 <hr>
-<p><a href="https://github.com/slegroux/nimrod/blob/main/nimrod/audio/datasets/tts.py#L21" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/slegroux/nimrod/blob/main/nimrod/audio/datasets/tts.py#L24" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="lhotsettsdataset" class="level3">
 <h3 class="anchored" data-anchor-id="lhotsettsdataset">LhotseTTSDataset</h3>
@@ -272,7 +272,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <pre><code> LhotseTTSDataset (tokenizer=&lt;class
                    'lhotse.dataset.collation.TokenCollater'&gt;, extractor=&lt;l
                    hotse.dataset.input_strategies.OnTheFlyFeatures object
-                   at 0x7fd2a1a71b80&gt;)</code></pre>
+                   at 0x7ff2a6dabdf0&gt;)</code></pre>
 </blockquote>
 <p>An abstract class representing a :class:<code>Dataset</code>.</p>
 <p>All datasets that represent a map from keys to data samples should subclass it. All subclasses should overwrite :meth:<code>__getitem__</code>, supporting fetching a data sample for a given key. Subclasses could also optionally overwrite :meth:<code>__len__</code>, which is expected to return the size of the dataset by many :class:<code>~torch.utils.data.Sampler</code> implementations and the default options of :class:<code>~torch.utils.data.DataLoader</code>.</p>
@@ -302,7 +302,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <tr class="even">
 <td>extractor</td>
 <td>OnTheFlyFeatures</td>
-<td>&lt;lhotse.dataset.input_strategies.OnTheFlyFeatures object at 0x7fd2a1a71b80&gt;</td>
+<td>&lt;lhotse.dataset.input_strategies.OnTheFlyFeatures object at 0x7ff2a6dabdf0&gt;</td>
 <td>feature extractor</td>
 </tr>
 </tbody>
