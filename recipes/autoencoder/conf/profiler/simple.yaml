@@ -1,4 +1,0 @@
-_target_: pytorch_lightning.profilers.SimpleProfiler
-dirpath: ${paths.output_dir}
-filename: "simple_perf_logs"
-extended: True

@@ -163,7 +163,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./index.html" class="sidebar-item-text sidebar-link"></a>
+  <a href="./index.html" class="sidebar-item-text sidebar-link">Description</a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -255,18 +255,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <section id="ttstextnormalizer" class="level3">
 <h3 class="anchored" data-anchor-id="ttstextnormalizer">TTSTextNormalizer</h3>
 <blockquote class="blockquote">
-<pre><code> TTSTextNormalizer ()</code></pre>
+<pre><code> TTSTextNormalizer (language='en')</code></pre>
 </blockquote>
 <p>Initialize self. See help(type(self)) for accurate signature.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>cleaner <span class="op">=</span> TTSTextNormalizer()</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(cleaner.en_normalize_numbers(<span class="st">"$350"</span>))</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(cleaner.expand_time_english(<span class="st">"12:05pm"</span>))</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(cleaner.english_cleaners(<span class="st">"Oh my dear! this is $5 too soon... It's 1:04 am!"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(cleaner(<span class="st">"Oh my dear! this is $5 too soon... It's 1:04 am!"</span>))</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(cleaner([<span class="st">"Oh my dear! this is $5 too soon..."</span>, <span class="st">"It's 1:04 am!"</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>three hundred fifty dollars
 twelve oh five p m
-oh my dear! this is five dollars too soon... it's one oh four a m!</code></pre>
+oh my dear! this is five dollars too soon... it's one oh four a m!
+['oh my dear! this is five dollars too soon...', "it's one oh four a m!"]</code></pre>
 </div>
 </div>
 <hr>

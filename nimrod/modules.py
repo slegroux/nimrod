@@ -3,11 +3,11 @@
 # %% auto 0
 __all__ = ['Encoder', 'Decoder']
 
-# %% ../nbs/modules.ipynb 3
+# %% ../nbs/modules.ipynb 4
 import torch.nn as nn
 import torch
 
-# %% ../nbs/modules.ipynb 4
+# %% ../nbs/modules.ipynb 5
 class Encoder(nn.Module):
     def __init__(self):
         super().__init__()

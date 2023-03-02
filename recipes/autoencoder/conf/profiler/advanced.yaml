@@ -1,4 +1,0 @@
-_target_: pytorch_lightning.profilers.AdvancedProfiler
-dirpath: ${paths.output_dir}
-filename: "advanced_perf_logs"
-extended: True

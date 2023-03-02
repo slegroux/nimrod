@@ -10,9 +10,16 @@ from phonemizer.backend.espeak.words_mismatch import WordMismatch
 from phonemizer.punctuation import Punctuation
 from phonemizer.separator import Separator
 from phonemizer import phonemize
+
+from lhotse.features import FeatureExtractor
+from lhotse.utils import compute_num_frames, Seconds
+from lhotse import CutSet
+
 from torch.utils.data import DataLoader
 from plum import dispatch
 from typing import List, Tuple
+
+from tqdm.notebook import tqdm
 
 # %% ../../nbs/text.tokenizers.ipynb 6
 class Phonemizer():
@@ -57,7 +64,7 @@ class Phonemizer():
                 )
         for text in texts])
 
-# %% ../../nbs/text.tokenizers.ipynb 11
+# %% ../../nbs/text.tokenizers.ipynb 15
 import torch
 from collections import Counter
 import torchtext
@@ -68,7 +75,7 @@ from torchtext.datasets import AG_NEWS
 from typing import Iterable, List, Tuple
 from torch.nn.utils.rnn import pad_sequence
 
-# %% ../../nbs/text.tokenizers.ipynb 12
+# %% ../../nbs/text.tokenizers.ipynb 16
 class Tokenizer:
     def __init__(self, backend='spacy', language='en'):
         if language == 'en':
@@ -101,7 +108,7 @@ class Tokenizer:
             s.append(' '.join(tokens)) 
         return s
 
-# %% ../../nbs/text.tokenizers.ipynb 17
+# %% ../../nbs/text.tokenizers.ipynb 21
 # TODO: add more special characters
 class Numericalizer():
     def __init__(self, tokens_iter:Iterable, specials=["<pad>", "<unk>", "<bos>", "<eos>"]):
@@ -143,7 +150,7 @@ class Numericalizer():
         return [self._vocab.get_itos()[i] for i in indices]
     
 
-# %% ../../nbs/text.tokenizers.ipynb 23
+# %% ../../nbs/text.tokenizers.ipynb 27
 class TextCollater:
     def __init__(self,
                  tokenizer,

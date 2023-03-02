@@ -136,4 +136,13 @@ tests/
 *.pt
 *.onnx
 *.ckpt
+*.lca
+*.yaml
+*.wandb
+*tfevents*
+*/wandb/*
+*_logs*
+recipes/image/
+data/*
 logs/
+

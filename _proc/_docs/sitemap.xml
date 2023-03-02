@@ -2,50 +2,54 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://slegroux.github.io/nimrod/index.html</loc>
-    <lastmod>2023-02-16T08:54:45.280Z</lastmod>
+    <lastmod>2023-03-01T23:44:57.711Z</lastmod>
   </url>
   <url>
     <loc>https://slegroux.github.io/nimrod/text.normalizers.html</loc>
-    <lastmod>2023-02-16T08:54:54.756Z</lastmod>
+    <lastmod>2023-03-01T23:44:58.227Z</lastmod>
   </url>
   <url>
     <loc>https://slegroux.github.io/nimrod/modules.html</loc>
-    <lastmod>2023-02-16T08:52:10.048Z</lastmod>
+    <lastmod>2023-03-01T23:44:58.719Z</lastmod>
   </url>
   <url>
     <loc>https://slegroux.github.io/nimrod/models.aligners.html</loc>
-    <lastmod>2023-02-16T08:52:10.512Z</lastmod>
+    <lastmod>2023-03-01T23:44:59.171Z</lastmod>
   </url>
   <url>
     <loc>https://slegroux.github.io/nimrod/audio.utils.html</loc>
-    <lastmod>2023-02-16T08:52:10.960Z</lastmod>
+    <lastmod>2023-03-01T23:44:59.635Z</lastmod>
   </url>
   <url>
     <loc>https://slegroux.github.io/nimrod/audio.embeddings.html</loc>
-    <lastmod>2023-02-16T08:54:49.620Z</lastmod>
+    <lastmod>2023-03-01T23:45:00.119Z</lastmod>
   </url>
   <url>
     <loc>https://slegroux.github.io/nimrod/text.tokenizers.html</loc>
-    <lastmod>2023-02-16T08:52:12.020Z</lastmod>
+    <lastmod>2023-03-01T23:45:00.619Z</lastmod>
   </url>
   <url>
-    <loc>https://slegroux.github.io/nimrod/models.autoencoders.html</loc>
-    <lastmod>2023-02-16T08:52:12.476Z</lastmod>
+    <loc>https://slegroux.github.io/nimrod/data.utils.lhotse.html</loc>
+    <lastmod>2023-03-01T23:45:01.119Z</lastmod>
   </url>
   <url>
     <loc>https://slegroux.github.io/nimrod/audio.datasets.stt.html</loc>
-    <lastmod>2023-02-16T08:52:12.964Z</lastmod>
+    <lastmod>2023-03-01T23:45:01.623Z</lastmod>
+  </url>
+  <url>
+    <loc>https://slegroux.github.io/nimrod/models.autoencoders.html</loc>
+    <lastmod>2023-03-01T23:45:02.083Z</lastmod>
   </url>
   <url>
     <loc>https://slegroux.github.io/nimrod/lm.tokenizers.html</loc>
-    <lastmod>2023-02-16T08:52:13.392Z</lastmod>
+    <lastmod>2023-03-01T23:45:02.551Z</lastmod>
   </url>
   <url>
     <loc>https://slegroux.github.io/nimrod/image.datasets.html</loc>
-    <lastmod>2023-02-16T08:54:52.916Z</lastmod>
+    <lastmod>2023-03-01T23:45:03.035Z</lastmod>
   </url>
   <url>
     <loc>https://slegroux.github.io/nimrod/audio.datasets.tts.html</loc>
-    <lastmod>2023-02-16T08:52:14.392Z</lastmod>
+    <lastmod>2023-03-01T23:45:03.535Z</lastmod>
   </url>
 </urlset>
