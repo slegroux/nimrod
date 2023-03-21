@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://slegroux.github.io/nimrod/index.html</loc>
-    <lastmod>2023-03-21T01:04:50.000Z</lastmod>
+    <lastmod>2023-03-21T01:08:31.894Z</lastmod>
   </url>
   <url>
     <loc>https://slegroux.github.io/nimrod/text.normalizers.html</loc>
@@ -26,15 +26,15 @@
   </url>
   <url>
     <loc>https://slegroux.github.io/nimrod/audio.embeddings.html</loc>
-    <lastmod>2023-03-21T00:51:02.766Z</lastmod>
+    <lastmod>2023-03-21T01:08:24.358Z</lastmod>
   </url>
   <url>
     <loc>https://slegroux.github.io/nimrod/models.transformer.html</loc>
-    <lastmod>2023-03-21T00:51:27.850Z</lastmod>
+    <lastmod>2023-03-21T01:08:24.842Z</lastmod>
   </url>
   <url>
     <loc>https://slegroux.github.io/nimrod/models.lm.html</loc>
-    <lastmod>2023-03-21T00:51:18.974Z</lastmod>
+    <lastmod>2023-03-21T01:08:26.978Z</lastmod>
   </url>
   <url>
     <loc>https://slegroux.github.io/nimrod/text.tokenizers.html</loc>
