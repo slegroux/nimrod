@@ -6,8 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="description" content="TTS datasets">
 
-<title>slg_nimrod</title>
+<title>slg_nimrod - Audio TTS Datasets</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -124,11 +125,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 
 <link rel="stylesheet" href="styles.css">
-<meta property="og:title" content="">
-<meta property="og:description" content="">
+<meta property="og:title" content="slg_nimrod - Audio TTS Datasets">
+<meta property="og:description" content="TTS datasets">
 <meta property="og:site-name" content="slg_nimrod">
-<meta name="twitter:title" content="">
-<meta name="twitter:description" content="">
+<meta name="twitter:title" content="slg_nimrod - Audio TTS Datasets">
+<meta name="twitter:description" content="TTS datasets">
 <meta name="twitter:card" content="summary">
 </head>
 
@@ -148,7 +149,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     </nav>
   <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
     <div class="container-fluid d-flex justify-content-between">
-      <h1 class="quarto-secondary-nav-title"></h1>
+      <h1 class="quarto-secondary-nav-title">Audio TTS Datasets</h1>
       <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
         <i class="bi bi-chevron-right"></i>
       </button>
@@ -163,7 +164,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./index.html" class="sidebar-item-text sidebar-link active">Description</a>
+  <a href="./index.html" class="sidebar-item-text sidebar-link">Description</a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
@@ -176,12 +177,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="false">Data</a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">Data</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 ">  
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./audio.datasets.stt.html" class="sidebar-item-text sidebar-link">Speech to Text Datasets</a>
@@ -189,7 +190,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./audio.datasets.tts.html" class="sidebar-item-text sidebar-link">Audio TTS Datasets</a>
+  <a href="./audio.datasets.tts.html" class="sidebar-item-text sidebar-link active">Audio TTS Datasets</a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -365,47 +366,253 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#description" id="toc-description" class="nav-link active" data-scroll-target="#description">Description</a></li>
-  <li><a href="#install" id="toc-install" class="nav-link" data-scroll-target="#install">Install</a></li>
+  <li><a href="#text-to-speech" id="toc-text-to-speech" class="nav-link active" data-scroll-target="#text-to-speech">Text-To-Speech</a>
+  <ul class="collapse">
+  <li><a href="#lhotse-based-base-class" id="toc-lhotse-based-base-class" class="nav-link" data-scroll-target="#lhotse-based-base-class">Lhotse-based Base Class</a></li>
+  <li><a href="#lhotsettsdataset" id="toc-lhotsettsdataset" class="nav-link" data-scroll-target="#lhotsettsdataset">LhotseTTSDataset</a></li>
+  <li><a href="#default-base-class" id="toc-default-base-class" class="nav-link" data-scroll-target="#default-base-class">Default base class</a></li>
+  <li><a href="#ttsdataset" id="toc-ttsdataset" class="nav-link" data-scroll-target="#ttsdataset">TTSDataset</a></li>
+  <li><a href="#libritts-datamodule" id="toc-libritts-datamodule" class="nav-link" data-scroll-target="#libritts-datamodule">LibriTTS DataModule</a></li>
+  <li><a href="#librittsdatamodule" id="toc-librittsdatamodule" class="nav-link" data-scroll-target="#librittsdatamodule">LibriTTSDataModule</a></li>
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
-  <li><a href="#authors" id="toc-authors" class="nav-link" data-scroll-target="#authors">Authors</a></li>
+  </ul></li>
   </ul>
 <div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/slegroux/nimrod/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title d-none d-lg-block">Audio TTS Datasets</h1>
+</div>
 
+<div>
+  <div class="description">
+    TTS datasets
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
 
 <!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
-<center>
-<h1>
-Nimrod
-</h1>
-<h4 class="anchored">
-Minimal DL framework for fast experimentation
-</h4>
-</center>
-<p><a href="https://github.com/pre-commit/pre-commit"><img src="https://img.shields.io/badge/-Python_3.7_%7C_3.8_%7C_3.9_%7C_3.10-blue?logo=python&amp;logoColor=white" class="img-fluid" alt="python"></a> <a href="https://pytorch.org/get-started/locally/"><img src="https://img.shields.io/badge/PyTorch_1.10+-ee4c2c?logo=pytorch&amp;logoColor=white" class="img-fluid" alt="pytorch"></a> <a href="https://hydra.cc/"><img src="https://img.shields.io/badge/Config-Hydra_1.3-89b8cd" class="img-fluid" alt="hydra"></a> <a href="https://github.com/pre-commit/pre-commit"><img src="https://img.shields.io/badge/Pre--commit-enabled-brightgreen?logo=pre-commit&amp;logoColor=white.png" class="img-fluid" alt="pre-commit"></a></p>
-<section id="description" class="level2">
-<h2 class="anchored" data-anchor-id="description">Description</h2>
-<p>This is a repo with minimal tooling, modules, models and recipes to get easily get started with deep learning training and experimentation</p>
+<section id="text-to-speech" class="level2">
+<h2 class="anchored" data-anchor-id="text-to-speech">Text-To-Speech</h2>
+<section id="lhotse-based-base-class" class="level3">
+<h3 class="anchored" data-anchor-id="lhotse-based-base-class">Lhotse-based Base Class</h3>
+<p>https://github.com/Lightning-AI/lightning/issues/10358 https://colab.research.google.com/drive/1HKSYPsWx_HoCdrnLpaPdYj5zwlPsM3NH</p>
+<hr>
+<p><a href="https://github.com/slegroux/nimrod/blob/main/nimrod/audio/datasets/tts.py#L24" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
-<section id="install" class="level2">
-<h2 class="anchored" data-anchor-id="install">Install</h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install nimrod</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="lhotsettsdataset" class="level3">
+<h3 class="anchored" data-anchor-id="lhotsettsdataset">LhotseTTSDataset</h3>
+<blockquote class="blockquote">
+<pre><code> LhotseTTSDataset (tokenizer=&lt;class
+                   'lhotse.dataset.collation.TokenCollater'&gt;, extractor=&lt;l
+                   hotse.dataset.input_strategies.OnTheFlyFeatures object
+                   at 0x7f9134b870d0&gt;)</code></pre>
+</blockquote>
+<p>An abstract class representing a :class:<code>Dataset</code>.</p>
+<p>All datasets that represent a map from keys to data samples should subclass it. All subclasses should overwrite :meth:<code>__getitem__</code>, supporting fetching a data sample for a given key. Subclasses could also optionally overwrite :meth:<code>__len__</code>, which is expected to return the size of the dataset by many :class:<code>~torch.utils.data.Sampler</code> implementations and the default options of :class:<code>~torch.utils.data.DataLoader</code>.</p>
+<p>.. note:: :class:<code>~torch.utils.data.DataLoader</code> by default constructs a index sampler that yields integral indices. To make it work with a map-style dataset with non-integral indices/keys, a custom sampler must be provided.</p>
+<table class="table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>tokenizer</td>
+<td>type</td>
+<td>TokenCollater</td>
+<td>text tokenizer</td>
+</tr>
+<tr class="even">
+<td>extractor</td>
+<td>OnTheFlyFeatures</td>
+<td>&lt;lhotse.dataset.input_strategies.OnTheFlyFeatures object at 0x7f9134b870d0&gt;</td>
+<td>feature extractor</td>
+</tr>
+</tbody>
+</table>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># tok = TokenCollater()</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># ds = LhotseTTSDataset(tok)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
-<section id="usage" class="level2">
-<h2 class="anchored" data-anchor-id="usage">Usage</h2>
-<p>Check recipes in <code>recipes/</code> folder. For instance:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> recipes/autoencoder/</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> train.py</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="default-base-class" class="level3">
+<h3 class="anchored" data-anchor-id="default-base-class">Default base class</h3>
+<hr>
+<p><a href="https://github.com/slegroux/nimrod/blob/main/nimrod/data/datasets.py#L251" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
-<section id="authors" class="level2">
-<h2 class="anchored" data-anchor-id="authors">Authors</h2>
-<p>2023 Sylvain Le Groux <a href="mailto:slegroux@ccrma.stanford.edu" class="email">slegroux@ccrma.stanford.edu</a></p>
+<section id="ttsdataset" class="level3">
+<h3 class="anchored" data-anchor-id="ttsdataset">TTSDataset</h3>
+<blockquote class="blockquote">
+<pre><code> TTSDataset (tokenizer, num_mel_bins:int=80)</code></pre>
+</blockquote>
+<p>An abstract class representing a :class:<code>Dataset</code>.</p>
+<p>All datasets that represent a map from keys to data samples should subclass it. All subclasses should overwrite :meth:<code>__getitem__</code>, supporting fetching a data sample for a given key. Subclasses could also optionally overwrite :meth:<code>__len__</code>, which is expected to return the size of the dataset by many :class:<code>~torch.utils.data.Sampler</code> implementations and the default options of :class:<code>~torch.utils.data.DataLoader</code>.</p>
+<p>.. note:: :class:<code>~torch.utils.data.DataLoader</code> by default constructs a index sampler that yields integral indices. To make it work with a map-style dataset with non-integral indices/keys, a custom sampler must be provided.</p>
+<table class="table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>tokenizer</td>
+<td></td>
+<td></td>
+<td>text tokenizer</td>
+</tr>
+<tr class="even">
+<td>num_mel_bins</td>
+<td>int</td>
+<td>80</td>
+<td>number of mel spectrogram bins</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="libritts-datamodule" class="level3">
+<h3 class="anchored" data-anchor-id="libritts-datamodule">LibriTTS DataModule</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">#(Waveform, Sample_rate, Original_text, Normalized_text, Speaker_ID, Chapter_ID, Utterance_ID)</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>ds <span class="op">=</span> LIBRITTS(<span class="st">"../data/en"</span>, <span class="st">'test-clean'</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(ds[<span class="dv">0</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>(tensor([[0.0007, 0.0008, 0.0012,  ..., 0.0039, 0.0042, 0.0042]]), 24000, 'He hoped there would be stew for dinner, turnips and carrots and bruised potatoes and fat mutton pieces to be ladled out in thick peppered flour-fattened sauce. Stuff it into you, his belly counselled him.', 'He hoped there would be stew for dinner, turnips and carrots and bruised potatoes and fat mutton pieces to be ladled out in thick peppered flour fattened sauce. Stuff it into you, his belly counselled him.', 1089, 134686, '1089_134686_000001_000001')</code></pre>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/slegroux/nimrod/blob/main/nimrod/data/datasets.py#L305" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="librittsdatamodule" class="level3">
+<h3 class="anchored" data-anchor-id="librittsdatamodule">LibriTTSDataModule</h3>
+<blockquote class="blockquote">
+<pre><code> LibriTTSDataModule (target_dir='/data/en/libriTTS', dataset_parts=['dev-
+                     clean', 'test-clean'], output_dir='/home/syl20/slg/ni
+                     mrod/recipes/libritts/data', num_jobs=1)</code></pre>
+</blockquote>
+<p>A DataModule standardizes the training, val, test splits, data preparation and transforms. The main advantage is consistent data splits, data preparation and transforms across models.</p>
+<p>Example::</p>
+<pre><code>class MyDataModule(LightningDataModule):
+    def __init__(self):
+        super().__init__()
+    def prepare_data(self):
+        # download, split, etc...
+        # only called on 1 GPU/TPU in distributed
+    def setup(self, stage):
+        # make assignments here (val/train/test split)
+        # called on every process in DDP
+    def train_dataloader(self):
+        train_split = Dataset(...)
+        return DataLoader(train_split)
+    def val_dataloader(self):
+        val_split = Dataset(...)
+        return DataLoader(val_split)
+    def test_dataloader(self):
+        test_split = Dataset(...)
+        return DataLoader(test_split)
+    def teardown(self):
+        # clean up after fit or test
+        # called on every process in DDP</code></pre>
+<table class="table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>target_dir</td>
+<td>str</td>
+<td>/data/en/libriTTS</td>
+<td>where data will be saved / retrieved</td>
+</tr>
+<tr class="even">
+<td>dataset_parts</td>
+<td>list</td>
+<td>[‘dev-clean’, ‘test-clean’]</td>
+<td>either full libritts or subset</td>
+</tr>
+<tr class="odd">
+<td>output_dir</td>
+<td>str</td>
+<td>/home/syl20/slg/nimrod/recipes/libritts/data</td>
+<td>where to save manifest</td>
+</tr>
+<tr class="even">
+<td>num_jobs</td>
+<td>int</td>
+<td>1</td>
+<td>num_jobs depending on number of cpus available</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="usage" class="level3">
+<h3 class="anchored" data-anchor-id="usage">Usage</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>dm <span class="op">=</span> LibriTTSDataModule(</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    target_dir<span class="op">=</span><span class="st">"../data/en"</span>, </span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    dataset_parts<span class="op">=</span><span class="st">"test-clean"</span>,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    output_dir<span class="op">=</span><span class="st">"../data/en/LibriTTS/test-clean"</span>,</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    num_jobs<span class="op">=</span><span class="dv">1</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># skip download and use local data folder</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co"># dm.prepare_data()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>dm.setup(stage<span class="op">=</span><span class="st">'test'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Scanning audio files (*.wav): 0it [00:00, ?it/s]00:00&lt;?, ?it/s]
+Scanning audio files (*.wav): 0it [00:00, ?it/s]
+Scanning audio files (*.wav): 95it [00:00, 5596.18it/s]
+Scanning audio files (*.wav): 0it [00:00, ?it/s]
+Scanning audio files (*.wav): 0it [00:00, ?it/s]
+Scanning audio files (*.wav): 0it [00:00, ?it/s]00:00&lt;00:00, 46.46it/s]
+Scanning audio files (*.wav): 0it [00:00, ?it/s]
+Preparing LibriTTS parts: 100%|██████████| 7/7 [00:00&lt;00:00, 53.83it/s]</code></pre>
+</div>
+</div>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
