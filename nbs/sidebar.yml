@@ -31,6 +31,7 @@ website:
           - models.aligners.ipynb
           - text.normalizers.ipynb
           - text.tokenizers.ipynb
+          - text.datasets.ipynb
         - section: Models
           contents:
           - models.lm.ipynb

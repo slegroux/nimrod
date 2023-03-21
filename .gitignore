@@ -146,3 +146,4 @@ recipes/image/
 data/*
 logs/
 
+_proc/
