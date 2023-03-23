@@ -24,14 +24,18 @@ from plum import dispatch
 
 # %% ../../nbs/models.lm.ipynb 5
 class Vocab:
-    def __init__(self, data:pd.Series, specials=['<pad>', '<unk>', '<bos>', '<eos>']):
+    def __init__(self,
+                 data:List[List[str]], # one line per sentence. each line is a list of tokens
+                 specials=['<pad>', '<unk>', '<bos>', '<eos>'] # special characters
+                 ):
+        # count individual tokens
         c = Counter()
-        for row in data.items():
-            name = list(row[1])
-            c.update(name)
-
+        for row in data:
+            for token in row:
+                c.update(token)
         ordered_tuple = sorted(c.items(), key=lambda x:x[1], reverse=True)
         dict = OrderedDict(ordered_tuple)        
+        # leverage torchtext vocab
         self.voc = vocab(dict, specials=specials)
         if '<unk>' in specials:
             self.voc.set_default_index(self.voc['<unk>'])
@@ -42,6 +46,8 @@ class Vocab:
 
     @dispatch
     def stoi(self, token:str)->int:
+        if len(token) > 1 and token not in ['<pad>', '<unk>', '<bos>', '<eos>']:
+            raise ValueError("input should be a token or list of tokens")
         return self._stoi[token]
 
     @dispatch
@@ -63,9 +69,12 @@ class Vocab:
     def __len__(self):
         return len(self.voc)
     
+    @property
+    def vocabulary(self)->Set:
+        return sorted(set([k for k,v in self._stoi.items()]))
+    
 
-
-# %% ../../nbs/models.lm.ipynb 15
+# %% ../../nbs/models.lm.ipynb 16
 @dataclass
 class NNLMConfig:
     n_vocab:int = 30
@@ -91,17 +100,19 @@ class NNLM(nn.Module):
         logits = self.l2(h)
         return(logits)
     
-    def sample(self, n_iterations=10)->str:
+    def sample(self, n_iterations:int=10, eos:int=3, pad:int=0, bos:int=2)->str:
+        res = []
         for _ in range(n_iterations):
-            out = []
-            context = [0] * self.n_context
+            out = [] # current sequence prediction
+            context = [pad] * (self.n_context-1) + [bos]
             while True:
                 logits = self(torch.tensor([context]))
                 probs = F.softmax(logits, dim=1)
                 ix = torch.multinomial(probs, num_samples=1).item()
                 context = context[1:] + [ix]
-                out.append(ix)
-                if ix == 0:
+                if ix == eos:
                     break
-        return(out)
-
+                else:
+                    out.append(ix)
+            res.append(out)
+        return(res)

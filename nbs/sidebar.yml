@@ -2,12 +2,44 @@ website:
   sidebar:
     contents:
       - index.ipynb
-      - audio.datasets.ipynb
-      - audio.embeddings.ipynb
-      - audio.utils.ipynb
-      - image.datasets.ipynb
-      - lm.tokenizers.ipynb
-      - models.aligners.ipynb
-      - models.autoencoders.ipynb
-      - modules.ipynb
-      - text.normalizers.ipynb
+      - section: Audio
+        contents:
+          - section: Data
+            contents:
+            - audio.datasets.stt.ipynb
+            - audio.datasets.tts.ipynb
+            - data.utils.lhotse.ipynb
+          - section: Embeddings
+            contents:
+            - audio.embeddings.ipynb
+          - section: Utils
+            contents:
+            - audio.utils.ipynb
+      - section: Image
+        contents:
+          - section: Data
+            contents:
+            - image.datasets.ipynb
+          - section: Models
+            contents:
+            - models.autoencoders.ipynb
+      - section: Text
+        contents:
+        - section: Data
+          contents:
+          - lm.tokenizers.ipynb
+          - models.aligners.ipynb
+          - text.normalizers.ipynb
+          - text.tokenizers.ipynb
+          - text.datasets.ipynb
+        - section: Models
+          contents:
+          - models.lm.ipynb
+          - models.ngram.ipynb
+          - models.transformer.ipynb
+
+      - section: Misc
+        contents:
+        - models.mlp.ipynb  
+        - modules.ipynb
+  
