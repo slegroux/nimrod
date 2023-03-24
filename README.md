@@ -17,7 +17,8 @@ Minimal DL framework for fast experimentation
 ## Description
 
 This is a repo with minimal tooling, modules, models and recipes to get
-easily get started with deep learning training and experimentation
+easily get started with deep learning training and experimentation with
+an emphasis on speech, audio and language modeling.
 
 ## Install
 
@@ -36,4 +37,4 @@ python train.py
 
 ## Authors
 
-2023 Sylvain Le Groux <slegroux@ccrma.stanford.edu>
+2023 Sylvain Le Groux <sylvain.legroux@gmail.com>
