@@ -27,17 +27,16 @@ website:
         contents:
         - section: Data
           contents:
-          - lm.tokenizers.ipynb
-          - models.aligners.ipynb
+          - text.phonemizers.ipynb
           - text.normalizers.ipynb
           - text.tokenizers.ipynb
           - text.datasets.ipynb
         - section: Models
           contents:
-          - models.lm.ipynb
+          - models.aligners.ipynb
           - models.ngram.ipynb
+          - models.lm.ipynb
           - models.transformer.ipynb
-
       - section: Misc
         contents:
         - models.mlp.ipynb  
