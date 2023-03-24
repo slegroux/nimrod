@@ -57,15 +57,17 @@ class Vocab:
     # @dispatch #TODO
     # def stoi(self, tokens:List[List[str]])->List[List[int]]:
     #     return [self._stoi[u] for tok in tokens for ]
+    # TODO:
+    # support torch tensors
 
     @dispatch    
     def itos(self, index:int)->str:
         return self._itos[index]
-
+    
     @dispatch    
     def itos(self, indices:List[int])->List[str]:
         return [self._itos[index] for index in indices]
-    
+        
     def __len__(self):
         return len(self.voc)
     
@@ -82,19 +84,19 @@ class NNLMConfig:
     n_context:int = 3
     n_h:int = 100
 
-
 class NNLM(nn.Module):
     def __init__(self, n_vocab:int, n_emb:int, n_context:int, n_h:int):
         super().__init__()
-        self.embedder = nn.Embedding(n_vocab, n_emb)
+        self.embedder = nn.Embedding(n_vocab, n_emb) # (B,T)->(B,T,C)
         self.n_emb = n_emb
         self.n_context = n_context
+        # we concatenate input of n_context length:
         self.l1 = nn.Linear(n_emb*n_context, n_h)
         self.l2 = nn.Linear(n_h, n_vocab)
     
     def forward(self, x:torch.Tensor)->torch.Tensor:
-        # in: (n_sample, n_context)
-        embedding = self.embedder(x) #(n_sample, n_context, n_embed)
+        # input: (B,T)
+        embedding = self.embedder(x) # ->(B,T,C)
         h = self.l1(embedding.view(-1, self.n_emb*self.n_context))
         h = torch.tanh(h)
         logits = self.l2(h)

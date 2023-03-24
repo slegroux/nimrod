@@ -21,7 +21,7 @@ import numpy as np
 
 from ...audio.embedding import EncoDecExtractor
 from ...text.normalizers import TTSTextNormalizer
-from ...text.tokenizers import Phonemizer
+from ...text.phonemizers import Phonemizer
 
 
 # %% ../../../nbs/data.utils.lhotse.ipynb 5
