@@ -29,7 +29,7 @@ from pprint import pprint
 from typing import List, Dict, Optional, Union, Tuple
 
 
-from ...text.tokenizers import Tokenizer
+# from nimrod.text.tokenizers import Tokenizer
 from ..embedding import EncoDec, EncoDecExtractor
 from ...text.phonemizers import Phonemizer
 from ...text.normalizers import TTSTextNormalizer
