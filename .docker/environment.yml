@@ -1,0 +1,11 @@
+name: base
+channels:
+  - fastai
+  - pytorch
+  - conda-forge
+dependencies:
+  - jupyterlab
+  - nbdev
+  - pip:
+    - torch
+    - torchvision
