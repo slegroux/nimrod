@@ -1,4 +1,3 @@
-# FROM condaforge/mambaforge
 FROM mambaorg/micromamba:jammy-cuda-12.1.0
 USER root
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
