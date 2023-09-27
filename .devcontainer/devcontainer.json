@@ -9,7 +9,8 @@
             "extensions": [
                 "ms-python.python",
                 "ms-azuretools.vscode-docker",
-                "ms-vscode.makefile-tools"
+                "ms-vscode.makefile-tools",
+                "ms-toolsai.jupyter"
             ]
         }
     },

@@ -5,9 +5,17 @@ channels:
   - conda-forge
 dependencies:
   - jupyterlab
+  - matplotlib
+  - pandas
   - nbdev
   - lightning
+  - omegaconf
+  - hydra-core
+  - wandb
+  - onnxruntime
   - pip:
     - jupyterlab-quarto
     - torch
     - torchvision
+    - torchaudio
+    - https://github.com/kpu/kenlm/archive/master.zip

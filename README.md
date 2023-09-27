@@ -34,6 +34,13 @@ Check recipes in `recipes/` folder. For instance:
 cd recipes/autoencoder/
 python train.py
 ```
+## Docker
+```bash
+# build the docker image
+make container
+# run
+docker run -it --rm slegroux/nimrod /bin/bash
+```
 
 ## Authors
 
