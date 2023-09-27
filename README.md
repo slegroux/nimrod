@@ -35,13 +35,30 @@ cd recipes/autoencoder/
 python train.py
 ```
 ## Docker
+You might want to use docker containers for reproductible development environment or run your project in the cloud
+
 ```bash
 # build the docker image
 make container
-# run
-docker run -it --rm slegroux/nimrod /bin/bash
+# or pull from dockerhub
+docker pull slegroux/nimrod
+# run manually
+docker run -it --rm -p 8888:8888 slegroux/nimrod /bin/bash
+```
+You can also use docker-compose to define services and volumes
+```bash
+cd .devcontainer
+# edit docker-compose.yml to suit your needs
+# start service
+docker-compose up
+# stop service
+docker-compose down
 ```
 
+## Development setup
+```bash
+pip install -e .
+```
 ## Authors
 
 2023 Sylvain Le Groux <sylvain.legroux@gmail.com>
