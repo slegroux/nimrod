@@ -31,4 +31,4 @@ train: ## Train the model
 	python src/train.py
 
 container:
-	docker build --network host -t nimrod -f .devcontainer/Dockerfile .
+	docker build --network host -t slegroux/nimrod -f .devcontainer/Dockerfile .

@@ -1,8 +1,13 @@
 FROM mambaorg/micromamba:jammy-cuda-12.1.0
+LABEL maintainer="Sylvain Le Groux <sylvain.legroux@gmail.com>"
 USER root
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
      apt-get install -y --no-install-recommends \
      build-essential \
+     libboost-all-dev \
+     libeigen3-dev \
+     cmake \
+     zlib1g-dev libbz2-dev liblzma-dev \
      git \
      curl \
      ca-certificates \     
@@ -12,13 +17,19 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
+RUN git clone https://github.com/kpu/kenlm && \
+    cd kenlm; mkdir build; cd build && \
+    cmake ..; make -j 4; make install
+
 USER $MAMBA_USER
 
-WORKDIR /workspace
+WORKDIR /home/$MAMBA_USER
 COPY environment.yml .
 
-RUN micromamba install --yes --name base -f environment.yml
-RUN micromamba clean --all --yes
+RUN micromamba install --yes --name base -f environment.yml && \
+    micromamba clean --all --yes
 ARG MAMBA_DOCKERFILE_ACTIVATE=1
-RUN nbdev_install_quarto
-RUN git clone https://github.com/slegroux/nimrod
+RUN nbdev_install_quarto && git clone https://github.com/slegroux/nimrod
+WORKDIR /home/$MAMBA_USER/nimrod
+EXPOSE 8888
+# CMD ["jupyter", "lab", "--allow-root", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--NotebookApp.token=''","--NotebookApp.password=''"]
