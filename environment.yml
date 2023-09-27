@@ -3,19 +3,35 @@ channels:
   - fastai
   - pytorch
   - conda-forge
+  - huggingface
 dependencies:
   - jupyterlab
   - matplotlib
+  - tqdm
   - pandas
+  - datasets
+  - transformers
   - nbdev
+  - spacy
+  - cupy
+  - inflect
+  - anyascii
   - lightning
   - omegaconf
   - hydra-core
   - wandb
   - onnxruntime
+  - h5py
+  - pre-commit
+  - pytest
   - pip:
     - jupyterlab-quarto
     - torch
     - torchvision
+    - torchtext
     - torchaudio
+    - plum-dispatch
     - https://github.com/kpu/kenlm/archive/master.zip
+    - lhotse
+    - phonemizer
+    - hydra_colorlog

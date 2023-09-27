@@ -8,6 +8,9 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
      libeigen3-dev \
      cmake \
      zlib1g-dev libbz2-dev liblzma-dev \
+     festival \
+     espeak-ng \
+     mbrola \
      git \
      curl \
      ca-certificates \     
@@ -25,11 +28,13 @@ USER $MAMBA_USER
 
 WORKDIR /home/$MAMBA_USER
 COPY environment.yml .
+COPY .devcontainer/start_jupyterlab.sh .
 
 RUN micromamba install --yes --name base -f environment.yml && \
     micromamba clean --all --yes
 ARG MAMBA_DOCKERFILE_ACTIVATE=1
+RUN python -m spacy download en_core_web_sm
 RUN nbdev_install_quarto && git clone https://github.com/slegroux/nimrod
 WORKDIR /home/$MAMBA_USER/nimrod
 EXPOSE 8888
-# CMD ["jupyter", "lab", "--allow-root", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--NotebookApp.token=''","--NotebookApp.password=''"]
+CMD ["jupyter", "lab", "--allow-root", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--NotebookApp.token=''","--NotebookApp.password=''"]
