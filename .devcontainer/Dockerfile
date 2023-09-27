@@ -36,5 +36,6 @@ ARG MAMBA_DOCKERFILE_ACTIVATE=1
 RUN python -m spacy download en_core_web_sm
 RUN nbdev_install_quarto && git clone https://github.com/slegroux/nimrod
 WORKDIR /home/$MAMBA_USER/nimrod
+RUN pip install -e .
 EXPOSE 8888
 CMD ["jupyter", "lab", "--allow-root", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--NotebookApp.token=''","--NotebookApp.password=''"]

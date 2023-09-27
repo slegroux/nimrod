@@ -13,10 +13,8 @@ dependencies:
   - transformers
   - nbdev
   - spacy
-  - cupy
   - inflect
   - anyascii
-  - lightning
   - omegaconf
   - hydra-core
   - wandb
@@ -36,3 +34,4 @@ dependencies:
     - lhotse
     - phonemizer
     - hydra_colorlog
+    - lightning
