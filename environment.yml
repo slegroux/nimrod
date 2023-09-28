@@ -25,6 +25,7 @@ dependencies:
   - pre-commit
   - pytest
   - portalocker
+  - python-dotenv
   - pip:
     - jupyterlab-quarto
     - torch
