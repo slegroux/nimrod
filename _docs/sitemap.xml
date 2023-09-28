@@ -1,43 +1,83 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://slegroux.github.io/nimrod/index.html</loc>
-    <lastmod>2023-02-14T20:54:54.979Z</lastmod>
+    <loc>https://slegroux.github.io/nimrod/audio.datasets.stt.html</loc>
+    <lastmod>2023-09-28T07:32:42.212Z</lastmod>
   </url>
   <url>
-    <loc>https://slegroux.github.io/nimrod/text.normalizers.html</loc>
-    <lastmod>2023-02-14T20:54:55.471Z</lastmod>
+    <loc>https://slegroux.github.io/nimrod/models.mlp.html</loc>
+    <lastmod>2023-09-28T07:32:42.703Z</lastmod>
   </url>
   <url>
-    <loc>https://slegroux.github.io/nimrod/modules.html</loc>
-    <lastmod>2023-02-14T20:54:55.943Z</lastmod>
+    <loc>https://slegroux.github.io/nimrod/models.ngram.html</loc>
+    <lastmod>2023-09-27T22:51:35.155Z</lastmod>
   </url>
   <url>
-    <loc>https://slegroux.github.io/nimrod/models.aligners.html</loc>
-    <lastmod>2023-02-14T20:54:56.459Z</lastmod>
-  </url>
-  <url>
-    <loc>https://slegroux.github.io/nimrod/audio.utils.html</loc>
-    <lastmod>2023-02-14T20:54:56.903Z</lastmod>
-  </url>
-  <url>
-    <loc>https://slegroux.github.io/nimrod/audio.embeddings.html</loc>
-    <lastmod>2023-02-14T20:54:57.591Z</lastmod>
-  </url>
-  <url>
-    <loc>https://slegroux.github.io/nimrod/lm.tokenizers.html</loc>
-    <lastmod>2023-02-14T20:54:58.031Z</lastmod>
-  </url>
-  <url>
-    <loc>https://slegroux.github.io/nimrod/models.autoencoders.html</loc>
-    <lastmod>2023-02-14T20:54:58.495Z</lastmod>
-  </url>
-  <url>
-    <loc>https://slegroux.github.io/nimrod/audio.datasets.html</loc>
-    <lastmod>2023-02-14T20:54:59.363Z</lastmod>
+    <loc>https://slegroux.github.io/nimrod/text.phonemizer.html</loc>
+    <lastmod>2023-09-28T07:32:40.472Z</lastmod>
   </url>
   <url>
     <loc>https://slegroux.github.io/nimrod/image.datasets.html</loc>
-    <lastmod>2023-02-14T20:54:59.831Z</lastmod>
+    <lastmod>2023-09-27T22:51:37.244Z</lastmod>
+  </url>
+  <url>
+    <loc>https://slegroux.github.io/nimrod/models.transformer.html</loc>
+    <lastmod>2023-09-28T07:32:41.782Z</lastmod>
+  </url>
+  <url>
+    <loc>https://slegroux.github.io/nimrod/modules.html</loc>
+    <lastmod>2023-09-27T22:51:34.345Z</lastmod>
+  </url>
+  <url>
+    <loc>https://slegroux.github.io/nimrod/audio.embeddings.html</loc>
+    <lastmod>2023-09-28T07:32:41.381Z</lastmod>
+  </url>
+  <url>
+    <loc>https://slegroux.github.io/nimrod/text.normalizers.html</loc>
+    <lastmod>2023-09-28T07:32:40.108Z</lastmod>
+  </url>
+  <url>
+    <loc>https://slegroux.github.io/nimrod/audio.datasets.tts.html</loc>
+    <lastmod>2023-09-28T07:32:42.620Z</lastmod>
+  </url>
+  <url>
+    <loc>https://slegroux.github.io/nimrod/utils.html</loc>
+    <lastmod>2023-09-28T07:32:40.857Z</lastmod>
+  </url>
+  <url>
+    <loc>https://slegroux.github.io/nimrod/data.utils.lhotse.html</loc>
+    <lastmod>2023-09-28T07:32:41.596Z</lastmod>
+  </url>
+  <url>
+    <loc>https://slegroux.github.io/nimrod/models.lm.html</loc>
+    <lastmod>2023-09-27T22:51:35.505Z</lastmod>
+  </url>
+  <url>
+    <loc>https://slegroux.github.io/nimrod/models.aligners.html</loc>
+    <lastmod>2023-09-28T07:32:41.138Z</lastmod>
+  </url>
+  <url>
+    <loc>https://slegroux.github.io/nimrod/text.datasets.html</loc>
+    <lastmod>2023-09-28T07:32:41.843Z</lastmod>
+  </url>
+  <url>
+    <loc>https://slegroux.github.io/nimrod/text.tokenizers.html</loc>
+    <lastmod>2023-09-28T07:32:41.854Z</lastmod>
+  </url>
+  <url>
+    <loc>https://slegroux.github.io/nimrod/audio.features.html</loc>
+    <lastmod>2023-09-27T22:51:35.860Z</lastmod>
+  </url>
+  <url>
+    <loc>https://slegroux.github.io/nimrod/models.autoencoders.html</loc>
+    <lastmod>2023-09-28T07:32:42.427Z</lastmod>
+  </url>
+  <url>
+    <loc>https://slegroux.github.io/nimrod/audio.utils.html</loc>
+    <lastmod>2023-09-27T22:51:35.455Z</lastmod>
+  </url>
+  <url>
+    <loc>https://slegroux.github.io/nimrod/index.html</loc>
+    <lastmod>2023-09-28T07:50:29.075Z</lastmod>
   </url>
 </urlset>
