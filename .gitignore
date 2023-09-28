@@ -137,7 +137,6 @@ tests/
 *.onnx
 *.ckpt
 *.lca
-*.yaml
 *.wandb
 *tfevents*
 */wandb/*
