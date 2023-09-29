@@ -8,7 +8,6 @@ import torch.nn as nn
 import torch
 
 from pytorch_lightning import LightningModule
-from pytorch_lightning.utilities import rank_zero_only
 from torchmetrics import Accuracy
 from hydra.utils import instantiate
 from omegaconf import OmegaConf

@@ -3,7 +3,7 @@
 # %% auto 0
 __all__ = ['AttentionHead', 'MultiHeadAttention', 'FeedFoward', 'Block', 'GPTLanguageModel']
 
-# %% ../../nbs/models.transformer.ipynb 4
+# %% ../../nbs/models.transformer.ipynb 5
 # torch
 import torch.nn as nn
 import torch
@@ -31,8 +31,9 @@ from plum import dispatch
 
 # nimrod
 from .lm import Vocab
+from ..utils import get_device
 
-# %% ../../nbs/models.transformer.ipynb 17
+# %% ../../nbs/models.transformer.ipynb 19
 class AttentionHead(nn.Module):
     """ self attention head """
     def __init__(self, n_embd, head_size, block_size, dropout):
@@ -60,7 +61,7 @@ class AttentionHead(nn.Module):
         out = wei @ v # (B, T, T) @ (B, T, hs) -> (B, T, hs)
         return out
 
-# %% ../../nbs/models.transformer.ipynb 19
+# %% ../../nbs/models.transformer.ipynb 21
 class MultiHeadAttention(nn.Module):
     """ multiple heads of self-attention in parallel """
 
@@ -75,7 +76,7 @@ class MultiHeadAttention(nn.Module):
         out = self.dropout(self.proj(out))
         return out
 
-# %% ../../nbs/models.transformer.ipynb 22
+# %% ../../nbs/models.transformer.ipynb 24
 class FeedFoward(nn.Module):
     """ a simple linear layer followed by a non-linearity """
 
@@ -91,7 +92,7 @@ class FeedFoward(nn.Module):
     def forward(self, x):
         return self.net(x)
 
-# %% ../../nbs/models.transformer.ipynb 25
+# %% ../../nbs/models.transformer.ipynb 27
 class Block(nn.Module):
     """ Transformer block: communication followed by computation """
 
@@ -110,7 +111,7 @@ class Block(nn.Module):
         x = x + self.ffwd(self.ln2(x))
         return x
 
-# %% ../../nbs/models.transformer.ipynb 28
+# %% ../../nbs/models.transformer.ipynb 30
 class GPTLanguageModel(nn.Module):
 
     def __init__(self, vocab_size, n_embd, block_size, n_head, n_layer, dropout):

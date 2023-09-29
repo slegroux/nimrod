@@ -4,6 +4,14 @@
 __all__ = ['Phonemizer']
 
 # %% ../../nbs/text.phonemizer.ipynb 3
+import platform
+import os
+if platform.system() == 'Darwin':
+    os.environ['PHONEMIZER_ESPEAK_LIBRARY'] = "/opt/homebrew/Cellar/espeak/1.48.04_1/lib/libespeak.dylib"
+
+from dotenv import load_dotenv
+load_dotenv()
+
 from phonemizer.backend import EspeakBackend
 from phonemizer.backend.espeak.language_switch import LanguageSwitch
 from phonemizer.backend.espeak.words_mismatch import WordMismatch
