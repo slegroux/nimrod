@@ -63,11 +63,11 @@ class LibriSpeechDataModule(LightningDataModule):
             self.tokenizer.inverse(*self.tokenizer(self.cuts_test.subset(first=2)))
 
     def train_dataloader(self):
-        train_sampler = BucketingSampler(self.cuts_train, max_duration=300, shuffle=True, bucket_method="equal_duration")
+        train_sampler = BucketingSampler(self.cuts_train, max_duration=300, shuffle=True) #, bucket_method="equal_duration")
         return DataLoader(STTDataset(self.tokenizer), sampler=train_sampler, batch_size=None, num_workers=2)
 
     def test_dataloader(self):
-        test_sampler = BucketingSampler(self.cuts_test, max_duration=400, shuffle=False, bucket_method="equal_duration")
+        test_sampler = BucketingSampler(self.cuts_test, max_duration=400, shuffle=False) #, bucket_method="equal_duration")
         return DataLoader(STTDataset(self.tokenizer), sampler=test_sampler, batch_size=None, num_workers=2)
 
     @property

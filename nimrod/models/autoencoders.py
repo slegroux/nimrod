@@ -3,7 +3,7 @@
 # %% auto 0
 __all__ = ['AutoEncoder', 'AutoEncoderPL']
 
-# %% ../../nbs/models.autoencoders.ipynb 3
+# %% ../../nbs/models.autoencoders.ipynb 4
 import torch.nn.functional as F
 import torch.nn as nn
 import torch
@@ -12,7 +12,7 @@ from pytorch_lightning import LightningModule
 from ..image.datasets import MNISTDataset
 from torch.utils.data import DataLoader
 
-# %% ../../nbs/models.autoencoders.ipynb 4
+# %% ../../nbs/models.autoencoders.ipynb 5
 class AutoEncoder(nn.Module):
     def __init__(self,
         encoder:Encoder, # Encoder layer
@@ -29,7 +29,7 @@ class AutoEncoder(nn.Module):
         x_hat = self.decoder(z)
         return x_hat
 
-# %% ../../nbs/models.autoencoders.ipynb 7
+# %% ../../nbs/models.autoencoders.ipynb 8
 class AutoEncoderPL(LightningModule):
     def __init__(self, autoencoder:AutoEncoder):
         super().__init__()

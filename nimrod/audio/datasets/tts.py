@@ -39,9 +39,10 @@ class LhotseTTSDataset(Dataset):
 class TTSDataset(Dataset):
     def __init__(self,
         tokenizer, # text tokenizer
-        num_mel_bins:int=80 # number of mel spectrogram bins
+        num_mel_bins:int=80,  # number of mel spectrogram bins
+        sampling_rate:int=16000 # sampling rate
         ):
-        self.extractor = OnTheFlyFeatures(Fbank(FbankConfig(num_mel_bins=num_mel_bins)))
+        self.extractor = OnTheFlyFeatures(Fbank(FbankConfig(num_mel_bins=num_mel_bins, sampling_rate=sampling_rate)))
         self.tokenizer = tokenizer
 
     def __getitem__(self, cuts: CutSet) -> dict:
@@ -55,14 +56,15 @@ from lhotse.recipes import download_libritts, prepare_libritts
 from ...text.tokenizers import Tokenizer
 from ..embedding import EncoDec
 from torchaudio.datasets import LIBRITTS
+from ..utils import plot_waveform
 
-# %% ../../../nbs/audio.datasets.tts.ipynb 13
+# %% ../../../nbs/audio.datasets.tts.ipynb 14
 class LibriTTSDataModule(LightningDataModule):
     def __init__(self,
         target_dir="/data/en/libriTTS", # where data will be saved / retrieved
         dataset_parts=["dev-clean", "test-clean"], # either full libritts or subset
         output_dir="/home/syl20/slg/nimrod/recipes/libritts/data", # where to save manifest
-        num_jobs=1 # num_jobs depending on number of cpus available
+        num_jobs=0 # num_jobs depending on number of cpus available
     ):
         super().__init__()
         self.save_hyperparameters(logger=False)
@@ -86,12 +88,12 @@ class LibriTTSDataModule(LightningDataModule):
             # self.tokenizer.inverse(*self.tokenizer(self.cuts_test.subset(first=2)))
 
     def train_dataloader(self):
-        train_sampler = BucketingSampler(self.cuts_train, max_duration=300, shuffle=True, bucket_method="equal_duration")
-        return DataLoader(TTSDataset(self.tokenizer), sampler=train_sampler, batch_size=None, num_workers=1)
+        train_sampler = BucketingSampler(self.cuts_train, max_duration=300, shuffle=True) #, bucket_method="equal_duration")
+        return DataLoader(TTSDataset(self.tokenizer, sampling_rate=24000), sampler=train_sampler, batch_size=None, num_workers=self.hparams.num_jobs)
 
     def test_dataloader(self):
-        test_sampler = BucketingSampler(self.cuts_test, max_duration=400, shuffle=False, bucket_method="equal_duration")
-        return DataLoader(TTSDataset(self.tokenizer), sampler=test_sampler, batch_size=None, num_workers=1)
+        test_sampler = BucketingSampler(self.cuts_test, max_duration=400, shuffle=False) #, bucket_method="equal_duration")
+        return DataLoader(TTSDataset(self.tokenizer, sampling_rate=24000), sampler=test_sampler, batch_size=None, num_workers=self.hparams.num_jobs)
 
     @property
     def model_kwargs(self):

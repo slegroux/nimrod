@@ -12,7 +12,7 @@ import torch
 
 from lhotse.features import FeatureExtractor
 from lhotse.utils import compute_num_frames, Seconds
-from lhotse import CutSet
+from lhotse import CutSet, Fbank
 
 from matplotlib import pyplot as plt
 import IPython.display as ipd
@@ -23,6 +23,7 @@ from typing import Any, Dict, List, Optional, Pattern, Union
 from plum import dispatch
 
 from .utils import plot_waveform
+from ..utils import get_device
 
 # %% ../../nbs/audio.embeddings.ipynb 5
 class EncoDec():
