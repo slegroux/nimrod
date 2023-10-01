@@ -5,28 +5,30 @@ channels:
   - conda-forge
   - huggingface
 dependencies:
-  - jupyterlab
-  - matplotlib
-  - tqdm
-  - pandas
-  - datasets
-  - transformers
-  - nbdev
-  - spacy
-  - cupy
-  - inflect
   - anyascii
-  - lightning
-  - omegaconf
-  - hydra-core
-  - wandb
-  - onnxruntime
+  - cupy
+  - datasets
+  - encodec
   - h5py
-  - pre-commit
-  - pytest
+  - hydra-core
+  - inflect
+  - jupyterlab
+  - lightning 
+  - matplotlib
+  - nbdev
+  - omegaconf
+  - onnxruntime
+  - pandas
   - portalocker
+  - pre-commit
   - python-dotenv
+  - pytest
+  - spacy
+  - tqdm
+  - transformers
+  - wandb
   - pip:
+    - hydra_colorlog
     - jupyterlab-quarto
     - torch
     - torchvision
@@ -36,4 +38,3 @@ dependencies:
     - https://github.com/kpu/kenlm/archive/master.zip
     - lhotse
     - phonemizer
-    - hydra_colorlog
