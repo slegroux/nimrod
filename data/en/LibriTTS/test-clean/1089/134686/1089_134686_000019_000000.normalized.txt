@@ -1,1 +1,3 @@
-A tall boy behind Stephen rubbed his hands and said:
+version https://git-lfs.github.com/spec/v1
+oid sha256:13bec1395725311e9e44ba48f3a4762ed75d5e7136591fb731b4e115ee8fd1a1
+size 52

@@ -1,1 +1,3 @@
-Stephen, leaning back and drawing idly on his scribbler, listened to the talk about him which Heron checked from time to time by saying:
+version https://git-lfs.github.com/spec/v1
+oid sha256:77772de872795cbd6a71a0d34b177fadab4a8ccdb662a87fe80205701fdbc28b
+size 136

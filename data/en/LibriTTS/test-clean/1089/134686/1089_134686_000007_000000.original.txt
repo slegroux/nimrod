@@ -1,1 +1,3 @@
-The equation on the page of his scribbler began to spread out a widening tail, eyed and starred like a peacock's; and, when the eyes and stars of its indices had been eliminated, began slowly to fold itself together again.
+version https://git-lfs.github.com/spec/v1
+oid sha256:37ceb9cb947519c79c0531818e8ba6996f3d26b24995d6b2bbaad9da7fde3b4d
+size 222

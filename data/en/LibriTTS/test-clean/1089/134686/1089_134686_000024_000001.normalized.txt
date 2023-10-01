@@ -1,1 +1,3 @@
-If a man had stolen a pound in his youth and had used that pound to amass a huge fortune how much was he obliged to give back, the pound he had stolen only or the pound together with the compound interest accruing upon it or all his huge fortune?
+version https://git-lfs.github.com/spec/v1
+oid sha256:3926aa77feee0bfbc196cfe7b2f9bf2ab4cccc7dcda3d7dad4df6b55d8c6f3e3
+size 246

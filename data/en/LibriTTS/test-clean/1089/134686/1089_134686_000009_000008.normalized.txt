@@ -1,1 +1,3 @@
-What did it avail to pray when he knew that his soul lusted after its own destruction?
+version https://git-lfs.github.com/spec/v1
+oid sha256:01ecee328059125bd370861cfea230817e98f09d188c60dd2f0b6f92f38048b0
+size 86

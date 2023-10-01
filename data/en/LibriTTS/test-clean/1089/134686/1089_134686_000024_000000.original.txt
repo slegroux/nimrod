@@ -1,1 +1,3 @@
-As he sat in his bench gazing calmly at the rector's shrewd harsh face, his mind wound itself in and out of the curious questions proposed to it.
+version https://git-lfs.github.com/spec/v1
+oid sha256:860677ef10a2289f60088840aea304deedf4b9c2bcc0d27c3b331abb3f146dec
+size 145

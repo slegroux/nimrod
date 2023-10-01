@@ -1,1 +1,3 @@
-If any boys have special confessors perhaps it will be better for them not to change.
+version https://git-lfs.github.com/spec/v1
+oid sha256:691ff10be1eab8aa74dd76425727ce1a6accfd4a0ab8c9eefb69b529327b01f1
+size 85

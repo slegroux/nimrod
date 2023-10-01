@@ -1,1 +1,3 @@
-Towards others he felt neither shame nor fear.
+version https://git-lfs.github.com/spec/v1
+oid sha256:7eeb4cde818830abebea7647281a53bba4174fd221f58b759e9d62ae3386b1c5
+size 46

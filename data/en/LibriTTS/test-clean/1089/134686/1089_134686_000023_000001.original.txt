@@ -1,1 +1,3 @@
-The sentence of saint James which says that he who offends against one commandment becomes guilty of all, had seemed to him first a swollen phrase until he had begun to grope in the darkness of his own state.
+version https://git-lfs.github.com/spec/v1
+oid sha256:92824090bcd82e3c5cbf78f20ed2e3b4944283b1bb526e6cd0e958221040f51b
+size 208

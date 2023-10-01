@@ -1,1 +1,3 @@
-At his first violent sin he had felt a wave of vitality pass out of him and had feared to find his body or his soul maimed by the excess.
+version https://git-lfs.github.com/spec/v1
+oid sha256:6b4e5d0f5133eda2a044e1acb612da731012d853fae9d6244d7bd8144960c72f
+size 137

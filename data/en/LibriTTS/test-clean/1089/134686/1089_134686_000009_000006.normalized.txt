@@ -1,1 +1,3 @@
-At most, by an alms given to a beggar whose blessing he fled from, he might hope wearily to win for himself some measure of actual grace.
+version https://git-lfs.github.com/spec/v1
+oid sha256:1b69bbc5466655605001d56ca633b0871799c42836f29f4934d4661dd634f553
+size 137

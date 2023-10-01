@@ -1,1 +1,3 @@
-That was strange.
+version https://git-lfs.github.com/spec/v1
+oid sha256:1d10d050b1881bf120cd5ba1772c24f35b69159f5a67615138c673fdf66fa5be
+size 17

@@ -1,1 +1,3 @@
-If at moments he felt an impulse to rise from his post of honour and, confessing before them all his unworthiness, to leave the chapel, a glance at their faces restrained him.
+version https://git-lfs.github.com/spec/v1
+oid sha256:47ecdef0467bfc8156e27ecdfddd9ba4f3524d386c4dcb6b7978378e718ba47e
+size 175

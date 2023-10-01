@@ -1,1 +1,3 @@
-Heron, beside Stephen, began to hum tunelessly.
+version https://git-lfs.github.com/spec/v1
+oid sha256:5d898345cba81fed1e19da7a177ce30f819df85b09d7b12fb2059f2d8992a9b8
+size 47
