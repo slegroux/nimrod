@@ -1,1 +1,3 @@
-His pride in his own sin, his loveless awe of God, told him that his offence was too grievous to be atoned for in whole or in part by a false homage to the All-seeing and All-knowing.
+version https://git-lfs.github.com/spec/v1
+oid sha256:4867d2a8f2b8b5ae1f6bfdbb3a83577b8113cbb5c065a99bf316b7d40c5a1712
+size 183

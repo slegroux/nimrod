@@ -1,1 +1,3 @@
-It was strange too that he found an arid pleasure in following up to the end the rigid lines of the doctrines of the church and penetrating into obscure silences only to hear and feel the more deeply his own condemnation.
+version https://git-lfs.github.com/spec/v1
+oid sha256:4f9f6a262407aec27dfda533b3a75239e3fc1995e5a32b961c5cf889d4aa213f
+size 221

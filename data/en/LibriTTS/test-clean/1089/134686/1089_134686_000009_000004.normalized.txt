@@ -1,1 +1,3 @@
-He had sinned mortally not once but many times and he knew that, while he stood in danger of eternal damnation for the first sin alone, by every succeeding sin he multiplied his guilt and his punishment.
+version https://git-lfs.github.com/spec/v1
+oid sha256:cdf3c0038adec5fab2b86eaa6290bf02faf5749d31411821b2de82d6b66b528c
+size 203

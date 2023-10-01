@@ -1,1 +1,3 @@
-Do you mean to say that you are not able to tell me what a surd is?
+version https://git-lfs.github.com/spec/v1
+oid sha256:6fdd87b457c9f7a64d077b1252909811ffb513efbb7254138eea6e252af5401e
+size 67

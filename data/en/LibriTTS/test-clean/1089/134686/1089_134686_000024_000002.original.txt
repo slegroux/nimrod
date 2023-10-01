@@ -1,1 +1,3 @@
-If a layman in giving baptism pour the water before saying the words is the child baptized?
+version https://git-lfs.github.com/spec/v1
+oid sha256:44d9e4c82ebc5242bff885ead00f864347538bd97bb2aa9d50a7423a6119e2a6
+size 91

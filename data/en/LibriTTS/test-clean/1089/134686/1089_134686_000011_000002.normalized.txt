@@ -1,1 +1,3 @@
-On Sunday mornings as he passed the church door he glanced coldly at the worshippers who stood bareheaded, four deep, outside the church, morally present at the mass which they could neither see nor hear. Their dull piety and the sickly smell of the cheap hair oil with which they had anointed their heads repelled him from the altar they prayed at.
+version https://git-lfs.github.com/spec/v1
+oid sha256:7f1d65d3e2f551490fb494cbc5bbc4c29114226b2946afacf0a7a7ff5c65c03d
+size 349

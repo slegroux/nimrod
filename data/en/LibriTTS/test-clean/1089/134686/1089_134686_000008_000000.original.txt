@@ -1,1 +1,3 @@
-The dull light fell more faintly upon the page whereon another equation began to unfold itself slowly and to spread abroad its widening tail. It was his own soul going forth to experience, unfolding itself sin by sin, spreading abroad the bale-fire of its burning stars and folding back upon itself, fading slowly, quenching its own lights and fires. They were quenched: and the cold darkness filled chaos.
+version https://git-lfs.github.com/spec/v1
+oid sha256:9c4c142d7c76149f140fae8f82cc638863f0cbce8806984eb83ae387c5e824ca
+size 406

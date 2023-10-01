@@ -1,1 +1,3 @@
-The rector went on gravely:
+version https://git-lfs.github.com/spec/v1
+oid sha256:e843f4af8ded88ceff97db2239927a480685ca7199ad14ecf74270c99b49a313
+size 27

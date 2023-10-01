@@ -1,1 +1,3 @@
-A boy from his post at the window had seen the rector come from the house.
+version https://git-lfs.github.com/spec/v1
+oid sha256:5ded2783846f62a2342cb008b11de7a3b3ca4ab0edb233bc4294dcbb97e53cbf
+size 74

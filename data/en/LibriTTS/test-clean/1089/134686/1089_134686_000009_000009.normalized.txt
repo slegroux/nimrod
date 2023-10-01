@@ -1,1 +1,3 @@
-A certain pride, a certain awe, withheld him from offering to God even one prayer at night, though he knew it was in God's power to take away his life while he slept and hurl his soul hellward ere he could beg for mercy.
+version https://git-lfs.github.com/spec/v1
+oid sha256:db29054e3e7a9efa263a71bf995a1f4a97891b06c3c22121c85bb6fd5d30c1d5
+size 220

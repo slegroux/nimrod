@@ -1,1 +1,3 @@
-Mass will be on Saturday morning at nine o'clock and general communion for the whole college.
+version https://git-lfs.github.com/spec/v1
+oid sha256:6a9515df23688db3dfd20eddf55e1cebb105a78a9275a7b6f6b581a96a581998
+size 93

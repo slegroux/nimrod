@@ -1,1 +1,3 @@
-Yet as he prowled in quest of that call, his senses, stultified only by his desire, would note keenly all that wounded or shamed them; his eyes, a ring of porter froth on a clothless table or a photograph of two soldiers standing to attention or a gaudy playbill; his ears, the drawling jargon of greeting:
+version https://git-lfs.github.com/spec/v1
+oid sha256:e9bd1fa9e58b443629d1c97f59c58bcddc267ba2669cc23eb6a507db029ff7c6
+size 306

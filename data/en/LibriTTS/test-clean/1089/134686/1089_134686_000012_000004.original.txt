@@ -1,1 +1,3 @@
-The imagery of the psalms of prophecy soothed his barren pride.
+version https://git-lfs.github.com/spec/v1
+oid sha256:67e0d88ff18d0d6e6c58e6ce24efb96a3196a9972f8f46fcc5b8f979630ac535
+size 63

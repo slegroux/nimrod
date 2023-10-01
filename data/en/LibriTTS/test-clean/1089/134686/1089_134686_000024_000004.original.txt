@@ -1,1 +1,3 @@
-How comes it that while the first beatitude promises the kingdom of heaven to the poor of heart the second beatitude promises also to the meek that they shall possess the land?
+version https://git-lfs.github.com/spec/v1
+oid sha256:8fe8aa76caf96ea776a1ae398474a80d5472b04b56b46bf2238a564aac33b90b
+size 176

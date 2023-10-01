@@ -1,1 +1,3 @@
-He hoped there would be stew for dinner, turnips and carrots and bruised potatoes and fat mutton pieces to be ladled out in thick peppered flour-fattened sauce. Stuff it into you, his belly counselled him.
+version https://git-lfs.github.com/spec/v1
+oid sha256:3c4c531aab89079547e957a9622211ff1875af7982bc4b8f248c9d98b8521cf4
+size 205

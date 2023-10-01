@@ -1,1 +1,3 @@
-We can scut the whole hour.
+version https://git-lfs.github.com/spec/v1
+oid sha256:45b74336e31857de15024f987688e8b4c4f3fdaeea37225d583aeb3f8b6938f6
+size 27

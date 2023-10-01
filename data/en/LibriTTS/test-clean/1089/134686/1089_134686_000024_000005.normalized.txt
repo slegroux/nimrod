@@ -1,1 +1,3 @@
-Why was the sacrament of the eucharist instituted under the two species of bread and wine if Jesus Christ be present body and blood, soul and divinity, in the bread alone and in the wine alone?
+version https://git-lfs.github.com/spec/v1
+oid sha256:0c8a04a01fb8cfd2caa0557429cca8dcca8350ee1742ff51064abfff254c5bf4
+size 193

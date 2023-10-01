@@ -1,1 +1,3 @@
-A little wave of quiet mirth broke forth over the class of boys from the rector's grim smile.
+version https://git-lfs.github.com/spec/v1
+oid sha256:00b97d722516844c3279a7b67275af05849c7d4cc81209a647a4fb57afdd2539
+size 93

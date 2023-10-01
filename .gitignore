@@ -142,7 +142,6 @@ tests/
 */wandb/*
 *_logs*
 recipes/image/
-data/*
 logs/
-
 _proc/
+_docs/

@@ -1,1 +1,3 @@
-The vast cycle of starry life bore his weary mind outward to its verge and inward to its centre, a distant music accompanying him outward and inward.
+version https://git-lfs.github.com/spec/v1
+oid sha256:0dee87ece61919a3bbd2ed5e4d6ecb2f1077440367e1080b9af7729ee42d14c9
+size 149
