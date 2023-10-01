@@ -1,0 +1,4 @@
+_target_: nimrod.tts.models.tacotron2.Encoder
+encoder_embedding_dim: 512
+encoder_kernel_size: 5
+encoder_n_convolutions: 3
