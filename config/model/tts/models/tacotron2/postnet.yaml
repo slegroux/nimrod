@@ -1,0 +1,5 @@
+_target_: nimrod.tts.models.tacotron2.Postnet
+n_mel_channels: 80
+postnet_embedding_dim: 512
+postnet_kernel_size: 5
+postnet_n_convolutions: 5

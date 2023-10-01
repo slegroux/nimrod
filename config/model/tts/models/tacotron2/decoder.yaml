@@ -1,0 +1,14 @@
+_target_: nimrod.tts.models.tacotron2.Decoder
+n_mel_channels: 80
+n_frames_per_step: 1
+encoder_embedding_dim: 512
+attention_rnn_dim: 1024
+decoder_rnn_dim: 1024
+prenet_dim: 256
+max_decoder_steps: 1000
+gate_threshold: 0.5
+p_attention_dropout: 0.5
+p_decoder_dropout: 0.5
+attention_dim: 128
+attention_location_n_filters: 32
+attention_location_kernel_size: 31
