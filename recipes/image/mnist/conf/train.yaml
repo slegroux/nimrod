@@ -1,7 +1,7 @@
 # @package _global_
 
 run_id: ${now:%Y-%m-%d}_${now:%H-%M-%S}
-project: "mnist"
+project: "MNIST"
 ckpt_path: null # ckpt to resume training from
 seed: 42
 test: True
@@ -30,8 +30,8 @@ datamodule:
   _target_: nimrod.data.datasets.MNISTDataModule
   data_dir: "~/Data"
   train_val_test_split: [0.8, 0.1, 0.1]
-  batch_size: 1024
-  num_workers: 0
+  batch_size: 64
+  num_workers: 4
   pin_memory: False
 
 model:
@@ -46,12 +46,12 @@ trainer:
   _target_: pytorch_lightning.Trainer
   default_root_dir: ${paths.output_dir}
   min_epochs: 1 # prevents early stopping
-  max_epochs: 250
-  devices: auto
-  accelerator: gpu
-  strategy: ddp
-  precision: 16
-  auto_lr_find: False
+  max_epochs: 10
+  devices: 1
+  accelerator: 'mps'
+  #strategy: ddp
+  precision: "16-mixed"
+  # auto_lr_find: False
   # perform a validation loop every N training epochs
   check_val_every_n_epoch: 1
   # set True to to ensure deterministic results makes training slower but gives more reproducibility than just setting seeds
