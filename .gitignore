@@ -141,7 +141,7 @@ tests/
 *tfevents*
 */wandb/*
 *_logs*
-recipes/image/
+# recipes/image/
 logs/
 _proc/
 _docs/

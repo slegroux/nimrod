@@ -29,6 +29,7 @@ class ImageDataset(Dataset):
     def show_idx(self,
         index:int # Index of the (image,label) sample to visualize
         ):
+        "display image from data point index of a image dataset"
         X, y = self.__getitem__(index)
         plt.figure(figsize = (1, 1))
         plt.imshow(X.numpy().reshape(28,28),cmap='gray')
@@ -36,7 +37,11 @@ class ImageDataset(Dataset):
         plt.show()
 
     @staticmethod
-    def show_grid(imgs, save_path=None):
+    def show_grid(
+        imgs: List[torch.Tensor], # python list of images dim (C,H,W)
+        save_path=None # path where image can be saved
+        ):
+        "display list of mnist-like images (C,H,W)"
         if not isinstance(imgs, list):
             imgs = [imgs]
         fig, axs = plt.subplots(ncols=len(imgs), squeeze=False)
@@ -50,6 +55,7 @@ class ImageDataset(Dataset):
     def show_random(self,
         n=3 # number of images to display
         ):
+        "display grid of random images"
         indices = torch.randint(0,len(self), (n,))
         images = []
         for index in indices:
@@ -59,7 +65,7 @@ class ImageDataset(Dataset):
         self.show_grid(images)
         
 
-# %% ../../nbs/image.datasets.ipynb 8
+# %% ../../nbs/image.datasets.ipynb 11
 class MNISTDataset(ImageDataset):
     "MNIST digit dataset"
 
@@ -68,6 +74,9 @@ class MNISTDataset(ImageDataset):
         data_dir:str='~/Data', # path where data is saved
         train = True, # train or test dataset
         transform:torchvision.transforms.transforms=torchvision.transforms.ToTensor() # data formatting
+        # TODO: add noramlization?
+        # torchvision.transforms.Compose([torchvision.transforms.ToTensor(), torchvision.transforms.Normalize(0.1307,), (0.3081,))])
+
     ):
 
         super().__init__()
@@ -79,10 +88,11 @@ class MNISTDataset(ImageDataset):
             download=True
         )
 
-    def __len__(self):
+    def __len__(self) -> int: # length of dataset
         return len(self.ds)
     
-    def __getitem__(self, idx):
+    def __getitem__(self, idx # index into the dataset
+                    ) -> tuple[torch.FloatTensor, int]: # Y image data, x digit number
         x = self.ds[idx][0]
         y = self.ds[idx][1]
         return x, y
@@ -90,7 +100,7 @@ class MNISTDataset(ImageDataset):
     def train_dev_split(self,
         ratio:float, # percentage of train/dev split,
         seed:int=42 # rand generator seed
-    ):
+    ) -> tuple[torchvision.datasets.MNIST, torchvision.datasets.MNIST]: # train and set mnnist datasets
         train_set_size = int(len(self.ds) * ratio)
         valid_set_size = len(self.ds) - train_set_size
 
@@ -101,15 +111,15 @@ class MNISTDataset(ImageDataset):
 
 
 
-# %% ../../nbs/image.datasets.ipynb 14
+# %% ../../nbs/image.datasets.ipynb 18
 class MNISTDataModule(LightningDataModule):
     def __init__(
         self,
-        data_dir: str = "~/Data/",
-        train_val_test_split:List[float] = [0.8, 0.1, 0.1],
-        batch_size: int = 64,
-        num_workers: int = 0,
-        pin_memory: bool = False,
+        data_dir: str = "~/Data/", # path to source data dir
+        train_val_test_split:List[float] = [0.8, 0.1, 0.1], # train val test %
+        batch_size: int = 64, # size of compute batch
+        num_workers: int = 0, # num_workers equal 0 means that it’s the main process that will do the data loading when needed, num_workers equal 1 is the same as any n, but you’ll only have a single worker, so it might be slow
+        pin_memory: bool = False, # If you load your samples in the Dataset on CPU and would like to push it during training to the GPU, you can speed up the host to device transfer by enabling pin_memory. This lets your DataLoader allocate the samples in page-locked memory, which speeds-up the transfer
     ):
         super().__init__()
         self.save_hyperparameters(logger=False) # can access inputs with self.hparams
@@ -122,17 +132,19 @@ class MNISTDataModule(LightningDataModule):
             raise Exception('split percentages should sum up to 1.0')
 
     @property
-    def num_classes(self):
+    def num_classes(self) -> int: # num of classes in dataset
         return 10
 
-    def prepare_data(self):
+    def prepare_data(self) -> None:
         """Download data if needed + format with MNISTDataset
         """
         MNISTDataset(self.hparams.data_dir, train=True)
         MNISTDataset(self.hparams.data_dir, train=False)
 
-    def setup(self, stage: Optional[str] = None):
+    def setup(self, stage: Optional[str] = None) -> None:
+        # concat train & test mnist dataset and randomly generate train, eval, test sets
         if not self.data_train and not self.data_val and not self.data_test:
+            # ((B, H, W), int)
             trainset = MNISTDataset(self.hparams.data_dir, train=True, transform=self.transforms)
             testset = MNISTDataset(self.hparams.data_dir, train=False, transform=self.transforms)
             dataset = ConcatDataset(datasets=[trainset, testset])
@@ -143,7 +155,7 @@ class MNISTDataModule(LightningDataModule):
                 generator=torch.Generator().manual_seed(42),
             )
 
-    def train_dataloader(self):
+    def train_dataloader(self) -> torch.utils.data.DataLoader:
         return DataLoader(
             dataset=self.data_train,
             batch_size=self.hparams.batch_size,
@@ -152,7 +164,7 @@ class MNISTDataModule(LightningDataModule):
             shuffle=True,
         )
 
-    def val_dataloader(self):
+    def val_dataloader(self) -> torch.utils.data.DataLoader:
         return DataLoader(
             dataset=self.data_val,
             batch_size=self.hparams.batch_size,
@@ -161,7 +173,7 @@ class MNISTDataModule(LightningDataModule):
             shuffle=False,
         )
 
-    def test_dataloader(self):
+    def test_dataloader(self) -> torch.utils.data.DataLoader:
         return DataLoader(
             dataset=self.data_test,
             batch_size=self.hparams.batch_size,
@@ -170,7 +182,7 @@ class MNISTDataModule(LightningDataModule):
             shuffle=False,
         )
 
-    def teardown(self, stage: Optional[str] = None):
+    def teardown(self, stage: Optional[str] = None) -> None:
         """Clean up after fit or test."""
         pass
 

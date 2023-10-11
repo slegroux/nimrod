@@ -24,9 +24,19 @@ pip install nimrod
 Check recipes in `recipes/` folder. For instance:
 
 ``` bash
-cd recipes/autoencoder/
-python train.py
+cd recipes/images/mnist
+python train.py datamodule.num_workers=10 trainer.max_epochs=20 trainer.accelerator='gpu'
+head conf/train.yaml
 ```
+
+All the parameters of the experiment are editable and read from a .yaml
+file which details:
+
+- data and logging directory paths
+- data module with data source path and batching parameters
+- model architecture
+- trainer with hardware acceleration and number of epochs
+- callbacks for early stopping and automatic logging to Wandb
 
 ## Docker
 
