@@ -16,7 +16,7 @@ an emphasis on speech, audio and language modeling.
 ## Install
 
 ``` sh
-pip install nimrod
+pip install slg-nimrod==0.0.2
 ```
 
 ## Usage
