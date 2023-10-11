@@ -9,7 +9,7 @@ import wandb
 def main(cfg: DictConfig) -> None:
 
     # PARAMS
-    print(OmegaConf.to_yaml(cfg))
+    # print(OmegaConf.to_yaml(cfg))
 
     # SEED
     pl.seed_everything(cfg.seed, workers=True)
@@ -25,10 +25,10 @@ def main(cfg: DictConfig) -> None:
     for _, cb_conf in cfg.callbacks.items():
         callbacks.append(instantiate(cb_conf))
 
-    # logger = instantiate(cfg.logger)
+    logger = instantiate(cfg.logger)
 
     profiler = instantiate(cfg.profiler)
-    trainer = instantiate(cfg.trainer, callbacks=callbacks) #, profiler=profiler) #, logger=[logger])
+    trainer = instantiate(cfg.trainer, callbacks=callbacks, profiler=profiler, logger=[logger])
 
     if cfg.get("train"):
         # trainer.fit(model=autoencoder_pl, train_dataloaders=train_dl, val_dataloaders=dev_dl, ckpt_path=cfg.get("ckpt_path"))
