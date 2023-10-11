@@ -3,34 +3,49 @@
 # %% auto 0
 __all__ = ['MLP', 'MLP_PL']
 
-# %% ../../nbs/models.mlp.ipynb 3
+# %% ../../nbs/models.mlp.ipynb 4
 import torch.nn as nn
 import torch
+from torchvision.transforms import ToTensor
+from torch.utils.data import DataLoader
+from torchvision.datasets import MNIST
 
-from pytorch_lightning import LightningModule
+
+from pytorch_lightning import LightningModule, Trainer
 from torchmetrics import Accuracy
 from hydra.utils import instantiate
 from omegaconf import OmegaConf
 
 from ..data.datasets import MNISTDataModule
+from ..utils import get_device
 
-# %% ../../nbs/models.mlp.ipynb 5
+# from IPython.core.debugger import set_trace
+
+# %% ../../nbs/models.mlp.ipynb 6
 class MLP(nn.Module):
-    def __init__(self, n_in=32*32*3, n_h=64, n_out=10):
+    def __init__(
+                self, n_in:int=32*32*3, # input dimension e.g. (H,W) for image
+                n_h:int=64, # hidden dimension
+                n_out:int=10 # output dimension (= number of classes for classification)
+                ):
         super().__init__()
         l1 = nn.Linear(n_in, n_h)
         l2 = nn.Linear(n_h, n_out)
-        relu = nn.ReLU()
-        self.layers = nn.Sequential(l1,l2,relu)
+        dropout = nn.Dropout(0.2)
+        self.layers = nn.Sequential(l1,l2, dropout)
         
-    def forward(self, x):
+    def forward(self, x: torch.FloatTensor # dim (B, H*W)
+                ) -> torch.FloatTensor:
         return self.layers(x)
 
-# %% ../../nbs/models.mlp.ipynb 9
+# %% ../../nbs/models.mlp.ipynb 20
 class MLP_PL(LightningModule):
-    def __init__(self, mlp:MLP):
+    def __init__(self,
+                mlp:MLP # pure pytorch MLP model
+                ):
         super().__init__()
-        self.save_hyperparameters(ignore=['mlp'])
+        # self.save_hyperparameters(ignore=['mlp'])
+        self.save_hyperparameters()
         self.mlp = mlp
         self.loss = nn.CrossEntropyLoss()
         self.accuracy = Accuracy(task="multiclass", num_classes=10)
@@ -39,7 +54,9 @@ class MLP_PL(LightningModule):
         optimizer = torch.optim.Adam(self.parameters(), lr=1e-3)
         return optimizer
     
-    def forward(self, x):
+    def forward(self,
+                x: torch.Tensor # X input images dim(B, H*W)
+                ) -> torch.Tensor: # y class probabilities (B, n_classes)
         return(self.mlp(x))
 
     def training_step(self, batch, batch_idx):

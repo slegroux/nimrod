@@ -1,7 +1,7 @@
 # @package _global_
 
 run_id: ${now:%Y-%m-%d}_${now:%H-%M-%S}
-project: "MNIST"
+project: "MNIST-TEST"
 ckpt_path: null # ckpt to resume training from
 seed: 42
 test: True
@@ -46,7 +46,7 @@ trainer:
   _target_: pytorch_lightning.Trainer
   default_root_dir: ${paths.output_dir}
   min_epochs: 1 # prevents early stopping
-  max_epochs: 10
+  max_epochs: 2
   devices: 1
   accelerator: 'mps'
   #strategy: ddp
@@ -85,7 +85,7 @@ logger:
   offline: False # store only locally
   id: null # give id to resume experiment
   entity: "slegroux"
-  log_model: False
+  log_model: False # log checkpoints at end of training
   prefix: ""
   group: ""
   tags: ${tags}
