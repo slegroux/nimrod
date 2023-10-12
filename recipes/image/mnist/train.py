@@ -26,6 +26,10 @@ def main(cfg: DictConfig) -> None:
         callbacks.append(instantiate(cb_conf))
 
     logger = instantiate(cfg.logger)
+    if isinstance(logger, pl.loggers.wandb.WandbLogger):
+        # wandb requires dict not DictConfig
+        hp = OmegaConf.to_container(cfg, resolve=True, throw_on_missing=True)
+        logger.experiment.config.update(hp)
 
     profiler = instantiate(cfg.profiler)
     trainer = instantiate(cfg.trainer, callbacks=callbacks, profiler=profiler, logger=[logger])
