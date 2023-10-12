@@ -1,0 +1,39 @@
+FROM nvcr.io/nvidia/pytorch:23.09-py3
+LABEL maintainer="Sylvain Le Groux <sylvain.legroux@gmail.com>"
+USER root
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
+    apt-get install -y --no-install-recommends \
+    build-essential \
+    libboost-all-dev \
+    libeigen3-dev \
+    cmake \
+    zlib1g-dev libbz2-dev liblzma-dev \
+    festival \
+    espeak-ng \
+    mbrola \
+    git \
+    curl \
+    ca-certificates \     
+    wget \
+    pkg-config && \
+    # Remove the effect of `apt-get update`
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN git clone https://github.com/kpu/kenlm && \
+    cd kenlm; mkdir build; cd build && \
+    cmake ..; make -j 4; make install
+
+# RUN apt-get install python3-pip
+RUN pip install slg-nimrod && \
+    python -m spacy download en_core_web_sm && \
+    nbdev_install_quarto && \
+    git clone https://github.com/slegroux/nimrod
+
+WORKDIR /workspace/nimrod
+EXPOSE 8888
+
+CMD ["jupyter", "lab", "--allow-root", "--ip=0.0.0.0", "--port=8888", "--no-browser", \
+    "--LabApp.trust_xheaders=True", "--LabApp.disable_check_xsrf=False", "--LabApp.allow_remote_access=True", \
+    "--LabApp.allow_origin='*'", \
+    "--NotebookApp.token=''","--NotebookApp.password=''"] #risky use with caution
