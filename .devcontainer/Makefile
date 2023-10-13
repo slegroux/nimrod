@@ -1,6 +1,6 @@
 .PHONY: nimrod-dev nimrod
 
-IMAGE_TAG = nimrod-dev
+IMAGE_TAG ?= nimrod-test
 
 nimrod-dev:
 	docker build --network host -t nimrod-dev -f Dockerfile .
@@ -18,5 +18,5 @@ base:
 	docker build -t base -f Dockerfile.base .
 
 push:
-	docker image tag nimrod-paperspace slegroux/nimrod-paperspace
-	docker image push slegroux/nimrod-paperspace
+	docker image tag ${IMAGE_TAG} slegroux/${IMAGE_TAG}
+	docker image push slegroux/${IMAGE_TAG}
