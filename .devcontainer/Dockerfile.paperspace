@@ -1,4 +1,8 @@
-FROM nvcr.io/nvidia/pytorch:23.09-py3
+#FROM nvcr.io/nvidia/pytorch:23.09-py3
+# FROM paperspace/gradient-base:pt112-tf29-jax0314-py39-20220803
+FROM ubuntu:20.04
+RUN yes| unminimize
+
 LABEL maintainer="Sylvain Le Groux <sylvain.legroux@gmail.com>"
 USER root
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
@@ -15,23 +19,25 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     curl \
     ca-certificates \     
     wget \
+    htop \
+    python3 \
+    python3-pip \
     pkg-config && \
     # Remove the effect of `apt-get update`
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-RUN git clone https://github.com/kpu/kenlm && \
-    cd kenlm; mkdir build; cd build && \
-    cmake ..; make -j 4; make install
+# RUN git clone https://github.com/kpu/kenlm && \
+#     cd kenlm; mkdir build; cd build && \
+#     cmake ..; make -j8; make install
 
-# RUN apt-get install python3-pip
-RUN pip install slg-nimrod && \
-    python -m spacy download en_core_web_sm && \
-    nbdev_install_quarto && \
-    git clone https://github.com/slegroux/nimrod
+RUN pip install slg-nimrod && ln -s /usr/bin/python3 /usr/local/bin/python && python -m spacy download en_core_web_sm && nbdev_install_quarto
+
+# RUN pip install -U 'spacy[cuda11x]'
+# RUN git clone https://github.com/slegroux/nimrod
 
 WORKDIR /workspace/nimrod
-EXPOSE 8888
+EXPOSE 8888 6006
 
 CMD ["jupyter", "lab", "--allow-root", "--ip=0.0.0.0", "--port=8888", "--no-browser", \
     "--LabApp.trust_xheaders=True", "--LabApp.disable_check_xsrf=False", "--LabApp.allow_remote_access=True", \
