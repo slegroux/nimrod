@@ -18,7 +18,6 @@ an emphasis on speech, audio and language modeling.
 you need python \<3.12
 
 ``` sh
-git clone https://github.com/slegroux/nimrod.git
 pip install slg-nimrod
 ```
 
@@ -27,7 +26,8 @@ pip install slg-nimrod
 Check recipes in `recipes/` folder. For instance:
 
 ``` bash
-cd recipes/images/mnist
+git clone https://github.com/slegroux/nimrod.git
+cd nimrod/recipes/images/mnist
 python train.py datamodule.num_workers=10 trainer.max_epochs=20 trainer.accelerator='gpu'
 head conf/train.yaml
 ```
