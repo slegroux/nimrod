@@ -1,13 +1,19 @@
 version:  '3'
 services:
   jupyterlab:
-      image: slegroux/nimrod
+      image: nimrod-test
       volumes:
         - /Users/syl20/Data:/home/data
       ports:
         - 8888:8888
       container_name: nimrod_jupyter
-      command: "jupyter lab --allow-root --ip=0.0.0.0 --port=8888 --no-browser --NotebookApp.token='' --NotebookApp.password=''"
+      env_file:
+        - env-file
+      command:
+        - ./command.sh
+        # - "jupyter lab --allow-root --ip=0.0.0.0 --no-browser --ServerApp.trust_xheaders=True --ServerApp.disable_check_xsrf=False --ServerApp.allow_remote_access=True --ServerApp.allow_origin='*' --ServerApp.allow_credentials=True"
+        # - git clone https://github.com/slegroux/nimrod
+        # - "jupyter lab --allow-root --ip=0.0.0.0 --port=8888 --no-browser --NotebookApp.token='' --NotebookApp.password=''"
       # command: "./start_jupyterlab.sh"
       # command: "start-notebook.sh \
       #   --NotebookApp.password=${ACCESS_TOKEN} \
