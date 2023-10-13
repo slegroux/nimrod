@@ -15,8 +15,11 @@ an emphasis on speech, audio and language modeling.
 
 ## Install
 
+you need python \<3.12
+
 ``` sh
-pip install slg-nimrod==0.0.2
+git clone https://github.com/slegroux/nimrod.git
+pip install slg-nimrod
 ```
 
 ## Usage

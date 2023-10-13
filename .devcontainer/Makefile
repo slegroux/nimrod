@@ -8,8 +8,14 @@ nimrod-dev:
 nimrod:
 	docker build --network host -t nimrod -f Dockerfile .
 
-nimrod-paperspace:
-	docker build -t nimrod-paperspace -f Dockerfile.paperspace .
+paperspace:
+	docker build -t nimrod-paperspace -f Dockerfile.paperspace . #--platform linux/amd64
+
+test:
+	docker build -t nimrod-test -f Dockerfile.test .
+
+base:
+	docker build -t base -f Dockerfile.base .
 
 push:
 	docker image tag nimrod-paperspace slegroux/nimrod-paperspace
