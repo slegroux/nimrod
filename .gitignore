@@ -148,3 +148,7 @@ _docs/
 data/codeparrot
 server
 token
+env-file
+Dockerfile.base
+Dockerfile.test
+Dockerfile.paperspace
