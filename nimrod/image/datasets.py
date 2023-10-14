@@ -26,6 +26,9 @@ from typing import Any, Dict, Optional, Tuple, List
 class ImageDataset(Dataset):
     " Base class for image datasets providing visualization of (image, label) samples"
 
+    def __init__(self):
+        pass
+
     def show_idx(self,
         index:int # Index of the (image,label) sample to visualize
         ):
@@ -107,6 +110,8 @@ class MNISTDataset(ImageDataset):
         # split the train set into two
         seed = torch.Generator().manual_seed(seed)
         train_set, valid_set = data.random_split(self.ds, [train_set_size, valid_set_size], generator=seed)
+        # TODO: cast to ImageDataset to allow for drawing
+        # train_set, valid_set = Dataset(train_set),j Dataset(valid_set)
         return train_set, valid_set
 
 

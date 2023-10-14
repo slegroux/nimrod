@@ -15,9 +15,11 @@ from pytorch_lightning import LightningModule, Trainer
 from torchmetrics import Accuracy
 from hydra.utils import instantiate
 from omegaconf import OmegaConf
+from matplotlib import pyplot as plt
 
 from ..data.datasets import MNISTDataModule
 from ..utils import get_device
+from ..image.datasets import ImageDataset
 
 # from IPython.core.debugger import set_trace
 
@@ -38,7 +40,7 @@ class MLP(nn.Module):
                 ) -> torch.FloatTensor:
         return self.layers(x)
 
-# %% ../../nbs/models.mlp.ipynb 20
+# %% ../../nbs/models.mlp.ipynb 21
 class MLP_PL(LightningModule):
     def __init__(self,
                 mlp:MLP # pure pytorch MLP model
@@ -86,6 +88,7 @@ class MLP_PL(LightningModule):
 
     def predict_step(self, batch, batch_idx, dataloader_idx=0):
         x, y = batch
+        x = x.view(x.size(0), -1)
         y_hat = self.mlp(x)
-        return y_hat
+        return y_hat.argmax(dim=1)
 
