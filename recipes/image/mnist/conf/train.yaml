@@ -41,6 +41,7 @@ model:
     n_in: 784
     n_h: 64
     n_out: 10
+  lr: 1e-3
 
 trainer:
   _target_: pytorch_lightning.Trainer
@@ -48,7 +49,7 @@ trainer:
   min_epochs: 1 # prevents early stopping
   max_epochs: 2
   devices: 1
-  accelerator: 'mps'
+  accelerator: 'cpu'
   #strategy: ddp
   precision: "16-mixed"
   # auto_lr_find: False
