@@ -1,0 +1,15 @@
+program: train.py
+method: bayes
+metric:
+  goal: maximize
+  name: test/accuracy
+parameters:
+  model:
+    lr: [1e-3, 1e-2]
+
+command:
+  - ${env}
+  - python
+  - ${program}
+  - ${args_no_hyphens}
+  - wandb.setup.entity=slegroux
