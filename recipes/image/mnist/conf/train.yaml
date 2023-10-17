@@ -24,8 +24,8 @@ paths:
 
 hydra:
   defaults:
-    - override hydra_logging: colorlog
-    - override job_logging: colorlog
+    - override hydra/hydra_logging: colorlog
+    - override hydra/job_logging: colorlog
   run:
     dir: ${paths.log_dir}/runs/${run_id}
   sweep:
@@ -34,7 +34,7 @@ hydra:
   sweeper:
     _target_: hydra_plugins.hydra_optuna_sweeper.optuna_sweeper.OptunaSweeper
     direction: maximize
-    n_trials: 5
+    n_trials: 20
     n_jobs: 1
     storage: null
     study_name: ${project}
@@ -42,23 +42,34 @@ hydra:
       _target_: optuna.samplers.TPESampler
       seed: 1234
       n_startup_trials: 10 # number of random sampling runs before optimization starts
+      consider_prior: true
+      prior_weight: 1.0
+      consider_magic_clip: true
+      consider_endpoints: false
+      n_ei_candidates: 24
+      multivariate: false
+      warn_independent_sampling: true
     params:
-      model.lr: interval(0.0001, 0.1)
-      model.n_h: choice(64, 128, 256)
-      datamodule.batch_size: choice(32, 64, 128, 256)
+      model.lr: tag(log, interval(1e-3, 1e-2))
+      # model.lr: interval(1e-3, 1e-2)
+      # model.dropout: interval(0.15, 0.5)
+      # model.n_h: choice(128, 256, 512)
+      # datamodule.batch_size: choice(128)
+
 
 datamodule:
-  _target_: nimrod.data.datasets.MNISTDataModule
+  _target_: nimrod.image.datasets.MNISTDataModule
   data_dir: "~/Data"
   train_val_test_split: [0.8, 0.1, 0.1]
   batch_size: 64
-  num_workers: 4
+  num_workers: 10
   pin_memory: True #https://discuss.pytorch.org/t/when-to-set-pin-memory-to-true/19723
+  persistent_workers: True #https://discuss.pytorch.org/t/what-are-the-dis-advantages-of-persistent-workers/102110
 
 model:
   _target_: nimrod.models.mlp.MLP_PL
   n_in: 784
-  n_h: 64
+  n_h: 256
   n_out: 10
   dropout: 0.2
   lr: 1e-3
@@ -101,7 +112,7 @@ callbacks:
 logger:
   _target_: pytorch_lightning.loggers.wandb.WandbLogger
   project: ${project}
-  name: ${run_id}
+  name: bs:${datamodule.batch_size}-do:${model.dropout}-lr:${model.lr}-nh:${model.n_h}
   save_dir: ${paths.output_dir}
   offline: False # store only locally
   id: null # give id to resume experiment
