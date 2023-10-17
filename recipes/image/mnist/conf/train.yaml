@@ -1,13 +1,19 @@
 # @package _global_
 
 run_id: ${now:%Y-%m-%d}_${now:%H-%M-%S}
-project: "MNIST-TEST"
+project: "MNIST-HP"
 ckpt_path: null # ckpt to resume training from
 seed: 42
 test: True
 train: True
 ignore_warnings: True
 tags: ["dev"]
+hparams_search: null
+
+# hparam tuning
+optimized_metric: "test/acc"
+defaults:
+  - override hydra/sweeper: optuna
 
 paths:
   root_dir: .
@@ -25,6 +31,21 @@ hydra:
   sweep:
     dir: ${paths.log_dir}/multiruns/${run_id}
     subdir: ${hydra.job.num}
+  sweeper:
+    _target_: hydra_plugins.hydra_optuna_sweeper.optuna_sweeper.OptunaSweeper
+    direction: maximize
+    n_trials: 5
+    n_jobs: 1
+    storage: null
+    study_name: ${project}
+    sampler:
+      _target_: optuna.samplers.TPESampler
+      seed: 1234
+      n_startup_trials: 10 # number of random sampling runs before optimization starts
+    params:
+      model.lr: interval(0.0001, 0.1)
+      model.n_h: choice(64, 128, 256)
+      datamodule.batch_size: choice(32, 64, 128, 256)
 
 datamodule:
   _target_: nimrod.data.datasets.MNISTDataModule
@@ -32,28 +53,28 @@ datamodule:
   train_val_test_split: [0.8, 0.1, 0.1]
   batch_size: 64
   num_workers: 4
-  pin_memory: False
+  pin_memory: True #https://discuss.pytorch.org/t/when-to-set-pin-memory-to-true/19723
 
 model:
   _target_: nimrod.models.mlp.MLP_PL
-  mlp:
-    _target_: nimrod.models.mlp.MLP
-    n_in: 784
-    n_h: 64
-    n_out: 10
+  n_in: 784
+  n_h: 64
+  n_out: 10
+  dropout: 0.2
+  lr: 1e-3
 
 trainer:
   _target_: pytorch_lightning.Trainer
   default_root_dir: ${paths.output_dir}
+  enable_progress_bar: True
   min_epochs: 1 # prevents early stopping
   max_epochs: 2
   devices: 1
-  accelerator: 'mps'
+  accelerator: auto
   #strategy: ddp
-  precision: "16-mixed"
+  # precision: "16-mixed"
   # auto_lr_find: False
-  # perform a validation loop every N training epochs
-  check_val_every_n_epoch: 1
+  check_val_every_n_epoch: 1   # perform a validation loop every N training epochs
   # set True to to ensure deterministic results makes training slower but gives more reproducibility than just setting seeds
   deterministic: False
   benchmark: False
