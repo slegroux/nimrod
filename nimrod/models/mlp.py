@@ -26,38 +26,46 @@ from ..image.datasets import ImageDataset
 # %% ../../nbs/models.mlp.ipynb 6
 class MLP(nn.Module):
     def __init__(
-                self, n_in:int=32*32*3, # input dimension e.g. (H,W) for image
-                n_h:int=64, # hidden dimension
-                n_out:int=10 # output dimension (= number of classes for classification)
-                ):
+                self,
+                n_in:int, # input dimension e.g. (H,W) for image
+                n_h:int, # hidden dimension
+                n_out:int, # output dimension (= number of classes for classification)
+                dropout:float=0.2
+                ) -> None:
         super().__init__()
         l1 = nn.Linear(n_in, n_h)
         l2 = nn.Linear(n_h, n_out)
-        dropout = nn.Dropout(0.2)
-        self.layers = nn.Sequential(l1,l2, dropout)
+        relu = nn.ReLU()
+        dropout = nn.Dropout(dropout)
+        self.layers = nn.Sequential(l1, l2, relu, dropout)
         
-    def forward(self, x: torch.FloatTensor # dim (B, H*W)
-                ) -> torch.FloatTensor:
+    def forward(self, x: torch.Tensor # dim (B, H*W)
+                ) -> torch.Tensor:
         return self.layers(x)
 
 # %% ../../nbs/models.mlp.ipynb 21
 class MLP_PL(LightningModule):
     def __init__(self,
-                mlp:MLP # pure pytorch MLP model
+                n_in:int, # input dimension e.g. (H,W) for image
+                n_h:int, # hidden dimension
+                n_out:int, # output dimension (= number of classes for classification)
+                dropout:float=0.2, # dropout factor
+                lr:float=1e-3 # learning rate
                 ):
         super().__init__()
-        # self.save_hyperparameters(ignore=['mlp'])
+
         self.save_hyperparameters()
-        self.mlp = mlp
+        self.mlp = MLP(n_in, n_h, n_out, dropout)
         self.loss = nn.CrossEntropyLoss()
         self.accuracy = Accuracy(task="multiclass", num_classes=10)
+        self.lr = lr
 
     def configure_optimizers(self):
-        optimizer = torch.optim.Adam(self.parameters(), lr=1e-3)
+        optimizer = torch.optim.Adam(self.parameters(), lr=self.lr)
         return optimizer
     
     def forward(self,
-                x: torch.Tensor # X input images dim(B, H*W)
+                x: torch.Tensor, # X input images dim(B, H*W)
                 ) -> torch.Tensor: # y class probabilities (B, n_classes)
         return(self.mlp(x))
 
