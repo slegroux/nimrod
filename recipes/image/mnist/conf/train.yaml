@@ -108,6 +108,9 @@ callbacks:
     dirpath: ${paths.output_dir}/checkpoints
     filename: "epoch{epoch:03d}-val_loss{val/loss:.2f}"
     auto_insert_metric_name: False
+  device_stats_monitor:
+    _target_: pytorch_lightning.callbacks.DeviceStatsMonitor
+
 
 logger:
   _target_: pytorch_lightning.loggers.wandb.WandbLogger
