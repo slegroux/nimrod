@@ -153,6 +153,7 @@ class MNISTDataModule(LightningDataModule):
             trainset = MNISTDataset(self.hparams.data_dir, train=True, transform=self.transforms)
             testset = MNISTDataset(self.hparams.data_dir, train=False, transform=self.transforms)
             dataset = ConcatDataset(datasets=[trainset, testset])
+            # TODO: keep test set untouched
             lengths = [int(split * len(dataset)) for split in self.hparams.train_val_test_split]
             self.data_train, self.data_val, self.data_test = random_split(
                 dataset=dataset,
