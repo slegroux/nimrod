@@ -15,7 +15,7 @@ from torchmetrics import Accuracy
 from hydra.utils import instantiate
 from omegaconf import OmegaConf
 
-from ..data.datasets import MNISTDataModule
+from ..image.datasets import MNISTDataModule
 from ..utils import get_device
 
 # %% ../../nbs/models.conv.ipynb 5
