@@ -17,13 +17,12 @@ from hydra.utils import instantiate
 from omegaconf import OmegaConf
 from matplotlib import pyplot as plt
 
-from ..data.datasets import MNISTDataModule
 from ..utils import get_device
-from ..image.datasets import ImageDataset
+from ..image.datasets import ImageDataset, MNISTDataModule
 
 # from IPython.core.debugger import set_trace
 
-# %% ../../nbs/models.mlp.ipynb 6
+# %% ../../nbs/models.mlp.ipynb 7
 class MLP(nn.Module):
     def __init__(
                 self,
@@ -37,13 +36,13 @@ class MLP(nn.Module):
         l2 = nn.Linear(n_h, n_out)
         relu = nn.ReLU()
         dropout = nn.Dropout(dropout)
-        self.layers = nn.Sequential(l1, l2, relu, dropout)
+        self.layers = nn.Sequential(l1, l2, dropout, relu)
         
     def forward(self, x: torch.Tensor # dim (B, H*W)
                 ) -> torch.Tensor:
         return self.layers(x)
 
-# %% ../../nbs/models.mlp.ipynb 21
+# %% ../../nbs/models.mlp.ipynb 22
 class MLP_PL(LightningModule):
     def __init__(self,
                 n_in:int, # input dimension e.g. (H,W) for image

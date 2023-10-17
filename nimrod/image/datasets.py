@@ -125,6 +125,7 @@ class MNISTDataModule(LightningDataModule):
         batch_size: int = 64, # size of compute batch
         num_workers: int = 0, # num_workers equal 0 means that it’s the main process that will do the data loading when needed, num_workers equal 1 is the same as any n, but you’ll only have a single worker, so it might be slow
         pin_memory: bool = False, # If you load your samples in the Dataset on CPU and would like to push it during training to the GPU, you can speed up the host to device transfer by enabling pin_memory. This lets your DataLoader allocate the samples in page-locked memory, which speeds-up the transfer
+        persistent_workers: bool = False
     ):
         super().__init__()
         self.save_hyperparameters(logger=False) # can access inputs with self.hparams
@@ -168,6 +169,7 @@ class MNISTDataModule(LightningDataModule):
             num_workers=self.hparams.num_workers,
             pin_memory=self.hparams.pin_memory,
             shuffle=True,
+            persistent_workers=self.hparams.persistent_workers
         )
 
     def val_dataloader(self) -> torch.utils.data.DataLoader:
@@ -177,6 +179,7 @@ class MNISTDataModule(LightningDataModule):
             num_workers=self.hparams.num_workers,
             pin_memory=self.hparams.pin_memory,
             shuffle=False,
+            persistent_workers=self.hparams.persistent_workers
         )
 
     def test_dataloader(self) -> torch.utils.data.DataLoader:
@@ -186,6 +189,7 @@ class MNISTDataModule(LightningDataModule):
             num_workers=self.hparams.num_workers,
             pin_memory=self.hparams.pin_memory,
             shuffle=False,
+            persistent_workers=self.hparams.persistent_workers
         )
 
     def teardown(self, stage: Optional[str] = None) -> None:
