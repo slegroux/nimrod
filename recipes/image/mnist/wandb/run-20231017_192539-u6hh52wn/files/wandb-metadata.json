@@ -1,0 +1,37 @@
+{
+    "os": "macOS-12.6-arm64-arm-64bit",
+    "python": "3.11.5",
+    "heartbeatAt": "2023-10-18T02:25:40.628734",
+    "startedAt": "2023-10-18T02:25:39.765436",
+    "docker": null,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "/Users/syl20/Projects/nimrod/recipes/image/mnist/infer.py",
+    "codePathLocal": "infer.py",
+    "codePath": "recipes/image/mnist/infer.py",
+    "git": {
+        "remote": "https://github.com/slegroux/nimrod",
+        "commit": "aa02b6c7591d726d018b94686d1b70cb46c764e3"
+    },
+    "email": "slegroux@ccrma.stanford.edu",
+    "root": "/Users/syl20/Projects/nimrod",
+    "host": "SYL20-M-5Q96",
+    "username": "syl20",
+    "executable": "/Users/syl20/mambaforge/envs/nimrod/bin/python",
+    "cpu_count": 10,
+    "cpu_count_logical": 10,
+    "disk": {
+        "/": {
+            "total": 460.4317207336426,
+            "used": 445.76927185058594
+        }
+    },
+    "gpuapple": {
+        "type": "arm",
+        "vendor": "Apple"
+    },
+    "memory": {
+        "total": 16.0
+    }
+}

@@ -1,0 +1,156 @@
+wandb_version: 1
+
+_wandb:
+  desc: null
+  value:
+    python_version: 3.11.5
+    cli_version: 0.15.11
+    framework: huggingface
+    huggingface_version: 4.33.3
+    is_jupyter_run: false
+    is_kaggle_kernel: true
+    start_time: 1697495421.810855
+    t:
+      1:
+      - 1
+      - 9
+      - 11
+      - 41
+      - 49
+      - 50
+      - 55
+      - 103
+      2:
+      - 1
+      - 9
+      - 11
+      - 41
+      - 49
+      - 50
+      - 55
+      - 103
+      3:
+      - 23
+      4: 3.11.5
+      5: 0.15.11
+      6: 4.33.3
+      8:
+      - 2
+      - 4
+      - 8
+      13: darwin-arm64
+run_id:
+  desc: null
+  value: 2023-10-16_15-30-20
+project:
+  desc: null
+  value: MNIST-TEST
+ckpt_path:
+  desc: null
+  value: null
+seed:
+  desc: null
+  value: 42
+test:
+  desc: null
+  value: true
+train:
+  desc: null
+  value: true
+ignore_warnings:
+  desc: null
+  value: true
+tags:
+  desc: null
+  value:
+  - dev
+hparams_search:
+  desc: null
+  value: null
+optimized_metric:
+  desc: null
+  value: test/acc
+paths:
+  desc: null
+  value:
+    root_dir: .
+    data_dir: ./data/
+    log_dir: ./logs/
+    output_dir: /Users/syl20/Projects/nimrod/recipes/image/mnist/logs/runs/2023-10-16_15-30-20
+    work_dir: /Users/syl20/Projects/nimrod/recipes/image/mnist
+datamodule:
+  desc: null
+  value:
+    _target_: nimrod.data.datasets.MNISTDataModule
+    data_dir: ~/Data
+    train_val_test_split:
+    - 0.8
+    - 0.1
+    - 0.1
+    batch_size: 64
+    num_workers: 4
+    pin_memory: true
+model:
+  desc: null
+  value:
+    _target_: nimrod.models.mlp.MLP_PL
+    n_in: 784
+    n_h: 64
+    n_out: 10
+    dropout: 0.2
+    lr: 0.001
+trainer:
+  desc: null
+  value:
+    _target_: pytorch_lightning.Trainer
+    default_root_dir: /Users/syl20/Projects/nimrod/recipes/image/mnist/logs/runs/2023-10-16_15-30-20
+    min_epochs: 1
+    max_epochs: 2
+    devices: 1
+    accelerator: auto
+    precision: 16-mixed
+    check_val_every_n_epoch: 1
+    deterministic: false
+    benchmark: false
+    fast_dev_run: false
+callbacks:
+  desc: null
+  value:
+    early_stopping:
+      _target_: pytorch_lightning.callbacks.EarlyStopping
+      monitor: val/loss
+      mode: min
+      patience: 10
+      min_delta: 0
+    model_checkpoint:
+      _target_: pytorch_lightning.callbacks.ModelCheckpoint
+      monitor: val/loss
+      mode: min
+      save_top_k: 1
+      save_last: true
+      verbose: true
+      dirpath: /Users/syl20/Projects/nimrod/recipes/image/mnist/logs/runs/2023-10-16_15-30-20/checkpoints
+      filename: epoch{epoch:03d}-val_loss{val/loss:.2f}
+      auto_insert_metric_name: false
+logger:
+  desc: null
+  value:
+    _target_: pytorch_lightning.loggers.wandb.WandbLogger
+    project: MNIST-TEST
+    name: 2023-10-16_15-30-20
+    save_dir: /Users/syl20/Projects/nimrod/recipes/image/mnist/logs/runs/2023-10-16_15-30-20
+    offline: false
+    id: null
+    entity: slegroux
+    log_model: false
+    prefix: ''
+    group: ''
+    tags:
+    - dev
+profiler:
+  desc: null
+  value:
+    _target_: pytorch_lightning.profilers.SimpleProfiler
+    dirpath: /Users/syl20/Projects/nimrod/recipes/image/mnist/logs/runs/2023-10-16_15-30-20
+    filename: simple_perf_logs
+    extended: true
