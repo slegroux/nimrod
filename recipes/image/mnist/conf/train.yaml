@@ -7,8 +7,8 @@ seed: 42
 test: True
 train: True
 ignore_warnings: True
-tags: ["dev"]
-hparams_search: null
+tags: ['dev']
+loggers: ['tensorboard', 'wandb']
 
 # hparam tuning
 optimized_metric: "test/acc"
@@ -55,7 +55,6 @@ hydra:
       # model.dropout: interval(0.15, 0.5)
       # model.n_h: choice(128, 256, 512)
       datamodule.batch_size: choice(64, 128)
-
 
 datamodule:
   _target_: nimrod.image.datasets.MNISTDataModule
@@ -106,7 +105,7 @@ callbacks:
     save_last: False
     verbose: True
     dirpath: ${paths.output_dir}/checkpoints
-    filename: "epoch{epoch:03d}-val_loss{val/acc:.2f}"
+    # filename: '{epoch:03d}_{val_loss:.2f}'
     auto_insert_metric_name: True
     save_weights_only: False
     every_n_train_steps: null # number of training steps between checkpoints
@@ -121,8 +120,7 @@ callbacks:
   # device_stats_monitor:
   #   _target_: pytorch_lightning.callbacks.DeviceStatsMonitor
 
-
-logger:
+wandb:
   _target_: pytorch_lightning.loggers.wandb.WandbLogger
   project: ${project}
   name: bs:${datamodule.batch_size}-do:${model.dropout}-lr:${model.lr}-nh:${model.n_h}
@@ -134,6 +132,16 @@ logger:
   prefix: ""
   group: ""
   tags: ${tags}
+  job_type: ""
+
+tensorboard:
+  _target_: pytorch_lightning.loggers.tensorboard.TensorBoardLogger
+  save_dir: "${paths.output_dir}/tensorboard/"
+  name: null
+  log_graph: False
+  default_hp_metric: True
+  prefix: ""
+  # version: ""
 
 profiler:
   _target_: pytorch_lightning.profilers.SimpleProfiler
