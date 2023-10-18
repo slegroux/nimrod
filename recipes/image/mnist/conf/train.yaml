@@ -8,7 +8,7 @@ test: True
 train: True
 ignore_warnings: True
 tags: ['dev']
-loggers: ['tensorboard', 'wandb']
+loggers: ['tensorboard']
 
 # hparam tuning
 optimized_metric: "test/acc"
