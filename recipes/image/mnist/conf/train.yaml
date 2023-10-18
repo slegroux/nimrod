@@ -50,11 +50,11 @@ hydra:
       multivariate: false
       warn_independent_sampling: true
     params:
-      model.lr: tag(log, interval(1e-3, 1e-2))
+      model.lr: tag(log, interval(1e-4, 1e-1))
       # model.lr: interval(1e-3, 1e-2)
       # model.dropout: interval(0.15, 0.5)
       # model.n_h: choice(128, 256, 512)
-      # datamodule.batch_size: choice(128)
+      datamodule.batch_size: choice(64, 128)
 
 
 datamodule:
@@ -100,16 +100,26 @@ callbacks:
     min_delta: 0
   model_checkpoint:
     _target_: pytorch_lightning.callbacks.ModelCheckpoint
-    monitor: "val/loss"
-    mode: min
+    monitor: "val/acc"
+    mode: max
     save_top_k: 1
-    save_last: True
+    save_last: False
     verbose: True
     dirpath: ${paths.output_dir}/checkpoints
-    filename: "epoch{epoch:03d}-val_loss{val/loss:.2f}"
-    auto_insert_metric_name: False
-  device_stats_monitor:
-    _target_: pytorch_lightning.callbacks.DeviceStatsMonitor
+    filename: "epoch{epoch:03d}-val_loss{val/acc:.2f}"
+    auto_insert_metric_name: True
+    save_weights_only: False
+    every_n_train_steps: null # number of training steps between checkpoints
+    train_time_interval: null # checkpoints are monitored at the specified time interval
+    every_n_epochs: null # number of epochs between checkpoints
+    save_on_train_epoch_end: null # whether to run checkpointing at the end of the training epoch or the end of validation
+  rich_progress_bar:
+    _target_: pytorch_lightning.callbacks.RichProgressBar
+  model_summary:
+    _target_: pytorch_lightning.callbacks.RichModelSummary
+    max_depth: 3
+  # device_stats_monitor:
+  #   _target_: pytorch_lightning.callbacks.DeviceStatsMonitor
 
 
 logger:
@@ -120,7 +130,7 @@ logger:
   offline: False # store only locally
   id: null # give id to resume experiment
   entity: "slegroux"
-  log_model: False # log checkpoints at end of training
+  log_model: True # log checkpoints at end of training
   prefix: ""
   group: ""
   tags: ${tags}

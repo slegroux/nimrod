@@ -36,7 +36,7 @@ class MLP(nn.Module):
         l2 = nn.Linear(n_h, n_out)
         relu = nn.ReLU()
         dropout = nn.Dropout(dropout)
-        self.layers = nn.Sequential(l1, l2, dropout, relu)
+        self.layers = nn.Sequential(l1, relu, l2)
         
     def forward(self, x: torch.Tensor # dim (B, H*W)
                 ) -> torch.Tensor:
@@ -68,13 +68,6 @@ class MLP_PL(LightningModule):
                 ) -> torch.Tensor: # y class probabilities (B, n_classes)
         return(self.mlp(x))
 
-    def training_step(self, batch, batch_idx):
-        x, y = batch
-        x = x.view(x.size(0), -1)
-        y_hat = self.mlp(x)
-        loss = self.loss(y_hat, y)
-        return loss
-    
     def _step(self, batch, batch_idx):
         x, y = batch
         x = x.view(x.size(0), -1)
@@ -82,6 +75,11 @@ class MLP_PL(LightningModule):
         loss = self.loss(y_hat, y)
         acc = self.accuracy(y_hat, y)
         return loss, acc
+
+    def training_step(self, batch, batch_idx):
+        loss, acc = self._step(batch, batch_idx)
+        metrics = {"train/loss": loss, "train/acc": acc}
+        return loss
     
     def validation_step(self, batch, batch_idx, prog_bar=True, on_step=False, on_epoch=True, sync_dist=True):
         loss, acc = self._step(batch, batch_idx)
