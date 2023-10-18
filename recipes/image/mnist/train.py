@@ -28,14 +28,17 @@ def main(cfg: DictConfig) -> dict:
     for _, cb_conf in cfg.callbacks.items():
         callbacks.append(instantiate(cb_conf))
 
-
-    logger = instantiate(cfg.logger)
-    if isinstance(logger, pl.loggers.wandb.WandbLogger):
-        # deal with hangs when hp optim multirun training 
-        # wandb.init(settings=wandb.Settings(start_method="thread"))
-        # wandb requires dict not DictConfig
-        logger.experiment.config.update(hp)
-
+    loggers = []
+    for log_conf in cfg.loggers:
+        logger = instantiate(cfg[log_conf])
+        # wandb logger special setup
+        if isinstance(logger, pl.loggers.wandb.WandbLogger):
+            # deal with hangs when hp optim multirun training 
+            # wandb.init(settings=wandb.Settings(start_method="thread"))
+            # wandb requires dict not DictConfig
+            logger.experiment.config.update(hp)
+        loggers.append(logger)
+        
     # trainer
     profiler = instantiate(cfg.profiler)
     trainer = instantiate(cfg.trainer, callbacks=callbacks, profiler=profiler, logger=[logger])
