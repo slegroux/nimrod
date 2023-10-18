@@ -40,7 +40,7 @@ model = MLP_PL.load_from_checkpoint(Path(artifact_dir) / "model.ckpt").to(torch.
 #     y_hat = model(x).argmax(dim=2)
 # print(y_hat)
 
-# with trainer predict
+# batch prediction with trainer predict
 trainer = pl.Trainer()
 preds = trainer.predict(model, datamodule.test_dataloader())
 
