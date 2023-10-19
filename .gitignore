@@ -146,11 +146,12 @@ logs/
 _proc/
 _docs/
 data/codeparrot
-server
 token
 env-file
 Dockerfile.base
 Dockerfile.test
 Dockerfile.paperspace
+# wandb stuff
 wandb
+artifacts
 .DS_Store
