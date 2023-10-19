@@ -17,18 +17,21 @@ an emphasis on speech, audio and language modeling.
 
 you need python \<3.12
 
+### Install using Pip
+
 ``` sh
 pip install slg-nimrod
 ```
 
 ## Usage
 
-Check recipes in `recipes/` folder. For instance:
+Check recipes in `recipes/` folder. E.g. for a simple digit recognizer
+on MNIST:
 
 ``` bash
 git clone https://github.com/slegroux/nimrod.git
 cd nimrod/recipes/images/mnist
-python train.py datamodule.num_workers=10 trainer.max_epochs=20 trainer.accelerator='gpu'
+python train.py datamodule.num_workers=8 trainer.max_epochs=20 trainer.accelerator='mps' loggers='tensorboard'
 head conf/train.yaml
 ```
 
@@ -64,6 +67,26 @@ docker-compose down
 
 ``` bash
 pip install -e .
+```
+
+## Hyperparameter tuning
+
+to compare training results on different model parameters:
+
+``` bash
+cd nimrod/recipes/images/mnist
+python train.py --multirun model.n_h=16,64,256 loggers='tensorboard' trainer.max_epochs=5
+```
+
+## Server
+
+### st webapp
+
+Run a simple digit recognizer webapp with GUI
+
+``` bash
+cd server
+./run_st_app.sh
 ```
 
 ## Authors
