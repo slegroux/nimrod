@@ -22,6 +22,7 @@ website:
             - image.datasets.ipynb
           - section: Models
             contents:
+            - models.mlp.ipynb  
             - models.autoencoders.ipynb
       - section: Text
         contents:
