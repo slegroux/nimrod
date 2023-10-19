@@ -36,7 +36,7 @@ class MLP(nn.Module):
         l2 = nn.Linear(n_h, n_out)
         relu = nn.ReLU()
         dropout = nn.Dropout(dropout)
-        self.layers = nn.Sequential(l1, relu, l2)
+        self.layers = nn.Sequential(l1, dropout, relu, l2)
         
     def forward(self, x: torch.Tensor # dim (B, H*W)
                 ) -> torch.Tensor:
@@ -79,6 +79,7 @@ class MLP_PL(LightningModule):
     def training_step(self, batch, batch_idx):
         loss, acc = self._step(batch, batch_idx)
         metrics = {"train/loss": loss, "train/acc": acc}
+        self.log_dict(metrics, on_epoch=True)
         return loss
     
     def validation_step(self, batch, batch_idx, prog_bar=True, on_step=False, on_epoch=True, sync_dist=True):

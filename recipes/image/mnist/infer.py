@@ -23,15 +23,14 @@ datamodule.prepare_data()
 datamodule.setup()
 
 # local checkpoints
-# PATH = "logs/multiruns/2023-10-17_17-37-15/5/checkpoints/last.ckpt"
 PATH = "ckpt/epoch=0-step=875.ckpt"
 model = MLP_PL.load_from_checkpoint(PATH).to(torch.device('cpu'))
 
 # WANDB to retrive checkpoints from cloud
-# run = wandb.init()
-# artifact = run.use_artifact('slegroux/MNIST-HP/model-girtmnkf:v0', type='model')
-# artifact_dir = artifact.download()
-# model = MLP_PL.load_from_checkpoint(Path(artifact_dir) / "model.ckpt").to(torch.device('cpu'))
+run = wandb.init()
+artifact = run.use_artifact('slegroux/MNIST-HP/model-0hfq6cko:v0', type='model')
+artifact_dir = artifact.download()
+model = MLP_PL.load_from_checkpoint(Path(artifact_dir) / "model.ckpt").to(torch.device('cpu'))
 
 # artifact_dir = "artifacts/model-girtmnkf:v0"
 # model = MLP_PL.load_from_checkpoint(Path(artifact_dir) / "model.ckpt").to(torch.device('cpu'))
@@ -53,13 +52,13 @@ print(predict(x, model))
 for idx in random.sample(range(0,10),4):
     x, y = datamodule.data_test[idx][0].view(1,1,28*28), datamodule.data_test[idx][1]
     print(predict(x, model).item(), y)
-    plt.imshow(x.numpy().reshape(28,28),cmap='gray')
-    plt.title(str(y))
+    # plt.imshow(x.numpy().reshape(28,28),cmap='gray')
+    # plt.title(str(y))
     # plt.savefig(str(y))
-    plt.show()
+    # plt.show()
 
 # # image from file
-image = Image.open('97.jpg').convert('RGB')
+image = Image.open('../../../data/image/MNIST/97.jpg').convert('RGB')
 # # img = torchvision.io.read_image('test.png')
 image.show()
 tf = transforms.Compose([transforms.ToTensor(), transforms.Grayscale(),transforms.Resize((28,28))])
