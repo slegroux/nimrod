@@ -36,42 +36,66 @@ from dataclasses import dataclass, asdict
 from plum import dispatch
 
 # nimrod
-from ..models.lm import Vocab
+# from nimrod.models.lm import Vocab
 
-# %% ../../nbs/text.tokenizers.ipynb 4
+# %% ../../nbs/text.tokenizers.ipynb 6
 class Tokenizer:
-    def __init__(self, backend='spacy', language='en'):
-        if language == 'en':
+    def __init__(self,
+                backend:str='spacy', # backend tokenizer default to spacy
+                language:str='en', # language on which tokenization is applied
+                bos:bool=False, # add beginning of sentence tag <bos>
+                eos:bool=False, # add end of sentence tag <eos>
+                ):
+        if backend == 'spacy' and language == 'en':
             language = 'en_core_web_sm'
-        self.tokenizer = get_tokenizer(backend, language=language)
-
+        if backend== 'character_based':
+            self.tokenizer = self.character_tokenizer
+        else:
+            self.tokenizer = get_tokenizer(backend, language=language)
+        self.bos = bos
+        self.eos = eos
+        self.backend = backend
+        print(f"# Tokenizer uses {self.backend} backend")
+    
+    @staticmethod
+    def character_tokenizer(text:str)->List[str]:
+        return [c for c in text]
+    
     @dispatch
     def __call__(self, text:str)->List[str]:
-        return self.tokenizer(text)
+        res = self.tokenizer(text)
+        if self.bos:
+            res = ['<bos>'] + res
+        if self.eos:
+            res = res + ['<eos>']
+        return(res)
     
     @dispatch
     def __call__(self, texts:List[str])->List[List[str]]:
-        return [self.tokenizer(text) for text in texts]
+        return [self(text) for text in texts]
     
     @dispatch # to replace Iterable
     # works with agnews type of dataset [(index, text)]
     def __call__(self, data_iter:Iterable)->Iterable:
         for _, text in data_iter:
-            yield self.tokenizer(text)
+            yield self(text)
 
     @dispatch    
     def inverse(self, tokens:List[str])->str:
+        if self.backend == 'character_based':
+            return ''.join(tokens)
         # TODO: take care of white spaces
-        return ' '.join(tokens)
+        else:
+            return ' '.join(tokens)
 
     @dispatch
     def inverse(self, list_of_tokens:List[List[str]])->List[str]:
         s = []
         for tokens in list_of_tokens:
-            s.append(' '.join(tokens)) 
+            s.append(self.inverse(tokens))
         return s
 
-# %% ../../nbs/text.tokenizers.ipynb 7
+# %% ../../nbs/text.tokenizers.ipynb 15
 # TODO: add more special characters
 class Numericalizer():
     def __init__(self, tokens_iter:Iterable, specials=["<pad>", "<unk>", "<bos>", "<eos>"]):
