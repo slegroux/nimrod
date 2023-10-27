@@ -42,7 +42,7 @@ class MLP(nn.Module):
                 ) -> torch.Tensor:
         return self.layers(x)
 
-# %% ../../nbs/models.mlp.ipynb 22
+# %% ../../nbs/models.mlp.ipynb 23
 class MLP_PL(LightningModule):
     def __init__(self,
                 n_in:int, # input dimension e.g. (H,W) for image
