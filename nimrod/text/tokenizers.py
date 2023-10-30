@@ -38,7 +38,7 @@ from plum import dispatch
 # nimrod
 # from nimrod.models.lm import Vocab
 
-# %% ../../nbs/text.tokenizers.ipynb 6
+# %% ../../nbs/text.tokenizers.ipynb 5
 class Tokenizer:
     def __init__(self,
                 backend:str='spacy', # backend tokenizer default to spacy
@@ -95,7 +95,7 @@ class Tokenizer:
             s.append(self.inverse(tokens))
         return s
 
-# %% ../../nbs/text.tokenizers.ipynb 15
+# %% ../../nbs/text.tokenizers.ipynb 14
 # TODO: add more special characters
 class Numericalizer():
     def __init__(self, tokens_iter:Iterable, specials=["<pad>", "<unk>", "<bos>", "<eos>"]):
