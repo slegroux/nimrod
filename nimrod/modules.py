@@ -4,8 +4,16 @@
 __all__ = ['Encoder', 'Decoder']
 
 # %% ../nbs/modules.ipynb 4
+# python
+from typing import List, Optional, Dict, Any
+
+# torch
 import torch.nn as nn
 import torch
+
+# lightning
+from pytorch_lightning import LightningDataModule
+
 
 # %% ../nbs/modules.ipynb 5
 class Encoder(nn.Module):

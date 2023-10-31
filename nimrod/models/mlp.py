@@ -3,7 +3,7 @@
 # %% auto 0
 __all__ = ['MLP', 'MLP_PL']
 
-# %% ../../nbs/models.mlp.ipynb 4
+# %% ../../nbs/models.mlp.ipynb 3
 import torch.nn as nn
 import torch
 from torchvision.transforms import ToTensor
@@ -22,7 +22,7 @@ from ..image.datasets import ImageDataset, MNISTDataModule
 
 # from IPython.core.debugger import set_trace
 
-# %% ../../nbs/models.mlp.ipynb 7
+# %% ../../nbs/models.mlp.ipynb 6
 class MLP(nn.Module):
     def __init__(
                 self,
@@ -42,7 +42,7 @@ class MLP(nn.Module):
                 ) -> torch.Tensor:
         return self.layers(x)
 
-# %% ../../nbs/models.mlp.ipynb 23
+# %% ../../nbs/models.mlp.ipynb 22
 class MLP_PL(LightningModule):
     def __init__(self,
                 n_in:int, # input dimension e.g. (H,W) for image

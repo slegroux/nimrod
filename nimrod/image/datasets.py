@@ -80,7 +80,7 @@ class MNISTDataset(ImageDataset):
         # TODO: add noramlization?
         # torchvision.transforms.Compose([torchvision.transforms.ToTensor(), torchvision.transforms.Normalize(0.1307,), (0.3081,))])
 
-    ):
+    ) -> None:
 
         super().__init__()
 
@@ -148,6 +148,7 @@ class MNISTDataModule(LightningDataModule):
         MNISTDataset(self.hparams.data_dir, train=False)
 
     def setup(self, stage: Optional[str] = None) -> None:
+        # stage: {fit,validate,test,predict}
         # concat train & test mnist dataset and randomly generate train, eval, test sets
         if not self.data_train and not self.data_val and not self.data_test:
             # ((B, H, W), int)
