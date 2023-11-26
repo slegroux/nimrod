@@ -133,6 +133,7 @@ recipes/*/logs
 tests/
 .hydra/
 *.png
+*.wav
 *.pt
 *.onnx
 *.ckpt
