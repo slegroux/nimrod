@@ -25,6 +25,17 @@ pip install slg-nimrod
 
 ## Usage
 
+Download test data on which to run example recipes:
+
+```bash
+# if not already installed on your system
+git lfs install 
+# update changes
+git lfs fetch --all
+# copy the actual data
+git lfs pull
+```
+
 Check recipes in `recipes/` folder. E.g. for a simple digit recognizer
 on MNIST:
 
