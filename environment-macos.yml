@@ -5,6 +5,7 @@ channels:
   - conda-forge
   - huggingface
 dependencies:
+  - av
   - jupyterlab
   - matplotlib
   - tqdm
@@ -35,3 +36,4 @@ dependencies:
     - phonemizer
     - hydra_colorlog
     - lightning
+    - pytorchvideo
