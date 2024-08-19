@@ -31,4 +31,10 @@ train: ## Train the model
 	python src/train.py
 
 container:
-	docker build --network host -t slegroux/nimrod -f .devcontainer/Dockerfile .
+	docker build --network host -t slegroux/nimrod -f ".devcontainer/Dockerfile" .
+
+docker-test:
+	docker run -it --rm slegroux/nimrod /bin/bash
+
+docker-run:
+	docker run -p 8888:8888 -v $(PWD):/data slegroux/nimrod
