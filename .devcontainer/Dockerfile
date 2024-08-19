@@ -20,22 +20,29 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-RUN git clone https://github.com/kpu/kenlm && \
-    cd kenlm; mkdir build; cd build && \
-    cmake ..; make -j 4; make install
+# RUN git clone https://github.com/kpu/kenlm && \
+#     cd kenlm; mkdir build; cd build && \
+#     cmake ..; make -j 4; make install
 
 USER $MAMBA_USER
 
 WORKDIR /home/$MAMBA_USER
-COPY environment.yml .
+COPY .devcontainer/environment-nbdev.yml .
 COPY .devcontainer/start_jupyterlab.sh .
 
-RUN micromamba install --yes --name base -f environment.yml && \
+RUN micromamba install --yes --name base -f environment-nbdev.yml && \
     micromamba clean --all --yes
+# activate mamba environment
 ARG MAMBA_DOCKERFILE_ACTIVATE=1
-RUN python -m spacy download en_core_web_sm
-RUN nbdev_install_quarto && git clone https://github.com/slegroux/nimrod
+# RUN python -m spacy download en_core_web_sm
+RUN nbdev_install_quarto 
+#&& git clone https://github.com/slegroux/nimrod
+
 WORKDIR /home/$MAMBA_USER/nimrod
-RUN pip install -e .
+# copy nimrod local folder to docker container
+COPY . .
+# RUN pip install -e .
+RUN pip install nimrod
+
 EXPOSE 8888
 CMD ["jupyter", "lab", "--allow-root", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--NotebookApp.token=''","--NotebookApp.password=''"]
