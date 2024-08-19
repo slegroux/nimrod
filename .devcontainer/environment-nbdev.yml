@@ -1,0 +1,8 @@
+name: base
+channels:
+  - fastai
+  - pytorch
+  - conda-forge
+  - huggingface
+dependencies:
+  - nbdev
