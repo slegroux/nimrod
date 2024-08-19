@@ -1,0 +1,47 @@
+name: base
+channels:
+  - fastai
+  - pytorch
+  - conda-forge
+  - huggingface
+dependencies:
+  - anyascii
+  - datasets
+  - h5py
+  - hydra-core
+  - inflect
+  - jupyterlab
+  - matplotlib
+  - nbdev
+  - omegaconf
+  - onnxruntime
+  - pandas
+  - portalocker
+  - pre-commit
+  - pytest
+  - python-dotenv
+  - portalocker
+  - spacy
+  - streamlit
+  - optuna
+  - tensorboard
+  - transformers
+  - tqdm
+  - wandb
+  - pip:
+    - encodec
+    - hydra_colorlog
+    - hydra-optuna-sweeper
+    - jupyterlab-quarto
+    - kenlm
+    - lightning
+    - lhotse
+    - plum-dispatch
+    - https://github.com/kpu/kenlm/archive/master.zip
+    - phonemizer
+    - torch
+    - torchvision
+    - torchtext
+    - torchdata
+    - torchaudio
+    - fairscale
