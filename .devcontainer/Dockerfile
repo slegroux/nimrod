@@ -12,6 +12,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
      espeak-ng \
      mbrola \
      git \
+     git-lfs \
      curl \
      ca-certificates \     
      wget \
@@ -43,6 +44,7 @@ WORKDIR /home/$MAMBA_USER/nimrod
 COPY . .
 # RUN pip install -e .
 RUN pip install nimrod
+# RUN git config --global --add safe.directory /workspaces/nimrod
 
 EXPOSE 8888
 CMD ["jupyter", "lab", "--allow-root", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--NotebookApp.token=''","--NotebookApp.password=''"]
