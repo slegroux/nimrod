@@ -1,50 +1,40 @@
-FROM mambaorg/micromamba:jammy-cuda-12.1.0
+# FROM mambaorg/micromamba:jammy-cuda-12.1.0
+# FROM pytorch/pytorch:2.4.0-cuda11.8-cudnn9-devel
+FROM bitnami/pytorch:latest
 LABEL maintainer="Sylvain Le Groux <sylvain.legroux@gmail.com>"
 USER root
+
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
-     apt-get install -y --no-install-recommends \
-     build-essential \
-     libboost-all-dev \
-     libeigen3-dev \
-     cmake \
-     zlib1g-dev libbz2-dev liblzma-dev \
-     festival \
-     espeak-ng \
-     mbrola \
-     git \
-     git-lfs \
-     curl \
-     ca-certificates \     
-     wget \
-     pkg-config && \
-     # Remove the effect of `apt-get update`
+    apt-get install -y --no-install-recommends \
+#     build-essential \
+#     libboost-all-dev \
+#     libeigen3-dev \
+#     cmake \
+#     zlib1g-dev libbz2-dev liblzma-dev \
+#     festival \
+    espeak-ng \
+#     mbrola \
+    git \
+    git-lfs \
+    curl \
+    ca-certificates \     
+    wget \
+    pkg-config && \
+    # Remove the effect of `apt-get update`
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 # RUN git clone https://github.com/kpu/kenlm && \
 #     cd kenlm; mkdir build; cd build && \
 #     cmake ..; make -j 4; make install
-
-USER $MAMBA_USER
-
-WORKDIR /home/$MAMBA_USER
-COPY .devcontainer/environment-nbdev.yml .
-COPY .devcontainer/start_jupyterlab.sh .
-
-RUN micromamba install --yes --name base -f environment-nbdev.yml && \
-    micromamba clean --all --yes
-# activate mamba environment
-ARG MAMBA_DOCKERFILE_ACTIVATE=1
-# RUN python -m spacy download en_core_web_sm
+RUN pip install jupyterlab nbdev
+# # RUN python -m spacy download en_core_web_sm
 RUN nbdev_install_quarto 
-#&& git clone https://github.com/slegroux/nimrod
-
-WORKDIR /home/$MAMBA_USER/nimrod
-# copy nimrod local folder to docker container
+# #&& git clone https://github.com/slegroux/nimrod
+# WORKDIR /workspaces/nimrod
 COPY . .
-# RUN pip install -e .
-RUN pip install nimrod
-# RUN git config --global --add safe.directory /workspaces/nimrod
+RUN pip install -e .
+# # RUN git config --global --add safe.directory /workspaces/nimrod
 
-EXPOSE 8888
-CMD ["jupyter", "lab", "--allow-root", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--NotebookApp.token=''","--NotebookApp.password=''"]
+# EXPOSE 8888
+# CMD ["jupyter", "lab", "--allow-root", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--NotebookApp.token=''","--NotebookApp.password=''"]
