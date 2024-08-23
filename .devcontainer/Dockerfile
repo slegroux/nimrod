@@ -1,12 +1,14 @@
 # FROM mambaorg/micromamba:jammy-cuda-12.1.0
 # FROM pytorch/pytorch:2.4.0-cuda11.8-cudnn9-devel
-FROM bitnami/pytorch:latest
+# torch 2.4.0 torchaudio 2.4.0 torchtext 0.15.0
+FROM bitnami/pytorch:latest 
+
 LABEL maintainer="Sylvain Le Groux <sylvain.legroux@gmail.com>"
 USER root
 
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
-#     build-essential \
+    build-essential \
 #     libboost-all-dev \
 #     libeigen3-dev \
 #     cmake \
@@ -27,9 +29,10 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
 # RUN git clone https://github.com/kpu/kenlm && \
 #     cd kenlm; mkdir build; cd build && \
 #     cmake ..; make -j 4; make install
-RUN pip install jupyterlab nbdev
-# # RUN python -m spacy download en_core_web_sm
-RUN nbdev_install_quarto 
+# taking care of dependencies between torch/torchtext & lightning/numpy
+RUN pip install jupyterlab nbdev torchvision torchaudio torchtext==0.15.2 torchdata numpy==1.26.4 lightning
+RUN pip install spacy && python -m spacy download en_core_web_sm && nbdev_install_quarto
+# RUN nbdev_install_quarto 
 # #&& git clone https://github.com/slegroux/nimrod
 # WORKDIR /workspaces/nimrod
 COPY . .
