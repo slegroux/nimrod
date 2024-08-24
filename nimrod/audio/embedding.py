@@ -68,7 +68,7 @@ class EncoDec():
     def device(self):
         return self._device
 
-# %% ../../nbs/audio.embeddings.ipynb 11
+# %% ../../nbs/audio.embeddings.ipynb 12
 # https://lhotse.readthedocs.io/en/v0.6_ba/features.html#creating-custom-feature-extractor
 @dataclass
 class EncoDecConfig:
