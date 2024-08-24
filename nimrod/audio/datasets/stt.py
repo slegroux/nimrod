@@ -36,7 +36,7 @@ class STTDataset(Dataset):
 # %% ../../../nbs/audio.datasets.stt.ipynb 7
 class LibriSpeechDataModule(LightningDataModule):
     def __init__(self,
-        target_dir="/data/en", # where data will be saved / retrieved
+        target_dir="../data/en", # where data will be saved / retrieved
         dataset_parts="mini_librispeech", # either full librispeech or mini subset
         output_dir="../recipes/stt/librispeech/data", # where to save manifest
         num_jobs=1 # num_jobs depending on number of cpus available
@@ -49,7 +49,7 @@ class LibriSpeechDataModule(LightningDataModule):
         download_librispeech(target_dir=self.hparams.target_dir, dataset_parts=self.hparams.dataset_parts)
 
     def setup(self, stage = None):
-        self.libri = prepare_librispeech(corpus_dir=Path(self.hparams.target_dir) / "LibriSpeech", output_dir=self.hparams.output_dir, num_jobs=self.hparams.num_jobs)
+        self.libri = prepare_librispeech(Path(self.hparams.target_dir) / "LibriSpeech", dataset_parts=self.hparams.dataset_parts, output_dir=self.hparams.output_dir, num_jobs=self.hparams.num_jobs)
         if stage == "fit" or stage == None:
             self.cuts_train = CutSet.from_manifests(**self.libri["train-clean-5"])
             self.cuts_test = CutSet.from_manifests(**self.libri["dev-clean-2"])
