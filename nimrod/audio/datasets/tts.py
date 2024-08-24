@@ -3,7 +3,7 @@
 # %% auto 0
 __all__ = ['LhotseTTSDataset', 'TTSDataset', 'LibriTTSDataModule']
 
-# %% ../../../nbs/audio.datasets.tts.ipynb 4
+# %% ../../../nbs/audio.datasets.tts.ipynb 3
 import torch
 from torch.utils.data import DataLoader, Dataset
 from pytorch_lightning import LightningDataModule, LightningModule
@@ -20,7 +20,7 @@ from pathlib import Path
 from pprint import pprint
 from typing import List, Dict, Optional, Union
 
-# %% ../../../nbs/audio.datasets.tts.ipynb 7
+# %% ../../../nbs/audio.datasets.tts.ipynb 6
 class LhotseTTSDataset(Dataset):
     def __init__(self,
                 tokenizer=TokenCollater, # text tokenizer
@@ -35,7 +35,7 @@ class LhotseTTSDataset(Dataset):
         tokens, token_lens = self.tokenizer(cuts)
         return {"feats_pad": feats, "feats_lens": feat_lens, "tokens_pad": tokens, "tokens_lens": token_lens}
 
-# %% ../../../nbs/audio.datasets.tts.ipynb 10
+# %% ../../../nbs/audio.datasets.tts.ipynb 9
 class TTSDataset(Dataset):
     def __init__(self,
         tokenizer, # text tokenizer
@@ -51,14 +51,14 @@ class TTSDataset(Dataset):
         tokens, token_lens = self.tokenizer(cuts)
         return {"feats_pad": feats, "feats_lens": feat_lens, "tokens_pad": tokens, "tokens_lens": token_lens}
 
-# %% ../../../nbs/audio.datasets.tts.ipynb 12
+# %% ../../../nbs/audio.datasets.tts.ipynb 11
 from lhotse.recipes import download_libritts, prepare_libritts
 from ...text.tokenizers import Tokenizer
 from ..embedding import EncoDec
 from torchaudio.datasets import LIBRITTS
 from ..utils import plot_waveform
 
-# %% ../../../nbs/audio.datasets.tts.ipynb 15
+# %% ../../../nbs/audio.datasets.tts.ipynb 14
 class LibriTTSDataModule(LightningDataModule):
     def __init__(self,
         target_dir="/data/en/libriTTS", # where data will be saved / retrieved
@@ -74,7 +74,7 @@ class LibriTTSDataModule(LightningDataModule):
         download_libritts(target_dir=self.hparams.target_dir, dataset_parts=self.hparams.dataset_parts)
 
     def setup(self, stage = None):
-        self.libri = prepare_libritts(corpus_dir=Path(self.hparams.target_dir) / "LibriTTS", output_dir=self.hparams.output_dir, num_jobs=self.hparams.num_jobs)
+        self.libri = prepare_libritts(corpus_dir=Path(self.hparams.target_dir) / "LibriTTS", dataset_parts=self.hparams.dataset_parts, output_dir=self.hparams.output_dir, num_jobs=self.hparams.num_jobs)
         if stage == 'fit' or stage == None:
             self.cuts_train = CutSet.from_manifests(**self.libri["dev-clean"])
             self.cuts_test = CutSet.from_manifests(**self.libri["test-clean"])

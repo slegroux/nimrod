@@ -12,6 +12,7 @@ from dataclasses import dataclass
 
 # %% ../../nbs/models.aligners.ipynb 5
 @dataclass
+
 class Segment:
     label: str
     start: int

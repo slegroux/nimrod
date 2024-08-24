@@ -13,11 +13,11 @@ from torch.optim import SGD
 import torchtext
 from torchtext.datasets import WikiText2
 from torchtext.data.utils import get_tokenizer
-from torchtext.vocab import vocab, build_vocab_from_iterator
+from torchtext.vocab import build_vocab_from_iterator
 from torch.utils.data import DataLoader, dataset, Dataset
 
 # pl
-from pytorch_lightning import LightningDataModule
+from lightning import LightningDataModule
 
 # hf
 import datasets
@@ -44,7 +44,7 @@ import random
 # nimrod
 # from nimrod.models.lm import Vocab
 
-# %% ../../nbs/text.datasets.ipynb 5
+# %% ../../nbs/text.datasets.ipynb 6
 class CharDataset(Dataset):
     def __init__(self,
                 data: str, # text as a long continuous string
