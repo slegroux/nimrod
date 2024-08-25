@@ -1,7 +1,7 @@
 # FROM mambaorg/micromamba:jammy-cuda-12.1.0
 # FROM pytorch/pytorch:2.4.0-cuda11.8-cudnn9-devel
-# torch 2.4.0 torchaudio 2.4.0 torchtext 0.15.0
-FROM bitnami/pytorch:latest 
+# because of deps with torchtext will downgrade to torch 2.0.1
+FROM bitnami/pytorch:2.3.1
 
 LABEL maintainer="Sylvain Le Groux <sylvain.legroux@gmail.com>"
 USER root
@@ -22,6 +22,9 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     ca-certificates \     
     wget \
     pkg-config && \
+    # spacy takes forever to install (wheels not available)
+    pip install spacy && \
+    python -m spacy download en_core_web_sm && \
     # Remove the effect of `apt-get update`
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
@@ -29,14 +32,16 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
 # RUN git clone https://github.com/kpu/kenlm && \
 #     cd kenlm; mkdir build; cd build && \
 #     cmake ..; make -j 4; make install
+
 # taking care of dependencies between torch/torchtext & lightning/numpy
-RUN pip install jupyterlab nbdev torchvision torchaudio torchtext==0.15.2 torchdata numpy==1.26.4 lightning
-RUN pip install spacy && python -m spacy download en_core_web_sm && nbdev_install_quarto
-# RUN nbdev_install_quarto 
+# RUN pip install torchtext torchvision torchaudio torchdata jupyterlab nbdev numpy lightning
+
+# RUN python -m spacy download en_core_web_sm
 # #&& git clone https://github.com/slegroux/nimrod
 # WORKDIR /workspaces/nimrod
 COPY . .
 RUN pip install -e .
+RUN nbdev_install_quarto && nbdev_install_hooks
 # # RUN git config --global --add safe.directory /workspaces/nimrod
 
 # EXPOSE 8888
