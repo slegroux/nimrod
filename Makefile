@@ -33,7 +33,7 @@ train: ## Train the model
 container:
 	docker build --network host -t slegroux/nimrod -f ".devcontainer/Dockerfile" .
 
-docker-test:
+test-container:
 	docker run -it --network host --rm --privileged slegroux/nimrod /bin/bash
 
 docker-run:
