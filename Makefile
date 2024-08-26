@@ -34,7 +34,11 @@ container:
 	docker build --network host -t slegroux/nimrod -f ".devcontainer/Dockerfile" .
 
 test-container:
-	docker run -it --network host --rm --privileged slegroux/nimrod /bin/bash
+## opt: --privileged 
+	docker run -it --network host --rm slegroux/nimrod /bin/bash 
 
 docker-run:
-	docker run -p 8888:8888 -v $(PWD):/data slegroux/nimrod
+	docker run -p 8888:8888 -v $(PWD):/app slegroux/nimrod
+
+docker-push: # push to dockerhub
+	docker push slegroux/nimrod
