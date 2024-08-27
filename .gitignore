@@ -148,6 +148,7 @@ _proc/
 _docs/
 data/codeparrot
 data/en/
+data
 token
 env-file
 Dockerfile.base
