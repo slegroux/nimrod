@@ -30,12 +30,21 @@ test-full: ## Run all tests
 train: ## Train the model
 	python src/train.py
 
-container:
-	docker build --network host -t slegroux/nimrod -f ".devcontainer/Dockerfile" .
+docker-build:
+	# docker build --network host -t slegroux/nimrod -f ".devcontainer/Dockerfile" . --push
+	# docker buildx build --network host --platform linux/amd64,linux/arm64 -t slegroux/nimrod:latest -f ".devcontainer/Dockerfile.nimrod" .
+	docker buildx build --network host --platform linux/amd64 -t slegroux/nimrod:latest -f ".devcontainer/Dockerfile" .
 
-test-container:
+docker-build-mac:
+	docker buildx build --network host -t slegroux/nimrod-mac:latest -f ".devcontainer/Dockerfile" .
+
+docker-test:
 ## opt: --privileged 
-	docker run -it --network host --rm slegroux/nimrod /bin/bash 
+	docker run -it --network host -v $(PWD):/app --rm slegroux/nimrod /bin/bash 
+
+docker-test-mac:
+## opt: --privileged 
+	docker run -it --network host -v $(PWD):/app --rm slegroux/nimrod-mac /bin/bash 
 
 docker-run:
 	docker run -p 8888:8888 -v $(PWD):/app slegroux/nimrod
