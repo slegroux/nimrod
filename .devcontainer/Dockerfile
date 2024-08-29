@@ -11,7 +11,8 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-RUN pip install slg-nimrod==0.0.11
+# RUN pip install slg-nimrod==0.0.11
+COPY . .
+RUN pip install -e .
 RUN python -m spacy download en_core_web_sm
-RUN nbdev_install_hooks
-# RUN nbdev_install_quarto && \
+RUN nbdev_install_hooks && nbdev_install_quarto
