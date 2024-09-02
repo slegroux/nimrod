@@ -9,13 +9,9 @@ __all__ = ['ITER_MAX', 'NNLMConfig', 'NNLM', 'NNLM_L', 'NNBigram']
 import torch.nn as nn
 import torch
 import torch.nn.functional as F
-from torch.nn.utils.rnn import pad_sequence
 from torch.optim import SGD
-from torch.optim.lr_scheduler import StepLR, ReduceLROnPlateau, ExponentialLR, CosineAnnealingLR
 from torch.optim.optimizer import Optimizer
-
 from torch.utils.data import DataLoader
-from torchtext.vocab import vocab
 
 import lightning as L
 from lightning import Trainer
@@ -29,10 +25,7 @@ from omegaconf import OmegaConf
 from hydra.utils import instantiate
 
 from typing import Dict, List, Tuple, Optional, Set
-from collections import Counter, OrderedDict
 from dataclasses import dataclass, asdict
-
-from plum import dispatch
 
 from ..text.datasets import CharDataset, Vocab
 
@@ -116,21 +109,21 @@ class NNLM_L(L.LightningModule):
         x, y = batch
         y_hat = self(x)
         loss = self.loss_fn(y_hat, y[:, -1]) # as y is shifted by one (cf. karpathy tuto)
-        self.log('train_loss', loss)
+        self.log('train/loss', loss, prog_bar=True)
         return loss
 
     def validation_step(self, batch, batch_idx):
         x, y = batch
         y_hat = self(x)
         loss = self.loss_fn(y_hat, y[:, -1])
-        self.log('val_loss', loss)
+        self.log('val/loss', loss, prog_bar=True)
         return loss
 
     def test_step(self, batch, batch_idx):
         x, y = batch
         y_hat = self(x)
         loss = self.loss_fn(y_hat, y[:, -1])
-        self.log('test_loss', loss)
+        self.log('test/loss', loss)
         return loss
 
     def predict_step(self, batch, batch_idx):
@@ -141,7 +134,7 @@ class NNLM_L(L.LightningModule):
     def sample(self, n_iterations:int=10, eos:int=3, pad:int=0, bos:int=2)->str:
         return self.model.sample(n_iterations, eos, pad, bos)
 
-# %% ../../nbs/models.lm.ipynb 47
+# %% ../../nbs/models.lm.ipynb 48
 class NNBigram(nn.Module):
     def __init__(self, vocab_size:int) -> None:
         super().__init__()
