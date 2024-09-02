@@ -5,15 +5,12 @@ __all__ = ['SEED', 'Vocab', 'CharDataset', 'CharDataModule']
 
 # %% ../../nbs/text.datasets.ipynb 3
 # torch
-import torch.nn as nn
 import torch
-import torch.nn.functional as F
-from torch.nn.utils.rnn import pad_sequence
 from torch.optim import SGD
-import torchtext
+import torchtext; torchtext.disable_torchtext_deprecation_warning()
 from torchtext.datasets import WikiText2
 from torchtext.data.utils import get_tokenizer
-from torchtext.vocab import build_vocab_from_iterator, vocab
+from torchtext.vocab import vocab
 from torch.utils.data import DataLoader, dataset, Dataset, random_split
 
 # pl
@@ -39,10 +36,9 @@ from hydra.utils import instantiate
 # python
 from typing import Dict, List, Tuple, Optional, Set, Union
 from collections import Counter, OrderedDict
-from dataclasses import dataclass, asdict
+
 from plum import dispatch
 import urllib
-import math
 import random
 import os
 from typing import Dict, List, Tuple, Optional, Set, Any
