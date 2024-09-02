@@ -16,9 +16,9 @@ def main():
     dm = instantiate(cfg.datamodule, num_workers=0, persistent_workers=False)
 
     # local checkpoints
-    date = "2024-09-01_18-01-31"
-    ckpt = "epoch009_loss1.83.ckpt"
-    PATH = os.path.join("logs", "runs", date, "checkpoints", ckpt)
+    run_id = "batch_size=512-lr=0.001-context_len=3"
+    ckpt = "epoch=020-val_loss=1.74.ckpt"
+    PATH = os.path.join("logs", "runs", run_id, "checkpoints", ckpt)
     
     lm = NNLM_L.load_from_checkpoint(PATH)
     lm.to("cpu")
