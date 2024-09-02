@@ -4,7 +4,6 @@ from lightning.pytorch.tuner import Tuner
 from omegaconf import DictConfig, OmegaConf
 import hydra
 from hydra.utils import instantiate
-import wandb
 from IPython import embed
 
 @hydra.main(version_base="1.3",config_path="conf", config_name="train.yaml")
@@ -13,7 +12,6 @@ def main(cfg: DictConfig) -> dict:
     # HPARAMS
     # print(OmegaConf.to_yaml(cfg))
     # convert hp to dict for logging & saving
-
     hp = OmegaConf.to_container(cfg, resolve=True, throw_on_missing=True)
 
     # SEED
@@ -49,31 +47,16 @@ def main(cfg: DictConfig) -> dict:
     
     # TUNER
     tuner = Tuner(trainer)
-    if cfg.get("tune_batch_size"):
-        # lr finder
-        tuner.scale_batch_size(model, datamodule=datamodule, mode="power")
+    # tuner.scale_batch_size(model, datamodule=datamodule, mode="power")
+    # print("suggested batch size: ", datamodule.hparams.batch_size)
+    lr_finder = tuner.lr_find(model, datamodule=datamodule)        
+    fig = lr_finder.plot(suggest=True)
+    fig.savefig('lr_finder.png')
 
-    if cfg.get("tune_lr"):
-        lr_finder = tuner.lr_find(model, datamodule=datamodule)
-        # Plot with
-        fig = lr_finder.plot(suggest=True)
-        fig.savefig('lr_finder.png')
-
-    # new_lr = lr_finder.suggestion()
+    new_lr = lr_finder.suggestion()
+    print("suggested lr: ", new_lr)
     # model.hparams.lr = new_lr
 
-    # TRAIN
-    if cfg.get("train"):
-        trainer.fit(model, datamodule=datamodule, ckpt_path=cfg.get("ckpt_path"))
-
-    # TEST
-    if cfg.get("test"):
-        trainer.test(datamodule=datamodule, ckpt_path="best")
-
-    wandb.finish()
-
-
-    # return trainer.callback_metrics[cfg.get("optimized_metric")].item()
 
 if __name__ == "__main__":
     main()
