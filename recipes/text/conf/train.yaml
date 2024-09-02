@@ -1,0 +1,157 @@
+# @package _global_
+
+# GLOBAL
+run_id: ${now:%Y-%m-%d}_${now:%H-%M-%S}
+project: "TINY_SHAKESPEARE_NNLM"
+ckpt_path: null # ckpt to resume training from
+seed: 42
+test: True
+train: True
+tune_batch_size: False
+tune_lr: True
+ignore_warnings: True
+tags: ['dev']
+loggers: ['tensorboard'] #, 'wandb']
+
+paths:
+  root_dir: .
+  data_dir: ${paths.root_dir}/data/
+  log_dir: ${paths.root_dir}/logs/
+  output_dir: ${hydra:runtime.output_dir}
+  work_dir: ${hydra:runtime.cwd}
+
+# HYPERPARAMETER OPTIMIZATION
+optimized_metric: "val/loss"
+defaults:
+  - override hydra/sweeper: optuna
+
+hydra:
+  defaults:
+    - override hydra/hydra_logging: colorlog
+    - override hydra/job_logging: colorlog
+  run:
+    dir: ${paths.log_dir}/runs/${run_id}
+  sweep:
+    dir: ${paths.log_dir}/multiruns/${run_id}
+    subdir: ${hydra.job.num}
+  sweeper:
+    _target_: hydra_plugins.hydra_optuna_sweeper.optuna_sweeper.OptunaSweeper
+    direction: minimize
+    n_trials: 20
+    n_jobs: 0
+    storage: null
+    study_name: ${project}
+    sampler:
+      _target_: optuna.samplers.TPESampler
+      seed: 1234
+      n_startup_trials: 10 # number of random sampling runs before optimization starts
+      consider_prior: true
+      prior_weight: 1.0
+      consider_magic_clip: true
+      consider_endpoints: false
+      n_ei_candidates: 24
+      multivariate: false
+      warn_independent_sampling: true
+    params:
+      model.lr: tag(log, interval(1e-4, 1e-1))
+      # model.lr: interval(1e-3, 1e-2)
+      # model.dropout: interval(0.15, 0.5)
+      # model.n_h: choice(128, 256, 512)
+      datamodule.batch_size: choice(64, 128)
+
+# DATA
+datamodule:
+  _target_: nimrod.text.datasets.CharDataModule
+  data_path: "../../data/text/tiny_shakespeare.txt"
+  train_val_test_split: [0.8, 0.1, 0.1]
+  batch_size: 2048
+  context_size: 3
+  num_workers: 0
+  pin_memory: False
+  persistent_workers: False
+
+# MODEL
+model:
+  _target_: nimrod.models.lm.NNLM_L
+  n_vocab: 70
+  n_emb: 10
+  n_context: 3
+  n_h: 100
+  lr: 0.001
+
+# TRAINER
+trainer:
+  _target_: lightning.Trainer
+  default_root_dir: ${paths.output_dir}
+  enable_progress_bar: True
+  min_epochs: 1 # prevents early stopping
+  max_epochs: 3
+  # devices: 1
+  accelerator: auto
+  #strategy: ddp
+  # precision: "16-mixed"
+  check_val_every_n_epoch: 1   # perform a validation loop every N training epochs
+  # set True to to ensure deterministic results makes training slower but gives more reproducibility than just setting seeds
+  deterministic: False
+  benchmark: False
+  fast_dev_run: False
+
+# CALLBACKS
+callbacks:
+  early_stopping:
+    _target_: lightning.pytorch.callbacks.early_stopping.EarlyStopping
+    monitor: val/loss
+    mode: min
+    patience: 10
+    min_delta: 0
+  model_checkpoint:
+    _target_: lightning.pytorch.callbacks.ModelCheckpoint
+    monitor: "val/loss"
+    mode: min
+    save_top_k: 3
+    save_last: True
+    verbose: True
+    dirpath: ${paths.output_dir}/checkpoints
+    filename: 'epoch={epoch:03d}-val_loss={val/loss:.2f}'
+    auto_insert_metric_name: False # set to false when using metrics with slashes in their name i.e. val/loss
+    save_weights_only: False
+    every_n_train_steps: null # number of training steps between checkpoints
+    train_time_interval: null # checkpoints are monitored at the specified time interval
+    every_n_epochs: null # number of epochs between checkpoints
+    save_on_train_epoch_end: null # whether to run checkpointing at the end of the training epoch or the end of validation
+  rich_progress_bar:
+    _target_: lightning.pytorch.callbacks.RichProgressBar
+  model_summary:
+    _target_: lightning.pytorch.callbacks.RichModelSummary
+    max_depth: 3
+  # device_stats_monitor:
+  #   _target_: lightning.callbacks.DeviceStatsMonitor
+
+wandb:
+  _target_: lightning.pytorch.loggers.wandb.WandbLogger
+  project: ${project}
+  name: bs:${datamodule.batch_size}-lr:${model.lr}
+  save_dir: ${paths.output_dir}
+  offline: False # store only locally
+  id: null # give id to resume experiment
+  entity: "slegroux"
+  log_model: True # log checkpoints at end of training
+  prefix: ""
+  group: ""
+  tags: ${tags}
+  job_type: ""
+
+tensorboard:
+  _target_: lightning.pytorch.loggers.tensorboard.TensorBoardLogger
+  save_dir: "${paths.output_dir}/tensorboard/"
+  name: null
+  log_graph: False
+  default_hp_metric: True
+  prefix: ""
+  # version: ""
+
+profiler:
+  _target_: lightning.pytorch.profilers.SimpleProfiler
+  dirpath: ${paths.output_dir}
+  filename: "simple_perf_logs"
+  extended: True
