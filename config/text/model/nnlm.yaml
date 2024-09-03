@@ -1,6 +1,5 @@
-model:
-  _target_: nimrod.models.lm.NNLM_L
-  n_vocab: 70
-  n_emb: 10
-  n_context: 3
-  n_h: 100  
+_target_: nimrod.models.lm.NNLM_L
+n_vocab: 70
+n_emb: 10
+n_context: 3
+n_h: 100  
