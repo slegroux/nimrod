@@ -15,15 +15,16 @@ def main(cfg: DictConfig) -> dict:
     # convert hp to dict for logging & saving
 
     hp = OmegaConf.to_container(cfg, resolve=True, throw_on_missing=True)
+    print(hp)
 
     # SEED
-    L.seed_everything(cfg.seed) #, workers=True)
+    L.seed_everything(cfg.seed, workers=True)
 
     # MODEL
     model = instantiate(cfg.model)
 
     # DATA
-    datamodule = instantiate(cfg.datamodule)
+    datamodule = instantiate(cfg.data)
 
     # CALLBACKS
     callbacks = []
@@ -32,43 +33,43 @@ def main(cfg: DictConfig) -> dict:
 
     # LOGGERS
     loggers = []
-    for log_conf in cfg.loggers:
-        logger = instantiate(cfg[log_conf])
-        # wandb logger special setup
-        if isinstance(logger, L.pytorch.loggers.wandb.WandbLogger):
-            # deal with hangs when hp optim multirun training 
-            # wandb.init(settings=wandb.Settings(start_method="thread"))
-            # wandb requires dict not DictConfig
-            logger.experiment.config.update(hp)
-        loggers.append(logger)
+    if cfg.get("logger"):
+        for _, log_conf in cfg.logger.items():
+            if "_target_" in log_conf:
+                logger = instantiate(log_conf)
+                # wandb logger special setup
+                if isinstance(logger, L.pytorch.loggers.wandb.WandbLogger):
+                    # deal with hangs when hp optim multirun training 
+                    # wandb.init(settings=wandb.Settings(start_method="thread"))
+                    # wandb requires dict not DictConfig
+                    logger.experiment.config.update(hp)
+                loggers.append(logger)
+
+
         
     # TRAINER
     profiler = instantiate(cfg.profiler)
     trainer = instantiate(cfg.trainer, callbacks=callbacks, profiler=profiler, logger=loggers)
-    trainer.logger.log_hyperparams(hp)
+
+    if loggers:
+        for logger in trainer.loggers:
+            logger.log_hyperparams(hp)
+
+            # trainer.logger.log_hyperparams(hp)
     
-    # TUNER
-    tuner = Tuner(trainer)
-    if cfg.get("tune_batch_size"):
-        # lr finder
-        tuner.scale_batch_size(model, datamodule=datamodule, mode="power")
-
-    if cfg.get("tune_lr"):
-        lr_finder = tuner.lr_find(model, datamodule=datamodule)
-        # Plot with
-        fig = lr_finder.plot(suggest=True)
-        fig.savefig('lr_finder.png')
-
-    # new_lr = lr_finder.suggestion()
-    # model.hparams.lr = new_lr
-
     # TRAIN
     if cfg.get("train"):
         trainer.fit(model, datamodule=datamodule, ckpt_path=cfg.get("ckpt_path"))
 
+    train_metrics = trainer.callback_metrics
+
     # TEST
     if cfg.get("test"):
+        ckpt_path = trainer.checkpoint_callback.best_model_path
+        print("best ckpt: ", ckpt_path)
         trainer.test(datamodule=datamodule, ckpt_path="best")
+
+    test_metrics = trainer.callback_metrics
 
     wandb.finish()
 
