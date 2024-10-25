@@ -5,6 +5,12 @@ hydra:
     - file://../../config
     - file://../../config/text
 
+seed: 42
+test: True
+train: True
+model_name: nnlm
+data_name: tinyshakespeare
+
 defaults:
   - model: nnlm
   - data: tinyshakespeare
@@ -15,15 +21,10 @@ defaults:
   - logger: [tensorboard, wandb]
   - profiler: default
   - _self_
-  
 
-task_name: "tiny_shakespeare_nnlm"
-
-# ckpt_path: ${paths.log_dir}/${task_name}/checkpoints/last.ckpt # ckpt to resume training from
-seed: 42
-test: True
-train: True
-tags: ['nnlm', 'tinyshakespeare'] # for filtering loggers
+task_name: ${data_name}_${model_name}
+ckpt_path: ${paths.log_dir}/${task_name}/checkpoints/last.ckpt # ckpt to resume training from
+tags: ['${data_name}', '${model_name}'] # for filtering loggers
 ignore_warnings: True
 
 data:
@@ -34,7 +35,7 @@ model:
   lr: 1e-3
   
 trainer:
-  max_epochs: 20
+  max_epochs: 30
 
 logger:
   tensorboard:

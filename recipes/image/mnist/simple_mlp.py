@@ -29,7 +29,7 @@ print(f"Using device: {device}")
 # test_loader = DataLoader(test_dataset, batch_size=64, shuffle=False)
 
 # Data module
-cfg = OmegaConf.load('../../../config/data/image/mnist.yaml')
+cfg = OmegaConf.load('../../../config/image/data/mnist.yaml')
 datamodule = instantiate(cfg.datamodule)
 datamodule.prepare_data()
 datamodule.setup()
