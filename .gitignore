@@ -145,6 +145,7 @@ tests/
 logs/
 _proc/
 _docs/
+data/en/Libri*
 data/codeparrot
 token
 env-file
