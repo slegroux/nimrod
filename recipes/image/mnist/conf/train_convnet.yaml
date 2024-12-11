@@ -1,0 +1,148 @@
+# @package _global_
+
+run_id: ${now:%Y-%m-%d}_${now:%H-%M-%S}
+project: "MNIST-HP"
+ckpt_path: null # ckpt to resume training from
+seed: 42
+test: True
+train: True
+ignore_warnings: True
+tags: ['convnet']
+loggers: ['tensorboard']
+
+# hparam tuning
+optimized_metric: "test/acc"
+defaults:
+  - override hydra/sweeper: optuna
+
+paths:
+  root_dir: .
+  data_dir: ${paths.root_dir}/data/
+  log_dir: ${paths.root_dir}/logs/
+  output_dir: ${hydra:runtime.output_dir}
+  work_dir: ${hydra:runtime.cwd}
+
+hydra:
+  defaults:
+    - override hydra/hydra_logging: colorlog
+    - override hydra/job_logging: colorlog
+  run:
+    dir: ${paths.log_dir}/runs/${run_id}
+  sweep:
+    dir: ${paths.log_dir}/multiruns/${run_id}
+    subdir: ${hydra.job.num}
+  sweeper:
+    _target_: hydra_plugins.hydra_optuna_sweeper.optuna_sweeper.OptunaSweeper
+    direction: maximize
+    n_trials: 20
+    n_jobs: 1
+    storage: null
+    study_name: ${project}
+    sampler:
+      _target_: optuna.samplers.TPESampler
+      seed: 1234
+      n_startup_trials: 10 # number of random sampling runs before optimization starts
+      consider_prior: true
+      prior_weight: 1.0
+      consider_magic_clip: true
+      consider_endpoints: false
+      n_ei_candidates: 24
+      multivariate: false
+      warn_independent_sampling: true
+    params:
+      model.lr: tag(log, interval(1e-4, 1e-1))
+      # model.lr: interval(1e-3, 1e-2)
+      # model.dropout: interval(0.15, 0.5)
+      # model.n_h: choice(128, 256, 512)
+      datamodule.batch_size: choice(64, 128)
+
+datamodule:
+  _target_: nimrod.image.datasets.MNISTDataModule
+  data_dir: "~/Data"
+  train_val_test_split: [0.8, 0.1, 0.1]
+  batch_size: 64
+  num_workers: 10
+  pin_memory: True #https://discuss.pytorch.org/t/when-to-set-pin-memory-to-true/19723
+  persistent_workers: True #https://discuss.pytorch.org/t/what-are-the-dis-advantages-of-persistent-workers/102110
+
+model:
+  _target_: nimrod.models.conv.ConvNetX
+  in_channels: 1
+  out_channels: 10
+  lr: 1e-3
+
+trainer:
+  _target_: pytorch_lightning.Trainer
+  default_root_dir: ${paths.output_dir}
+  enable_progress_bar: True
+  min_epochs: 1 # prevents early stopping
+  max_epochs: 2
+  devices: 1
+  accelerator: auto
+  #strategy: ddp
+  # precision: "16-mixed"
+  # auto_lr_find: False
+  check_val_every_n_epoch: 1   # perform a validation loop every N training epochs
+  # set True to to ensure deterministic results makes training slower but gives more reproducibility than just setting seeds
+  deterministic: False
+  benchmark: False
+  fast_dev_run: False
+
+callbacks:
+  early_stopping:
+    _target_: pytorch_lightning.callbacks.EarlyStopping
+    monitor: val/loss
+    mode: min
+    patience: 10
+    min_delta: 0
+  model_checkpoint:
+    _target_: pytorch_lightning.callbacks.ModelCheckpoint
+    monitor: "val/acc"
+    mode: max
+    save_top_k: 1
+    save_last: False
+    verbose: True
+    dirpath: ${paths.output_dir}/checkpoints
+    # filename: '{epoch:03d}_{val_loss:.2f}'
+    auto_insert_metric_name: True
+    save_weights_only: False
+    every_n_train_steps: null # number of training steps between checkpoints
+    train_time_interval: null # checkpoints are monitored at the specified time interval
+    every_n_epochs: null # number of epochs between checkpoints
+    save_on_train_epoch_end: null # whether to run checkpointing at the end of the training epoch or the end of validation
+  rich_progress_bar:
+    _target_: pytorch_lightning.callbacks.RichProgressBar
+  model_summary:
+    _target_: pytorch_lightning.callbacks.RichModelSummary
+    max_depth: 3
+  # device_stats_monitor:
+  #   _target_: pytorch_lightning.callbacks.DeviceStatsMonitor
+
+wandb:
+  _target_: pytorch_lightning.loggers.wandb.WandbLogger
+  project: ${project}
+  name: bs:${datamodule.batch_size}
+  save_dir: ${paths.output_dir}
+  offline: False # store only locally
+  id: null # give id to resume experiment
+  entity: "slegroux"
+  log_model: True # log checkpoints at end of training
+  prefix: ""
+  group: ""
+  tags: ${tags}
+  job_type: ""
+
+tensorboard:
+  _target_: pytorch_lightning.loggers.tensorboard.TensorBoardLogger
+  save_dir: "${paths.output_dir}/tensorboard/"
+  name: null
+  log_graph: False
+  default_hp_metric: True
+  prefix: ""
+  # version: ""
+
+profiler:
+  _target_: pytorch_lightning.profilers.SimpleProfiler
+  dirpath: ${paths.output_dir}
+  filename: "simple_perf_logs"
+  extended: True
