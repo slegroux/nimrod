@@ -19,7 +19,7 @@ from lightning import LightningDataModule, seed_everything
 # hf
 import datasets
 from datasets import load_dataset, DatasetDict
-from transformers import AutoTokenizer, DataCollatorForLanguageModeling, DefaultDataCollator, default_data_collator
+from transformers import AutoTokenizer, DataCollatorForLanguageModeling
 
 # data 
 import pandas as pd
@@ -34,14 +34,12 @@ from omegaconf import DictConfig, OmegaConf
 from hydra.utils import instantiate
 
 # python
-from typing import Dict, List, Tuple, Optional, Set, Union
+from typing import Dict, List, Tuple, Optional, Set, Any
 from collections import Counter, OrderedDict
-
 from plum import dispatch
-import urllib
 import random
 import os
-from typing import Dict, List, Tuple, Optional, Set, Any
+
 
 # nimrod
 # from nimrod.models.lm import Vocab
