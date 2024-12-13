@@ -9,6 +9,7 @@ __pycache__/
 # Distribution / packaging
 .Python
 build/
+conda/
 develop-eggs/
 dist/
 downloads/
@@ -137,6 +138,7 @@ tests/
 *.pt
 *.onnx
 *.ckpt
+*.pkg
 *.lca
 *.wandb
 *tfevents*
@@ -157,4 +159,14 @@ Dockerfile.paperspace
 # wandb stuff
 wandb
 artifacts
+
+.vscode
+*.swp
+
+# OSX
 .DS_Store
+.DS_Store?
+.Trashes
+ehthumbs.db
+Thumbs.db
+.idea
