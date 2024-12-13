@@ -133,6 +133,7 @@ recipes/*/logs
 tests/
 .hydra/
 *.png
+*.wav
 *.pt
 *.onnx
 *.ckpt
@@ -147,6 +148,8 @@ _proc/
 _docs/
 data/en/Libri*
 data/codeparrot
+data/en/
+data
 token
 env-file
 Dockerfile.base

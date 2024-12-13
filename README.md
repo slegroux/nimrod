@@ -19,11 +19,34 @@ you need python \<3.12
 
 ### Install using Pip
 
+Install package:
 ``` sh
 pip install slg-nimrod
 ```
+Install espeak for LM:
+```bash
+brew install espeak #macos
+```
+Install Spacy english model
+```bash
+python -m spacy download en_core_web_sm
+```
+
 
 ## Usage
+
+Download test data on which to run example recipes:
+
+```bash
+# if not already installed on your system
+git lfs install 
+# update changes
+git lfs fetch --all
+# copy the actual data
+git lfs checkout
+# or just
+git lfs pull # combing both steps above into one (like usual git pull)
+```
 
 Check recipes in `recipes/` folder. E.g. for a simple digit recognizer
 on MNIST:

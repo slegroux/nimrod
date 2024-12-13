@@ -1,0 +1,77 @@
+# @package _global_
+
+hydra:
+  searchpath:
+    - file://../../config
+    - file://../../config/text
+
+defaults:
+  - model: nnlm
+  - data: tinyshakespeare
+  - trainer: default
+  - paths: default
+  - hydra: default
+  - callbacks: default
+  - logger: [tensorboard, wandb]
+  - profiler: default
+  - _self_
+  
+
+task_name: "tiny_shakespeare_nnlm"
+
+# ckpt_path: ${paths.log_dir}/${task_name}/checkpoints/last.ckpt # ckpt to resume training from
+seed: 42
+test: True
+train: True
+tags: ['nnlm', 'tinyshakespeare'] # for filtering loggers
+ignore_warnings: True
+
+data:
+  batch_size: 1024
+  context_size: 3
+
+model:
+  lr: 1e-3
+  
+trainer:
+  max_epochs: 20
+
+logger:
+  tensorboard:
+    name: "tiny_shakespeare"
+  wandb:
+    project: tiny_shakespeare
+    name: batch_size=${data.batch_size}-context_size=${data.context_size}-lr=${model.lr}
+    tags: ${tags}
+
+
+# # HYPERPARAMETER OPTIMIZATION
+# optimized_metric: "val/loss"
+# defaults:
+#   - override hydra/sweeper: optuna
+
+# hydra:
+#   sweeper:
+#     _target_: hydra_plugins.hydra_optuna_sweeper.optuna_sweeper.OptunaSweeper
+#     direction: minimize
+#     n_trials: 20
+#     n_jobs: 0
+#     storage: null
+#     study_name: ${project}
+#     sampler:
+#       _target_: optuna.samplers.TPESampler
+#       seed: ${seed}
+#       n_startup_trials: 10 # number of random sampling runs before optimization starts
+#       consider_prior: true
+#       prior_weight: 1.0
+#       consider_magic_clip: true
+#       consider_endpoints: false
+#       n_ei_candidates: 24
+#       multivariate: false
+#       warn_independent_sampling: true
+#     params:
+#       model.lr: tag(log, interval(1e-4, 1e-1))
+#       # model.lr: interval(1e-3, 1e-2)
+#       # model.dropout: interval(0.15, 0.5)
+#       # model.n_h: choice(128, 256, 512)
+#       datamodule.batch_size: choice(64, 128)

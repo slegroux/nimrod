@@ -309,6 +309,8 @@ from enum import Enum
 import six
 
 # %% ../../nbs/text.normalizers.ipynb 8
+""" from https://github.com/coqui-ai/TTS/"""
+
 _DEF_PUNCS = ';:,.!?¡¿—…"«»“”'
 _PUNC_IDX = collections.namedtuple("_punc_index", ["punc", "position"])
 

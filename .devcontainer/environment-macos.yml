@@ -6,14 +6,11 @@ channels:
   - huggingface
 dependencies:
   - anyascii
-  - cupy
   - datasets
-  - encodec
   - h5py
   - hydra-core
   - inflect
   - jupyterlab
-  - lightning 
   - matplotlib
   - nbdev
   - omegaconf
@@ -21,20 +18,30 @@ dependencies:
   - pandas
   - portalocker
   - pre-commit
-  - python-dotenv
   - pytest
+  - python-dotenv
+  - portalocker
   - spacy
-  - tqdm
+  - streamlit
+  - optuna
+  - tensorboard
   - transformers
+  - tqdm
   - wandb
   - pip:
+    - encodec
     - hydra_colorlog
+    - hydra-optuna-sweeper
     - jupyterlab-quarto
+    - kenlm
+    - lightning
+    - lhotse
+    - plum-dispatch
+    - https://github.com/kpu/kenlm/archive/master.zip
+    - phonemizer
     - torch
     - torchvision
     - torchtext
+    - torchdata
     - torchaudio
-    - plum-dispatch
-    - https://github.com/kpu/kenlm/archive/master.zip
-    - lhotse
-    - phonemizer
+    - fairscale
