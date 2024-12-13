@@ -66,7 +66,7 @@ datamodule:
   persistent_workers: True #https://discuss.pytorch.org/t/what-are-the-dis-advantages-of-persistent-workers/102110
 
 model:
-  _target_: nimrod.models.mlp.MLP_PL
+  _target_: nimrod.models.mlp.MLP_X
   n_in: 784
   n_h: 256
   n_out: 10
