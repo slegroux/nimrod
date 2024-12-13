@@ -30,7 +30,7 @@ from dataclasses import dataclass, asdict
 from ..text.datasets import CharDataset, Vocab
 
 # N_EPOCHS for training debuggging
-ITER_MAX = 5
+ITER_MAX = 1
 
 # %% ../../nbs/models.lm.ipynb 18
 @dataclass

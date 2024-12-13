@@ -5,7 +5,7 @@
 # %% auto 0
 __all__ = ['LhotseTTSDataset', 'TTSDataset', 'LibriTTSDataModule']
 
-# %% ../../../nbs/audio.datasets.tts.ipynb 3
+# %% ../../../nbs/audio.datasets.tts.ipynb 4
 import torch
 from torch.utils.data import DataLoader, Dataset
 from pytorch_lightning import LightningDataModule, LightningModule
@@ -22,7 +22,7 @@ from pathlib import Path
 from pprint import pprint
 from typing import List, Dict, Optional, Union
 
-# %% ../../../nbs/audio.datasets.tts.ipynb 6
+# %% ../../../nbs/audio.datasets.tts.ipynb 7
 class LhotseTTSDataset(Dataset):
     def __init__(self,
                 tokenizer=TokenCollater, # text tokenizer
@@ -37,7 +37,7 @@ class LhotseTTSDataset(Dataset):
         tokens, token_lens = self.tokenizer(cuts)
         return {"feats_pad": feats, "feats_lens": feat_lens, "tokens_pad": tokens, "tokens_lens": token_lens}
 
-# %% ../../../nbs/audio.datasets.tts.ipynb 9
+# %% ../../../nbs/audio.datasets.tts.ipynb 10
 class TTSDataset(Dataset):
     def __init__(self,
         tokenizer, # text tokenizer
@@ -53,14 +53,14 @@ class TTSDataset(Dataset):
         tokens, token_lens = self.tokenizer(cuts)
         return {"feats_pad": feats, "feats_lens": feat_lens, "tokens_pad": tokens, "tokens_lens": token_lens}
 
-# %% ../../../nbs/audio.datasets.tts.ipynb 11
+# %% ../../../nbs/audio.datasets.tts.ipynb 12
 from lhotse.recipes import download_libritts, prepare_libritts
 from ...text.tokenizers import Tokenizer
 from ..embedding import EncoDec
 from torchaudio.datasets import LIBRITTS
 from ..utils import plot_waveform
 
-# %% ../../../nbs/audio.datasets.tts.ipynb 14
+# %% ../../../nbs/audio.datasets.tts.ipynb 15
 class LibriTTSDataModule(LightningDataModule):
     def __init__(self,
         target_dir="/data/en/libriTTS", # where data will be saved / retrieved
