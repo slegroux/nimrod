@@ -146,9 +146,9 @@ tests/
 logs/
 _proc/
 _docs/
-data/codeparrot
-data/en/
-data
+/data/codeparrot
+/data/en/
+/data/
 token
 env-file
 Dockerfile.base

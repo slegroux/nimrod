@@ -1,0 +1,15 @@
+dataset:
+  _target_: nimrod.image.datasets.MNISTDataset
+  data_dir: "../data/image"
+  train: False
+  transform: 
+    _target_: torchvision.transforms.ToTensor
+
+datamodule:
+  _target_: nimrod.image.datasets.MNISTDataModule
+  data_dir: "../data/image"
+  train_val_test_split: [0.8, 0.1, 0.1]
+  batch_size: 64
+  num_workers: 1
+  pin_memory: False
+  persistent_workers: False
