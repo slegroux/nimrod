@@ -142,6 +142,7 @@ tests/
 *.lca
 *.wandb
 *tfevents*
+
 */wandb/*
 *_logs*
 # recipes/image/
@@ -151,6 +152,7 @@ _docs/
 /data/codeparrot
 /data/en/
 /data/
+/nimrod/
 token
 env-file
 Dockerfile.base
