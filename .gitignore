@@ -150,7 +150,7 @@ logs/
 _proc/
 _docs/
 /data/codeparrot
-/data/en/
+/data/en/Libri*
 /data/
 /nimrod/
 token
