@@ -5,98 +5,77 @@
 # %% auto 0
 __all__ = ['MLP', 'MLP_PL']
 
-# %% ../../nbs/models.mlp.ipynb 4
+# %% ../../nbs/models.mlp.ipynb 3
 import torch.nn as nn
 import torch
 from torchvision.transforms import ToTensor
 from torch.utils.data import DataLoader
 from torchvision.datasets import MNIST
 
+from lightning import LightningModule
 
-from pytorch_lightning import LightningModule, Trainer
-from torchmetrics import Accuracy
 from hydra.utils import instantiate
 from omegaconf import OmegaConf
 from matplotlib import pyplot as plt
 
 from ..utils import get_device
 from ..image.datasets import ImageDataset, MNISTDataModule
+from ..utils import logger
+from ..core import Classifier
+# torch.set_num_interop_threads(1)
 
 # from IPython.core.debugger import set_trace
 
-# %% ../../nbs/models.mlp.ipynb 7
+# %% ../../nbs/models.mlp.ipynb 6
 class MLP(nn.Module):
     def __init__(
                 self,
-                n_in:int, # input dimension e.g. (H,W) for image
-                n_h:int, # hidden dimension
-                n_out:int, # output dimension (= number of classes for classification)
-                dropout:float=0.2
+                n_in:int=784, # input dimension e.g. (H,W) for image
+                n_h:int=64, # hidden dimension
+                n_out:int=10, # output dimension (= number of classes for classification)
+                dropout:float=0.2,
+                **kwargs
                 ) -> None:
-        super().__init__()
+        logger.info("MLP initi: n_in: {}, n_h: {}, n_out: {}, dropout: {}".format(n_in, n_h, n_out, dropout))
+        super().__init__(**kwargs)
         l1 = nn.Linear(n_in, n_h)
-        l2 = nn.Linear(n_h, n_out)
-        relu = nn.ReLU()
         dropout = nn.Dropout(dropout)
+        relu = nn.ReLU()
+        l2 = nn.Linear(n_h, n_out)
         self.layers = nn.Sequential(l1, dropout, relu, l2)
         
     def forward(self, x: torch.Tensor # dim (B, H*W)
                 ) -> torch.Tensor:
         return self.layers(x)
 
-# %% ../../nbs/models.mlp.ipynb 23
-class MLP_PL(LightningModule):
+# %% ../../nbs/models.mlp.ipynb 22
+class MLP_PL(Classifier, MLP, LightningModule):
     def __init__(self,
                 n_in:int, # input dimension e.g. (H,W) for image
                 n_h:int, # hidden dimension
                 n_out:int, # output dimension (= number of classes for classification)
-                dropout:float=0.2, # dropout factor
+                dropout:float=0.2, # dropout
                 lr:float=1e-3 # learning rate
-                ):
-        super().__init__()
+        ):
+        
+        logger.info("MLP_PL init: n_in: {}, n_h: {}, n_out: {}, dropout: {}, lr: {}".format(n_in, n_h, n_out, dropout, lr))        
+        super().__init__(num_classes=n_out, lr=lr, n_in=n_in, n_h=n_h, n_out=n_out, dropout=dropout)
 
-        self.save_hyperparameters()
-        self.mlp = MLP(n_in, n_h, n_out, dropout)
-        self.loss = nn.CrossEntropyLoss()
-        self.accuracy = Accuracy(task="multiclass", num_classes=10)
-        self.lr = lr
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=self.lr)
         return optimizer
     
-    def forward(self,
-                x: torch.Tensor, # X input images dim(B, H*W)
-                ) -> torch.Tensor: # y class probabilities (B, n_classes)
-        return(self.mlp(x))
-
     def _step(self, batch, batch_idx):
         x, y = batch
         x = x.view(x.size(0), -1)
-        y_hat = self.mlp(x)
+        y_hat = self.forward(x)
         loss = self.loss(y_hat, y)
         acc = self.accuracy(y_hat, y)
         return loss, acc
-
-    def training_step(self, batch, batch_idx):
-        loss, acc = self._step(batch, batch_idx)
-        metrics = {"train/loss": loss, "train/acc": acc}
-        self.log_dict(metrics, on_epoch=True)
-        return loss
     
-    def validation_step(self, batch, batch_idx, prog_bar=True, on_step=False, on_epoch=True, sync_dist=True):
-        loss, acc = self._step(batch, batch_idx)
-        metrics = {"val/loss":loss, "val/acc": acc}
-        self.log_dict(metrics, on_step=on_step, on_epoch=on_epoch, sync_dist=sync_dist)
-    
-    def test_step(self, batch, batch_idx, prog_bar=True, on_step=False, on_epoch=True, sync_dist=True):
-        loss, acc = self._step(batch, batch_idx)
-        metrics = {"test/loss":loss, "test/acc": acc}
-        self.log_dict(metrics, on_step=on_step, on_epoch=on_epoch, sync_dist=sync_dist)
-
     def predict_step(self, batch, batch_idx, dataloader_idx=0):
         x, y = batch
         x = x.view(x.size(0), -1)
-        y_hat = self.mlp(x)
+        y_hat = self.forward(x)
         return y_hat.argmax(dim=1)
-
