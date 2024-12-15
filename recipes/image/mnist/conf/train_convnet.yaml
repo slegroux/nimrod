@@ -72,7 +72,7 @@ model:
   lr: 1e-3
 
 trainer:
-  _target_: pytorch_lightning.Trainer
+  _target_: lightning.Trainer
   default_root_dir: ${paths.output_dir}
   enable_progress_bar: True
   min_epochs: 1 # prevents early stopping
@@ -90,13 +90,13 @@ trainer:
 
 callbacks:
   early_stopping:
-    _target_: pytorch_lightning.callbacks.EarlyStopping
+    _target_: lightning.pytorch.callbacks.EarlyStopping
     monitor: val/loss
     mode: min
     patience: 10
     min_delta: 0
   model_checkpoint:
-    _target_: pytorch_lightning.callbacks.ModelCheckpoint
+    _target_: lightning.pytorch.callbacks.ModelCheckpoint
     monitor: "val/acc"
     mode: max
     save_top_k: 1
@@ -111,15 +111,15 @@ callbacks:
     every_n_epochs: null # number of epochs between checkpoints
     save_on_train_epoch_end: null # whether to run checkpointing at the end of the training epoch or the end of validation
   rich_progress_bar:
-    _target_: pytorch_lightning.callbacks.RichProgressBar
+    _target_: lightning.pytorch.callbacks.RichProgressBar
   model_summary:
-    _target_: pytorch_lightning.callbacks.RichModelSummary
+    _target_: lightning.pytorch.callbacks.RichModelSummary
     max_depth: 3
   # device_stats_monitor:
-  #   _target_: pytorch_lightning.callbacks.DeviceStatsMonitor
+  #   _target_: lightning.callbacks.DeviceStatsMonitor
 
 wandb:
-  _target_: pytorch_lightning.loggers.wandb.WandbLogger
+  _target_: lightning.pytorch.loggers.WandbLogger
   project: ${project}
   name: bs:${datamodule.batch_size}
   save_dir: ${paths.output_dir}
@@ -133,7 +133,7 @@ wandb:
   job_type: ""
 
 tensorboard:
-  _target_: pytorch_lightning.loggers.tensorboard.TensorBoardLogger
+  _target_: lightning.pytorch.loggers.TensorBoardLogger
   save_dir: "${paths.output_dir}/tensorboard/"
   name: null
   log_graph: False
@@ -142,7 +142,7 @@ tensorboard:
   # version: ""
 
 profiler:
-  _target_: pytorch_lightning.profilers.SimpleProfiler
+  _target_: lightning.pytorch.profilers.SimpleProfiler
   dirpath: ${paths.output_dir}
   filename: "simple_perf_logs"
   extended: True
