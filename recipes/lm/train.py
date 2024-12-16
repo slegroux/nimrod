@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import pytorch_lightning as pl
+import lightning as L
 from lightning.pytorch.tuner import Tuner
 from omegaconf import DictConfig, OmegaConf
 import hydra
@@ -15,7 +15,7 @@ def main(cfg: DictConfig) -> dict:
     hp = OmegaConf.to_container(cfg, resolve=True, throw_on_missing=True)
 
     # SEED
-    pl.seed_everything(cfg.seed, workers=True)
+    L.seed_everything(cfg.seed, workers=True)
 
     # MODEL
     model = instantiate(cfg.model)
@@ -32,7 +32,7 @@ def main(cfg: DictConfig) -> dict:
     for log_conf in cfg.loggers:
         logger = instantiate(cfg[log_conf])
         # wandb logger special setup
-        if isinstance(logger, pl.loggers.wandb.WandbLogger):
+        if isinstance(logger,L.pytorch.loggers.WandbLogger):
             # deal with hangs when hp optim multirun training 
             # wandb.init(settings=wandb.Settings(start_method="thread"))
             # wandb requires dict not DictConfig
