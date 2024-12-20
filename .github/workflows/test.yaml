@@ -8,5 +8,6 @@ jobs:
       - run: sudo apt-get install espeak git-lfs
         shell: bash
       - run: git lfs install
-      - run: git init && git lfs fetch --all && git lfs checkout
+        shell: bash
+
       # - uses: fastai/workflows/nbdev-ci@master
