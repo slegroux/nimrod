@@ -5,6 +5,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps: 
-      - run: sudo apt-get install espeak
+      - run: sudo apt-get install espeak git-lfs
         shell: bash
+      - run: git lfs install
       - uses: fastai/workflows/nbdev-ci@master
