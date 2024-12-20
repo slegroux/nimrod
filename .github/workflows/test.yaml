@@ -7,6 +7,6 @@ jobs:
     steps: 
       - run: sudo apt-get install espeak
         shell: bash
-      - run: pip install spacy && python -m spacy download en-core-web-sm
+      - run: pip install spacy && python -m spacy download en_core_web_sm
         shell: bash
       - uses: fastai/workflows/nbdev-ci@master
