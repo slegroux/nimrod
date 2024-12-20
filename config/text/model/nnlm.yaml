@@ -1,5 +1,22 @@
-_target_: nimrod.models.lm.NNLM_L
-n_vocab: 70
-n_emb: 10
-n_context: 3
-n_h: 100  
+_target_: nimrod.models.lm.NNLM_X
+num_classes: 67
+
+nnet:
+  _target_: nimrod.models.lm.NNLM
+  n_vocab: ${num_classes}
+  n_emb: 10
+  n_context: 3
+  n_h: 100
+
+optimizer:
+  _target_: torch.optim.Adam
+  _partial_: true
+  lr: 0.001
+  weight_decay: 1e-5 # mild regularization
+
+scheduler:
+  _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
+  _partial_: true
+  mode: min
+  factor: 0.1
+  patience: 10
