@@ -1,6 +1,9 @@
 _target_: nimrod.text.datasets.CharDataModule
 data_path: "../data/text/tiny_shakespeare.txt"
+specials: ["<pad>", "<unk>"]
+add_sentence_tokens: False
 train_val_test_split: [0.8, 0.1, 0.1]
+random_split: False
 batch_size: 64
 context_size: 3
 num_workers: 0
