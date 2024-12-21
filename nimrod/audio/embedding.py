@@ -3,9 +3,9 @@
 # %% auto 0
 __all__ = ['EncoDec', 'EncoDecConfig', 'EncoDecExtractor']
 
-# %% ../../nbs/audio.embeddings.ipynb 4
-from encodec import EncodecModel
-from encodec.utils import convert_audio
+# %% ../../nbs/audio.embeddings.ipynb 6
+# from encodec import EncodecModel
+# from encodec.utils import convert_audio
 
 import torchaudio
 import torch
@@ -25,7 +25,10 @@ from plum import dispatch
 from .utils import plot_waveform
 from ..utils import get_device
 
-# %% ../../nbs/audio.embeddings.ipynb 5
+from datasets import load_dataset, Audio
+from transformers import EncodecModel, AutoProcessor
+
+# %% ../../nbs/audio.embeddings.ipynb 8
 class EncoDec():
     def __init__(self, device:str='cpu'):
         self.model = EncodecModel.encodec_model_24khz()
@@ -68,7 +71,7 @@ class EncoDec():
     def device(self):
         return self._device
 
-# %% ../../nbs/audio.embeddings.ipynb 12
+# %% ../../nbs/audio.embeddings.ipynb 14
 # https://lhotse.readthedocs.io/en/v0.6_ba/features.html#creating-custom-feature-extractor
 @dataclass
 class EncoDecConfig:
