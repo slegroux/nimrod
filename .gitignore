@@ -152,7 +152,6 @@ _docs/
 /data/codeparrot
 /data/en/Libri*
 /data/
-/nimrod/
 token
 env-file
 Dockerfile.base
