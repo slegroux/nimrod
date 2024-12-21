@@ -38,7 +38,7 @@ def set_seed(seed: int = 42) -> None:
 
 FORMAT = "%(asctime)s"
 logging.basicConfig(
-    level=logging.INFO, format=FORMAT, datefmt="[%X]",
+    level=logging.DEBUG, format=FORMAT, datefmt="[%X]",
     handlers=[RichHandler(rich_tracebacks=True, tracebacks_suppress=[matplotlib, L])]
 )
 # Create a logger

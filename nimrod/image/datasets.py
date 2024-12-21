@@ -32,6 +32,7 @@ import logging
 
 # %% ../../nbs/image.datasets.ipynb 4
 set_seed(42)
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 plt.set_loglevel('INFO')
 
@@ -101,16 +102,23 @@ class MNISTDataset(ImageDataset):
         # torchvision.transforms.Compose([torchvision.transforms.ToTensor(), torchvision.transforms.Normalize(0.1307,), (0.3081,))])
 
     ):
+        logger.info("MNISTDataset: init")
+        abs_data_dir = os.path.abspath(data_dir)
+        logger.info(f"Data directory: {abs_data_dir}")
         os.makedirs(data_dir, exist_ok=True)
         super().__init__()
-        logger.info("MNISTDataset: init")
-
-        self.ds = MNIST(
-            data_dir,
-            train = train,
-            transform=transform, 
-            download=True
-        )
+        
+        try:
+            self.ds = MNIST(
+                data_dir,
+                train = train,
+                transform=transform, 
+                download=True
+            )
+            logger.info(f"MNIST dataset loaded with total {len(self.ds)} samples")
+        except Exception as e:
+            logger.error(f"Error loading MNIST dataset: {e}")
+            raise
 
     def __len__(self) -> int: # length of dataset
         return len(self.ds)
