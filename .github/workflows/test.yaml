@@ -14,7 +14,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install nbdev torch torchvision
+          pip install nbdev torch torchvision requests
           pip install -e ".[dev]"
 
       - name: Diagnostic Information
@@ -29,18 +29,30 @@ jobs:
           python -c "
           import os
           import sys
-          import urllib.request
-          import gzip
-          import shutil
+          import requests
 
           def download_mnist(url, filename):
               os.makedirs('data/image/raw', exist_ok=True)
               filepath = os.path.join('data/image/raw', filename)
+              
               if not os.path.exists(filepath):
                   print(f'Downloading {url} to {filepath}')
                   try:
-                      urllib.request.urlretrieve(url, filepath)
+                      # Use requests with a user agent to avoid 403 errors
+                      headers = {
+                          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+                      }
+                      response = requests.get(url, headers=headers)
+                      
+                      # Raise an exception for HTTP errors
+                      response.raise_for_status()
+                      
+                      # Write the content to file
+                      with open(filepath, 'wb') as f:
+                          f.write(response.content)
+                      
                       print(f'Successfully downloaded {filename}')
+                      return True
                   except Exception as e:
                       print(f'Failed to download {filename}: {e}')
                       return False
@@ -48,23 +60,32 @@ jobs:
 
           # MNIST URLs
           base_url = 'http://yann.lecun.com/exdb/mnist/'
-          train_images_url = base_url + 'train-images-idx3-ubyte.gz'
-          train_labels_url = base_url + 'train-labels-idx1-ubyte.gz'
-          test_images_url = base_url + 't10k-images-idx3-ubyte.gz'
-          test_labels_url = base_url + 't10k-labels-idx1-ubyte.gz'
-
-          # Download files
           files_to_download = [
-              (train_images_url, 'train-images-idx3-ubyte.gz'),
-              (train_labels_url, 'train-labels-idx1-ubyte.gz'),
-              (test_images_url, 't10k-images-idx3-ubyte.gz'),
-              (test_labels_url, 't10k-labels-idx1-ubyte.gz')
+              (base_url + 'train-images-idx3-ubyte.gz', 'train-images-idx3-ubyte.gz'),
+              (base_url + 'train-labels-idx1-ubyte.gz', 'train-labels-idx1-ubyte.gz'),
+              (base_url + 't10k-images-idx3-ubyte.gz', 't10k-images-idx3-ubyte.gz'),
+              (base_url + 't10k-labels-idx1-ubyte.gz', 't10k-labels-idx1-ubyte.gz')
           ]
 
+          # Try alternative mirror if primary fails
+          alternative_base_url = 'https://ossci-datasets.s3.amazonaws.com/mnist/'
+          alternative_files = [
+              (alternative_base_url + 'train-images-idx3-ubyte.gz', 'train-images-idx3-ubyte.gz'),
+              (alternative_base_url + 'train-labels-idx1-ubyte.gz', 'train-labels-idx1-ubyte.gz'),
+              (alternative_base_url + 't10k-images-idx3-ubyte.gz', 't10k-images-idx3-ubyte.gz'),
+              (alternative_base_url + 't10k-labels-idx1-ubyte.gz', 't10k-labels-idx1-ubyte.gz')
+          ]
+
+          # Try primary URLs first
           success = all(download_mnist(url, filename) for url, filename in files_to_download)
 
+          # If primary fails, try alternative mirror
           if not success:
-              print('Failed to download all MNIST files')
+              print('Trying alternative mirror...')
+              success = all(download_mnist(url, filename) for url, filename in alternative_files)
+
+          if not success:
+              print('Failed to download MNIST files from all sources')
               sys.exit(1)
           "
 
