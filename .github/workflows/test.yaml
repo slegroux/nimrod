@@ -14,8 +14,40 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install nbdev
+          pip install nbdev torch torchvision
           pip install -e ".[dev]"
+
+      - name: Diagnostic Information
+        run: |
+          python -c "import torch; print('Torch version:', torch.__version__)"
+          python -c "import torchvision; print('Torchvision version:', torchvision.__version__)"
+          python -c "import os; print('Current working directory:', os.getcwd())"
+          python -c "import sys; print('Python path:', sys.path)"
+
+      - name: Prepare MNIST Dataset
+        run: |
+          python -c "
+          import os
+          import torch
+          import torchvision
+          from torchvision.datasets import MNIST
+
+          # Create data directory
+          data_dir = os.path.join(os.getcwd(), 'data', 'image')
+          os.makedirs(data_dir, exist_ok=True)
+          print(f'Created data directory: {data_dir}')
+
+          # Try to download MNIST dataset
+          try:
+              train_dataset = MNIST(root=data_dir, train=True, download=True)
+              test_dataset = MNIST(root=data_dir, train=False, download=True)
+              print(f'Train dataset size: {len(train_dataset)}')
+              print(f'Test dataset size: {len(test_dataset)}')
+          except Exception as e:
+              print(f'Failed to download MNIST dataset: {e}')
+              import traceback
+              traceback.print_exc()
+          "
 
       - name: Clean notebooks
         run: |
