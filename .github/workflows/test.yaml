@@ -28,25 +28,67 @@ jobs:
         run: |
           python -c "
           import os
-          import torch
-          import torchvision
-          from torchvision.datasets import MNIST
+          import sys
+          import urllib.request
+          import gzip
+          import shutil
 
-          # Create data directory
-          data_dir = os.path.join(os.getcwd(), 'data', 'image')
-          os.makedirs(data_dir, exist_ok=True)
-          print(f'Created data directory: {data_dir}')
+          def download_mnist(url, filename):
+              os.makedirs('data/image/raw', exist_ok=True)
+              filepath = os.path.join('data/image/raw', filename)
+              if not os.path.exists(filepath):
+                  print(f'Downloading {url} to {filepath}')
+                  try:
+                      urllib.request.urlretrieve(url, filepath)
+                      print(f'Successfully downloaded {filename}')
+                  except Exception as e:
+                      print(f'Failed to download {filename}: {e}')
+                      return False
+              return True
 
-          # Try to download MNIST dataset
-          try:
-              train_dataset = MNIST(root=data_dir, train=True, download=True)
-              test_dataset = MNIST(root=data_dir, train=False, download=True)
-              print(f'Train dataset size: {len(train_dataset)}')
-              print(f'Test dataset size: {len(test_dataset)}')
-          except Exception as e:
-              print(f'Failed to download MNIST dataset: {e}')
-              import traceback
-              traceback.print_exc()
+          # MNIST URLs
+          base_url = 'http://yann.lecun.com/exdb/mnist/'
+          train_images_url = base_url + 'train-images-idx3-ubyte.gz'
+          train_labels_url = base_url + 'train-labels-idx1-ubyte.gz'
+          test_images_url = base_url + 't10k-images-idx3-ubyte.gz'
+          test_labels_url = base_url + 't10k-labels-idx1-ubyte.gz'
+
+          # Download files
+          files_to_download = [
+              (train_images_url, 'train-images-idx3-ubyte.gz'),
+              (train_labels_url, 'train-labels-idx1-ubyte.gz'),
+              (test_images_url, 't10k-images-idx3-ubyte.gz'),
+              (test_labels_url, 't10k-labels-idx1-ubyte.gz')
+          ]
+
+          success = all(download_mnist(url, filename) for url, filename in files_to_download)
+
+          if not success:
+              print('Failed to download all MNIST files')
+              sys.exit(1)
+          "
+
+      - name: Verify MNIST Dataset
+        run: |
+          python -c "
+          import os
+          import sys
+
+          mnist_raw_dir = 'data/image/raw'
+          expected_files = [
+              'train-images-idx3-ubyte.gz',
+              'train-labels-idx1-ubyte.gz',
+              't10k-images-idx3-ubyte.gz',
+              't10k-labels-idx1-ubyte.gz'
+          ]
+
+          missing_files = [f for f in expected_files if not os.path.exists(os.path.join(mnist_raw_dir, f))]
+          
+          if missing_files:
+              print(f'Missing files: {missing_files}')
+              sys.exit(1)
+          else:
+              print('All MNIST files downloaded successfully')
           "
 
       - name: Clean notebooks
