@@ -1,12 +1,30 @@
 name: CI
-on:  [workflow_dispatch, pull_request, push]
+on: [workflow_dispatch, pull_request, push]
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    steps: 
-      - run: sudo apt-get install espeak
-        shell: bash
-      - run: pip install spacy && python -m spacy download en_core_web_sm
-        shell: bash
-      - uses: fastai/workflows/nbdev-ci@master
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install nbdev
+          pip install -e ".[dev]"
+
+      - name: Clean notebooks
+        run: |
+          nbdev_clean
+
+      - name: Export notebooks
+        run: |
+          nbdev_export
+
+      - name: Run tests
+        run: |
+          nbdev_test --do_print --timing
