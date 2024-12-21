@@ -1,0 +1,932 @@
+[
+  {
+    "objectID": "image.datasets.html",
+    "href": "image.datasets.html",
+    "title": "Image Datasets",
+    "section": "",
+    "text": "source\n\n\n\n ImageDataset ()\n\nBase class for image datasets providing visualization of (image, label) samples\n\nsource\n\n\n\n\n ImageDataset.show_idx (index:int)\n\ndisplay image from data point index of a image dataset\n\n\n\n\nType\nDetails\n\n\n\n\nindex\nint\nIndex of the (image,label) sample to visualize",
+    "crumbs": [
+      "Image",
+      "Data",
+      "Image Datasets"
+    ]
+  },
+  {
+    "objectID": "image.datasets.html#imagedataset-base-class",
+    "href": "image.datasets.html#imagedataset-base-class",
+    "title": "Image Datasets",
+    "section": "",
+    "text": "source\n\n\n\n ImageDataset ()\n\nBase class for image datasets providing visualization of (image, label) samples\n\nsource\n\n\n\n\n ImageDataset.show_idx (index:int)\n\ndisplay image from data point index of a image dataset\n\n\n\n\nType\nDetails\n\n\n\n\nindex\nint\nIndex of the (image,label) sample to visualize",
+    "crumbs": [
+      "Image",
+      "Data",
+      "Image Datasets"
+    ]
+  },
+  {
+    "objectID": "image.datasets.html#mnist",
+    "href": "image.datasets.html#mnist",
+    "title": "Image Datasets",
+    "section": "MNIST",
+    "text": "MNIST\n\nMNIST dataset\n\nsource\n\n\nMNISTDataset\n\n MNISTDataset (data_dir:str='../data/image', train=True, transform:&lt;module\n               'torchvision.transforms.transforms'from'/opt/hostedtoolcach\n               e/Python/3.10.15/x64/lib/python3.10/site-\n               packages/torchvision/transforms/transforms.py'&gt;=Compose(\n               ToTensor()     Normalize(mean=(0.1307,), std=(0.3081,)) ))\n\nMNIST digit dataset\n\n\n\n\n\n\n\n\n\n\nType\nDefault\nDetails\n\n\n\n\ndata_dir\nstr\n../data/image\npath where data is saved\n\n\ntrain\nbool\nTrue\ntrain or test dataset\n\n\ntransform\ntorchvision.transforms.transforms\nCompose( ToTensor() Normalize(mean=(0.1307,), std=(0.3081,)))\n\n\n\n\n\nsource\n\n\nMNISTDataset.train_dev_split\n\n MNISTDataset.train_dev_split (ratio:float)\n\n\n\n\n\nType\nDetails\n\n\n\n\nratio\nfloat\npercentage of train/dev split,\n\n\nReturns\ntuple\ntrain and set mnnist datasets\n\n\n\n\n\nUsage\nSetup MNIST dataset. Download data if not found in specified location.\n\n# define test set (train=False)\n\ntest = MNISTDataset('../data/image', train=False, transform=transforms.ToTensor())\n\n# output ( (C,H,W), int)\nprint(test.ds, test.ds[0][0].dtype, type(test.ds[0][1]))\nprint(f\"Number of samples in the dataset: {len(test)}\")\n\n# get item helper\nX, y = test[0]\nprint(X.shape, y, X.type(), type(y))\n\n# display each digit\ntest.show_idx(0)\n\n# split data\ntrain, dev = test.train_dev_split(0.8)\n\n[11:01:29] INFO     [11:01:29]                                                                     3839565024.py:18\n\n\n\n\n---------------------------------------------------------------------------\nUnboundLocalError                         Traceback (most recent call last)\nCell In[10], line 3\n      1 # define test set (train=False)\n----&gt; 3 test = MNISTDataset('../data/image', train=False, transform=transforms.ToTensor())\n      5 # output ( (C,H,W), int)\n      6 print(test.ds, test.ds[0][0].dtype, type(test.ds[0][1]))\n\nCell In[8], line 19, in MNISTDataset.__init__(self, data_dir, train, transform)\n      6 def __init__(\n      7     self,\n      8     data_dir:str='../data/image', # path where data is saved\n   (...)\n     16 \n     17 ):\n     18     logger.info(\"MNISTDataset: init\")\n---&gt; 19     logger.info(f\"Data directory: {abs_data_dir}\")\n     20     os.makedirs(data_dir, exist_ok=True)\n     21     super().__init__()\n\nUnboundLocalError: cannot access local variable 'abs_data_dir' where it is not associated with a value\n\n\n\n\n\nInstantiate from config file\nIt is convenient to keep setup of specific dataset for an experiment in a config file for reproductibility\n\n# instantiate dataset from yaml config file\ncfg = OmegaConf.load(\"../config/image/data/mnist.yaml\")\nprint(cfg.dataset)\ntest = instantiate(cfg.dataset)\ntype(test)\n\n# output ( (B,C, H,W), int)\nprint(test.ds, test.ds[0][0].dtype, type(test.ds[0][1]))\nprint(f\"Number of samples in the dataset: {len(test)}\")\n\n# get item helper\nX, y = test[0]\nprint(X.shape, y, X.type(), type(y))\n\n# display each digit\ntest.show_idx(0)\n\n# split data\ntrain, dev = test.train_dev_split(0.8)\n\n\n\nMNIST DataModule\n\nsource\n\n\nMNISTDataModule\n\n MNISTDataModule (data_dir:str|os.PathLike='~/Data/',\n                  train_val_test_split:List[float]=[0.8, 0.1, 0.1],\n                  batch_size:int=64, num_workers:int=0,\n                  pin_memory:bool=False, persistent_workers:bool=False)\n\nHelper class that provides a standard way to create an ABC using inheritance.\n\n\n\n\n\n\n\n\n\n\nType\nDefault\nDetails\n\n\n\n\ndata_dir\nstr | os.PathLike\n~/Data/\npath to source data dir\n\n\ntrain_val_test_split\nList\n[0.8, 0.1, 0.1]\ntrain val test %\n\n\nbatch_size\nint\n64\nsize of compute batch\n\n\nnum_workers\nint\n0\nnum_workers equal 0 means that it’s the main process that will do the data loading when needed, num_workers equal 1 is the same as any n, but you’ll only have a single worker, so it might be slow\n\n\npin_memory\nbool\nFalse\nIf you load your samples in the Dataset on CPU and would like to push it during training to the GPU, you can speed up the host to device transfer by enabling pin_memory. This lets your DataLoader allocate the samples in page-locked memory, which speeds-up the transfer\n\n\npersistent_workers\nbool\nFalse\n\n\n\n\n\nfrom pprint import pprint\n# check for abstract methods\npprint([(name, getattr(method,\"__isabstractmethod__\", False)) for (name, method) in DataModule.__dict__.items()])\n\n[('__module__', False),\n ('__init__', False),\n ('prepare_data', True),\n ('setup', True),\n ('train_dataloader', False),\n ('val_dataloader', False),\n ('test_dataloader', False),\n ('teardown', False),\n ('state_dict', False),\n ('load_state_dict', False),\n ('_sequential_split', False),\n ('__dict__', False),\n ('__weakref__', False),\n ('__doc__', False),\n ('__abstractmethods__', False),\n ('_abc_impl', False)]\n\n\n\n\nUsage\n\n# init\ndm = MNISTDataModule(\n    data_dir=\"../data/image\",\n    train_val_test_split=[0.8, 0.1, 0.1],\n    batch_size = 64,\n    num_workers = 0, # main process\n    pin_memory= False,\n    persistent_workers=False\n)\n\n# download or reference data from dir\ndm.prepare_data()\n\n# define train, eval, test subsets\ndm.setup()\n\n# len of splits\nprint(len(dm.data_train), len(dm.data_val), len(dm.data_test))\n\n# access data batches via dataloader\ntest_dl = dm.test_dataloader()\nX,Y = next(iter(test_dl))\nprint(\"X dim(B,C,W,H): \", X.shape, \"Y: dim(B)\", Y.shape)\n\n# access data points directly by index\nprint(len(dm.data_test[0]), print(dm.data_test[0][0].shape))\nimgs = [dm.data_test[i][0] for i in range(5)]\n\n# display image samples\nImageDataset.show_grid(imgs)\n\n# labels are ints\nlbls = [dm.data_test[i][1] for i in range(5)]\nprint(lbls)\n\n\n\nConfig\n\ncfg = OmegaConf.load(\"../config/image/data/mnist.yaml\")\nprint(cfg.datamodule)\ndm = instantiate(cfg.datamodule)\ndm.prepare_data()\ndm.setup()\ntest_dl = dm.test_dataloader()\nlen(dm.data_test[0])\nimgs = [dm.data_test[i][0] for i in range(5)]\nImageDataset.show_grid(imgs)\nprint(type(dm))",
+    "crumbs": [
+      "Image",
+      "Data",
+      "Image Datasets"
+    ]
+  },
+  {
+    "objectID": "models.transformer.html",
+    "href": "models.transformer.html",
+    "title": "Transformer LM",
+    "section": "",
+    "text": "Somewhat basic implemention of transformer model\ndevice = get_device()\nprint(device)",
+    "crumbs": [
+      "Text",
+      "Models",
+      "Transformer LM"
+    ]
+  },
+  {
+    "objectID": "models.transformer.html#data-formatting",
+    "href": "models.transformer.html#data-formatting",
+    "title": "Transformer LM",
+    "section": "Data formatting",
+    "text": "Data formatting\n\nhttps://buomsoo-kim.github.io/attention/2020/04/21/Attention-mechanism-19.md/\n\n\n# dataset = datasets.load_dataset('wikitext', 'wikitext-2-raw-v1')\n\n\n# print(dataset['train'][88])\n\n\n# read unstructured text into pd\ndf = pd.read_fwf('../data/text/tiny_shakespeare.txt', header=None)\nprint(\"Dataframe: \", df.head(2))\nsentences = df[0].tolist()\nprint(\"List: \", sentences[:2])\nv = Vocab(sentences)\nprint(\"Vocab: \", len(v), ''.join(v.vocabulary))\n\n\n# squash list of sentences into one large list of characters\ndata = []\nfor line in sentences:\n    data.extend(line + ' ')\nprint(data[:100])\n\n\nn = len(data)\ntrain = data[:int(n*0.9)]\nval = data[int(n*0.9):]\nprint(val[:25])\n\n\ncontext_length = 3\nx = data[:context_length]\ny = data[1:context_length+1]\nprint(x, y)\nfor t in range(context_length):\n    context = x[:t+1]\n    target = y[t]\n    print(context, target)\n\n\nids = v.stoi(data)\n\n\nprint(ids[:10])\nprint(v.itos(ids[:10]))\n\n\ndef get_random_batch(token_sequence, context_length, batch_size, device=device):\n    ix = torch.randint(len(token_sequence) - context_length, (batch_size,)) # max index is (L - context_length)\n    x = torch.stack([token_sequence[i:i+context_length] for i in ix])\n    y = torch.stack([token_sequence[i+1:i+1+context_length] for i in ix])\n    return (x.to(device),y.to(device))\n\n\ncontext_length = 10\nbatch_size = 8\nx, y = get_random_batch(torch.LongTensor(ids), context_length, batch_size)\nprint(f'Batches X: {x.shape}, Y: {y.shape}')\nfor i in range(batch_size):\n    # v.itos(int(x[i]))\n    print('X: ', [v.itos(int(el)) for el in x[i]])\n    print('Y: ', [v.itos(int(el)) for el in y[i]])",
+    "crumbs": [
+      "Text",
+      "Models",
+      "Transformer LM"
+    ]
+  },
+  {
+    "objectID": "models.transformer.html#attention",
+    "href": "models.transformer.html#attention",
+    "title": "Transformer LM",
+    "section": "Attention",
+    "text": "Attention\n\nvocab_size = 10\nbatch_size = 5\nembed_dim = 20\ncontext_size = 8\ndropout = 0.2\nhead_size = 16\n# embedded input (float)\nx = torch.randn(batch_size, context_size, embed_dim) #(B,T,C)\nprint(x.shape)\natt = AttentionHead(embed_dim, head_size, context_size, dropout)\nxx = att(x)\nprint(xx.shape)\n\n\nnum_heads = 3\nmulti_att = MultiHeadAttention(num_heads, head_size, embed_dim, context_size, dropout)\nxxx = multi_att(x)\nprint(xxx.shape)",
+    "crumbs": [
+      "Text",
+      "Models",
+      "Transformer LM"
+    ]
+  },
+  {
+    "objectID": "models.transformer.html#feed-forward",
+    "href": "models.transformer.html#feed-forward",
+    "title": "Transformer LM",
+    "section": "Feed forward",
+    "text": "Feed forward\n\nff = FeedFoward(embed_dim, dropout)\nff_x = ff(x)\nprint(ff_x.shape)",
+    "crumbs": [
+      "Text",
+      "Models",
+      "Transformer LM"
+    ]
+  },
+  {
+    "objectID": "models.transformer.html#block",
+    "href": "models.transformer.html#block",
+    "title": "Transformer LM",
+    "section": "Block",
+    "text": "Block\n\nb = Block(embed_dim, num_heads, context_length, dropout)\nbb = b(x)\nprint(bb.shape)",
+    "crumbs": [
+      "Text",
+      "Models",
+      "Transformer LM"
+    ]
+  },
+  {
+    "objectID": "models.transformer.html#gpt-model",
+    "href": "models.transformer.html#gpt-model",
+    "title": "Transformer LM",
+    "section": "GPT model",
+    "text": "GPT model\n\nbatch_size = 64 # how many independent sequences will we process in parallel?\nblock_size = 256 # what is the maximum context length for predictions?\neval_interval = 500\nlearning_rate = 3e-4\ndevice = get_device()\neval_iters = 200\nn_embd = 384\nn_head = 6\nn_layer = 6\ndropout = 0.2\nvocab_size = len(v)\nm = GPTLanguageModel(vocab_size, n_embd, block_size, n_head, n_layer, dropout)\n\n\nprint(device)\n\n\ndevice = torch.device('mps')\nm = m.to(device)\nx = torch.randint(vocab_size, (batch_size, block_size)).to(device)\nlogits, loss = m(x)\n# print(logits.shape)\n\n\n# @torch.no_grad()\n# def estimate_loss():\n#     out = {}\n#     model.eval()\n#     for split in ['train', 'val']:\n#         losses = torch.zeros(eval_iters)\n#         for k in range(eval_iters):\n#             X, Y = get_batch(split)\n#             logits, loss = model(X, Y)\n#             losses[k] = loss.item()\n#         out[split] = losses.mean()\n#     model.train()\n#     return out\n\n\n# create a PyTorch optimizer\noptimizer = torch.optim.AdamW(m.parameters(), lr=learning_rate)\nacc_loss = []\nmax_iters = 1\nfor iter in range(max_iters):\n\n    # sample a batch of data\n    xb, yb = get_random_batch(torch.LongTensor(ids), block_size, batch_size, device=device)\n\n    # evaluate the loss\n    logits, loss = m(xb.to(device), yb.to(device))\n    print(loss.item())\n    acc_loss.append(loss.item())\n    optimizer.zero_grad(set_to_none=True)\n    loss.backward()\n    optimizer.step()\n\n\nplt.plot(acc_loss)\n\n\n# generate from the model\ncontext = torch.zeros((1, 1), dtype=torch.long, device=device)\nprint(''.join(v.itos(m.generate(context, max_new_tokens=50)[0].tolist())))",
+    "crumbs": [
+      "Text",
+      "Models",
+      "Transformer LM"
+    ]
+  },
+  {
+    "objectID": "text.phonemizer.html",
+    "href": "text.phonemizer.html",
+    "title": "Text phonemizers",
+    "section": "",
+    "text": "source"
+  },
+  {
+    "objectID": "text.phonemizer.html#usage",
+    "href": "text.phonemizer.html#usage",
+    "title": "Text phonemizers",
+    "section": "usage",
+    "text": "usage\n\np = Phonemizer()\ntext = \"oh shoot I missed my train\"\nprint(p(text))\ntext = [\"Oh Dear, you'll be fine!\", \"this is it\"]\nprint(p(text))"
+  },
+  {
+    "objectID": "text.datasets.html",
+    "href": "text.datasets.html",
+    "title": "Text datasets",
+    "section": "",
+    "text": "SEED = 42\nset_seed(SEED)",
+    "crumbs": [
+      "Text",
+      "Data",
+      "Text datasets"
+    ]
+  },
+  {
+    "objectID": "text.datasets.html#vocab",
+    "href": "text.datasets.html#vocab",
+    "title": "Text datasets",
+    "section": "Vocab",
+    "text": "Vocab\nEach row is a list of words (sentence). For each row, extract unique character and add to vocabulary. deals with special characters too.\n\nUsage\nread text file into a pandas data framew with each row as a new line\n\nv = Vocab('../data/text/tiny_shakespeare.txt', specials=['&lt;pad&gt;', '&lt;unk&gt;', '&lt;bos&gt;', '&lt;eos&gt;'])\nprint(v.vocabulary)\n\n\n# egs where token * is not in vocab\nprint(v.stoi('*'))\nprint(v.itos(61))\n\n\nprint(v.vocabulary)\ns = v.stoi([\"&lt;bos&gt;\",\"h\", \"e\", \"l\", \"l\", \"o\", \"*\", \"&lt;eos&gt;\"])\nprint(s)\nprint(v.itos(s))",
+    "crumbs": [
+      "Text",
+      "Data",
+      "Text datasets"
+    ]
+  },
+  {
+    "objectID": "text.datasets.html#tiny-shakespeare",
+    "href": "text.datasets.html#tiny-shakespeare",
+    "title": "Text datasets",
+    "section": "Tiny shakespeare",
+    "text": "Tiny shakespeare\n\nChar Dataset\nC.f. https://karpathy.github.io/char-rnn/ text is a long continuous string\n\nUsage\n\nblock_size = 3 #context_length\nds = CharDataset(data_path='../data/text/tiny_shakespeare.txt', context_length=block_size, specials=['&lt;pad&gt;', '&lt;unk&gt;', '&lt;bos&gt;', '&lt;eos&gt;'], add_sentence_tokens=True)\n# just encode &lt;unk&gt; in case unknown characters are encountered in test set\nds = CharDataset(data_path='../data/text/tiny_shakespeare.txt', context_length=block_size, specials=['&lt;unk&gt;', '&lt;pad&gt;'], add_sentence_tokens=False)\nprint(\"vocab size: \", ds.vocab_size)\nprint(len(ds))\nfor i in range(2):\n    x, y = ds[i]\n    print(\"x:\", x,  \"itos: \", ds.from_tokens(x), \"\\ny:\", y, \"itos: \", ds.from_tokens(y)[-1])\n\n\nx,y = ds[0]\nprint(\"x:\", x,  \"itos: \", ds.from_tokens(x), \"\\ny:\", y, \"itos: \", ds.from_tokens(y))\nprint(\"vocab size: \", ds.vocab_size)\nprint(\"vocabulary: \", ds.vocabulary)\n\n\nprint(len(ds))\nt = len(ds)*torch.tensor((0.8, 0.1, 0.1))\nlengths = [int(p * len(ds)) for p in (0.8, 0.1, 0.1)]\nlengths[-1] = len(ds) - sum(lengths[:-1])\nprint(lengths)\n\nrandom_split(ds, lengths)\n\n\n\n\nChar Data Module\n\nUsage\n\ndm = CharDataModule(\n    data_path=\"../data/text/tiny_shakespeare.txt\",\n    add_sentence_tokens=False,\n    specials=['&lt;unk&gt;', '&lt;pad&gt;'],\n    context_size=3,\n    train_val_test_split = (0.8, 0.1, 0.1),\n    random_split=False,\n    batch_size=64,\n    num_workers=0,\n    pin_memory=False,\n    persistent_workers=False,\n    )\ndm.setup()\n\n\nX, Y = dm.data_train[0]\nprint(dm.ds.from_tokens(X), dm.ds.from_tokens(Y), dm.vocab_size)\n\n\nlen(dm.data_train), len(dm.data_val), len(dm.data_test)\nprint(dm.data_test[0])\nprint(len(dm.test_dataloader()))\n\n\ntest_dl = dm.test_dataloader()\nX,Y = next(iter(test_dl))\nprint(\"X (B,T): \", X.shape, \"X: \", X[0], \"chars: \", dm.ds.from_tokens(X[0]))\nprint( \"Y (B): \", Y.shape, \"Y: \", Y[0], \"chars: \", dm.ds.from_tokens(Y[0]))\n\n\n\nInit from config file\n\ncfg = OmegaConf.load('../config/text/data/tinyshakespeare.yaml')\nprint(cfg)\ndm = instantiate(cfg)\ndm.setup()\n\n\ntest_dl = dm.test_dataloader()\nX,Y = next(iter(test_dl))\nprint(\"X (B,T): \", X.shape, \"X: \", X[0], \"chars: \", dm.ds.from_tokens(X[0]))\nprint( \"Y (B): \", Y.shape, \"Y: \", Y[0], \"chars: \", dm.ds.from_tokens(Y[0]))\n\n\n\n\nHugging Face\nhttps://huggingface.co/learn/nlp-course/chapter7/6?fw=pt\n\nLoad text file\n\ndataset = load_dataset(\"text\", data_files=\"../data/text/tiny_shakespeare.txt\") #, split=['train','dev','test'])\nprint(dataset)\nfull = dataset['train']\n\n\ntrain_test = full.train_test_split(train_size=0.8)\ntest_valid = train_test['test'].train_test_split(train_size=0.5)\nshake = DatasetDict({\n    'train': train_test['train'],\n    'test': test_valid['test'],\n    'valid': test_valid['train']})\nprint(shake)\n\n\nshake['test'][0]\n\n\n\nTokenization / Numericalization\n\nTokenize single element\n\ntokenizer = AutoTokenizer.from_pretrained('gpt2')\n\nprint(\"vocab size: \", len(tokenizer))\nprint(\"text row 0: \", shake['test'][0]['text'])\ntokens = tokenizer.tokenize(shake['test'][0]['text'])\nprint(\"tokens of row 0: \", tokens)\n\ncontext_length = 10\npadded = tokenizer(shake['test'][0]['text'], max_length=context_length, truncation=True, return_length=True, return_overflowing_tokens=True)\nprint(\"context block & padding for lm: \", padded)\n# print(padded.keys())\nprint('decode single input_id: ', tokenizer.decode(849))\nprint([tokenizer.decode(x) for x in padded['input_ids']])\n\n\n\nTokenize whole dataset using map\n\nfrom omegaconf import OmegaConf\n\n\ncfg = {\n    \"context_length\": 10,\n    \"truncation\": True,\n    \"return_length\": True,\n    \"return_overflowing_tokens\": True,\n}\n\ncfg = OmegaConf.create(cfg)\n\n# tokenizer function called via dataset map\ndef tokenize_function(examples:List[dict[str,str]], cfg:OmegaConf=cfg) -&gt; dict[str, List[List[int]]]:\n    result = tokenizer(\n        examples[\"text\"],\n        max_length=cfg.context_length,\n        truncation=cfg.truncation,\n        return_length=cfg.return_length,\n        return_overflowing_tokens=cfg.return_overflowing_tokens\n        )\n    if tokenizer.is_fast:\n        result[\"word_ids\"] = [result.word_ids(i) for i in range(len(result[\"input_ids\"]))]\n    return result\n\n\ntokenize_function(shake['test'][0])\n\n\nshake_toked = shake.map(\n    tokenize_function, batched=True,\n    remove_columns=[\"text\"],\n    num_proc = 1\n)\n\n\nprint(shake_toked['test'][0])\nprint([tokenizer.decode(x) for x in shake_toked['test'][0]['input_ids']])\nprint(tokenizer.decode(shake_toked['test'][0]['input_ids']))\n\n\nfor split, dset in shake_toked.items():\n    print(split, dset)\n    arr_len = np.sum(dset['length'], dtype=np.uint64)\n\n\n\n\nData Collator\n\nprint(tokenizer.pad_token, tokenizer.eos_token)\n\n\ntokenizer.pad_token = tokenizer.eos_token\ndata_collator = DataCollatorForLanguageModeling(tokenizer, mlm=False)\nout = data_collator([shake_toked[\"test\"]['input_ids'][i] for i in range(5)])\n# out = default_data_collator(shake_toked['test']['input_ids'][0])\nprint(out)\n# for key in out:\n#     print(f\"{key} shape: {out[key].shape}\")\n# print('inputs: ', out['input_ids'])\n# print('labels: ', out['labels'])\n\n# data_collator = DefaultDataCollator(tokenizer)\n# out = data_collator([shake_toked[\"test\"][i] for i in range(5)])\n# print(out)\n\n\ndef my_collate(examples, block_size: int, **kwargs):\n    # Concatenate all texts.\n    concatenated_examples = {k: sum(examples[k], []) for k in examples.keys()}\n    total_length = len(concatenated_examples[list(examples.keys())[0]])\n    # We drop the small remainder, we could add padding if the model supported it instead of this drop, you can\n    # customize this part to your needs.\n    total_length = (total_length // block_size) * block_size\n    # Split by chunks of max_len.\n    result = {\n        k: [t[i : i + block_size] for i in range(0, total_length, block_size)]\n        for k, t in concatenated_examples.items()\n    }\n    result[\"labels\"] = result[\"input_ids\"].copy()\n    return result\n\n\nexample = shake['test'][0]\n# concatenated_examples = {k: sum(example[k], []) for k in example.keys()}\nprint([example[k] for k in example.keys()])\n\n\nout = data_collator([shake_toked['test']['input_ids'][i] for i in range(4)])\nprint(out)\n\n\nfor i in range(4):\n    print([tokenizer.decode(x) for x in out['input_ids'][i]])\n\n\n\nDataloader\n\ntest_dl = DataLoader(\n    shake_toked['test']['input_ids'],\n    batch_size=128,\n    collate_fn=data_collator,\n    num_workers=0,\n)\n\n\n#!head ../data/text/tiny_shakespeare.txt\n\n\nb = next(iter(test_dl))\nprint(b['input_ids'].shape)\nprint(b['input_ids'][1])\nprint(b['labels'][1])\n# for i in range(128):\n#     print([tokenizer.decode(x) for x in b['input_ids'][i]])",
+    "crumbs": [
+      "Text",
+      "Data",
+      "Text datasets"
+    ]
+  },
+  {
+    "objectID": "text.datasets.html#wikitext-2",
+    "href": "text.datasets.html#wikitext-2",
+    "title": "Text datasets",
+    "section": "Wikitext-2",
+    "text": "Wikitext-2\n\nData source from Hugging Face\n\ndataset = datasets.load_dataset('wikitext', 'wikitext-2-raw-v1', split='test')\n\n\nprint(len(dataset), type(dataset), dataset)\nprint(dataset[100])\n\n\ndataset[100]\n\n\n\nData source from torchtext\nhttps://pytorch.org/tutorials/beginner/transformer_tutorial.html\n\ntrain_iter = WikiText2(root='../data/text', split='test')\ntokenizer = get_tokenizer('basic_english')\n\n\n# vocab = build_vocab_from_iterator(map(tokenizer, train_iter), specials=['&lt;unk&gt;'])\n# vocab.set_default_index(vocab['&lt;unk&gt;'])\n# len(vocab)\n\n\n# vocab['the']\n\n\n# vocab(tokenizer('this is a test'))\n\n\n# # concatenate all sentences together\ndef data_process(raw_text_iter) -&gt; torch.Tensor:\n    \"\"\"Converts raw text into a flat Tensor.\"\"\"\n    data = [torch.tensor(vocab(tokenizer(item)), dtype=torch.long) for item in raw_text_iter]\n    return torch.cat(tuple(filter(lambda t: t.numel() &gt; 0, data)))\n\n\n# for idx, i in enumerate(train_iter):\n#     print(idx, i)\n#     print(vocab(tokenizer(i)))\n\n\n# train_iter, val_iter, test_iter = WikiText2()\n# train_data = data_process(train_iter)\n# val_data = data_process(val_iter)\n# test_data = data_process(test_iter)\n\n\ndef batchify(data: torch.Tensor, bsz: int) -&gt; torch.Tensor:\n    \"\"\"Divides the data into ``bsz`` separate sequences, removing extra elements\n    that wouldn't cleanly fit.\n\n    Arguments:\n        data: Tensor, shape ``[N]``\n        bsz: int, batch size\n\n    Returns:\n        Tensor of shape ``[N // bsz, bsz]``\n    \"\"\"\n    seq_len = data.size(0) // bsz\n    data = data[:seq_len * bsz]\n    data = data.view(bsz, seq_len).t().contiguous()\n    return data\n\n\n# test_data = batchify(test_data, 10)\n# print(test_data)\n\n\nbptt = 35\ndef get_batch(source: torch.Tensor, i: int) -&gt; Tuple[torch.Tensor, torch.Tensor]:\n    \"\"\"\n    Args:\n        source: Tensor, shape ``[full_seq_len, batch_size]``\n        i: int\n\n    Returns:\n        tuple (data, target), where data has shape ``[seq_len, batch_size]`` and\n        target has shape ``[seq_len * batch_size]``\n    \"\"\"\n    seq_len = min(bptt, len(source) - 1 - i)\n    data = source[i:i+seq_len]\n    target = source[i+1:i+1+seq_len]\n    return data, target\n\n\n# x, y = get_batch(test_data, 0)\n# print(\"x: \", x[:2])\n# print(\"y: \", y[:2])\n\n\n\nWord-based tokenization\n\ntorchtext tokenizer\n\n# tokenizer = torchtext.data.utils.get_tokenizer('basic_english')\n# vocab = build_vocab_from_iterator(map(tokenizer, train_iter), specials=['&lt;unk&gt;'])\n# # vocab.set_default_index(vocab['&lt;unk&gt;'])\n# tokenize_data = lambda example, tokenizer: {'tokens': tokenizer(example['text'])}  \n# tokenized_dataset = dataset.map(tokenize_data, remove_columns=['text'], \n# fn_kwargs={'tokenizer': tokenizer})\n# print(tokenized_dataset['train'][88]['tokens'])\n\n\n\nhugging face tokenizer\n\ntokenizer = AutoTokenizer.from_pretrained('bert-base-cased')\ntokens = tokenizer.tokenize(dataset[100]['text'])\nprint(tokens)\n\n\n\n\nNumericalization\n\ntorchtext\n\n# vocab = torchtext.vocab.build_vocab_from_iterator(tokenized_dataset['train']['tokens'], \n# min_freq=3) \n# vocab.insert_token('&lt;unk&gt;', 0)           \n# vocab.insert_token('&lt;eos&gt;', 1)            \n# vocab.set_default_index(vocab['&lt;unk&gt;'])   \n# print(len(vocab))                         \n# print(vocab.get_itos()[:10])\n\n\n\nhugging face\n\nids = tokenizer.convert_tokens_to_ids(tokens)\nprint(ids)\nprint(tokenizer.decode(ids))",
+    "crumbs": [
+      "Text",
+      "Data",
+      "Text datasets"
+    ]
+  },
+  {
+    "objectID": "text.datasets.html#hugging-face-for-lm-without-intermediary-steps",
+    "href": "text.datasets.html#hugging-face-for-lm-without-intermediary-steps",
+    "title": "Text datasets",
+    "section": "Hugging Face for LM without intermediary steps",
+    "text": "Hugging Face for LM without intermediary steps\nhttps://huggingface.co/course/chapter7/6?fw=pt\n\n# directly without intermediary steps\ntokenizer = AutoTokenizer.from_pretrained('bert-base-cased')\ntext = [\"this is a text.\", \"or so it seems\"]\npadded = tokenizer(text, max_length=4, truncation=True, return_length=True, return_overflowing_tokens=True)\n\nprint(padded)\nprint(padded.keys())\nprint([tokenizer.decode(x) for x in padded['input_ids']])\n\n\ndata_collator = DataCollatorForLanguageModeling(tokenizer, mlm=False)\nout = data_collator(padded['input_ids'])\nfor key in out:\n    print(f\"{key} shape: {out[key].shape}\")\n\nprint(out['input_ids'], out['labels'])\n# Shifting the inputs and labels to align them happens inside the model, so the data collator just copies the inputs to create the labels.\n\n\nData loader\nConcatenate all data into one large string of text and then chunk it into context length chunks - https://towardsdatascience.com/language-modeling-with-lstms-in-pytorch-381a26badcbf - https://www.youtube.com/watch?v=ma1TrR7gE7I&t=273s\n\ndef get_data(dataset, vocab, batch_size):\n    data = []                                                   \n    for example in dataset:\n        if example['tokens']:                                      \n            tokens = example['tokens'].append('&lt;eos&gt;')             \n            tokens = [vocab[token] for token in example['tokens']] \n            data.extend(tokens)                                    \n    data = torch.LongTensor(data)                                 \n    num_batches = data.shape[0] // batch_size \n    data = data[:num_batches * batch_size]                       \n    data = data.view(batch_size, num_batches)          \n    return data\n\n\n# batch_size = 1024\n# train_data = get_data(tokenized_dataset['train'], vocab, batch_size)\n# valid_data = get_data(tokenized_dataset['validation'], vocab, batch_size)\n# test_data = get_data(tokenized_dataset['test'], vocab, batch_size)\n\n\n# print(tokenized_dataset.shape)\n# print(tokenized_dataset['train']['tokens'][88])",
+    "crumbs": [
+      "Text",
+      "Data",
+      "Text datasets"
+    ]
+  },
+  {
+    "objectID": "text.datasets.html#language-modeling-dataset",
+    "href": "text.datasets.html#language-modeling-dataset",
+    "title": "Text datasets",
+    "section": "Language modeling dataset",
+    "text": "Language modeling dataset\nBasically concatenate all data into one big array of ids and then create block_lengths inputs. shift for corresponding labels.\n\nprint(shake)\n\n\nTokenization\n\ntokenizer = AutoTokenizer.from_pretrained('gpt2')\n\n\ndef tokenize_function(examples:List[dict[str,str]]) -&gt; dict[str, List[List[int]]]:\n    result = tokenizer(examples[\"text\"]) #, max_length=context_length, truncation=True, return_length=True, return_overflowing_tokens=True)\n    if tokenizer.is_fast:\n        result[\"word_ids\"] = [result.word_ids(i) for i in range(len(result[\"input_ids\"]))]\n    return result\n\n\ntokenized = shake.map(\n    tokenize_function, batched=True,\n    remove_columns=[\"text\"],\n    num_proc = 1\n)\n\n\nprint(tokenized['train'], type(tokenized['train']))\n\n\n\nSentences concatenation\n\nall = []\nfor k,v in tokenized.items():\n    print(k, v)\n    for x in v['input_ids']:\n        all += x\n    print(len(all))\nprint(all[:15])\n\n\n\nBatchify\n\ndef get_batch(data, batch_size, block_size):\n    ix = torch.randint(len(data) - block_size, (batch_size,))\n    x = torch.stack([torch.from_numpy((data[i:i+block_size]).astype(np.int64)) for i in ix])\n    y = torch.stack([torch.from_numpy((data[i+1:i+1+block_size]).astype(np.int64)) for i in ix])\n    return x, y\n\n\nx, y = get_batch(np.array(all), 16, 10)\nprint(x.shape, y.shape)\nprint(x[0], y[0])\nprint(tokenizer.decode(x[0]), tokenizer.decode(y[0]))",
+    "crumbs": [
+      "Text",
+      "Data",
+      "Text datasets"
+    ]
+  },
+  {
+    "objectID": "models.core.html",
+    "href": "models.core.html",
+    "title": "Core lib",
+    "section": "",
+    "text": "source\n\nClassifier\n\n Classifier (num_classes:int, optimizer:torch.optim.optimizer.Optimizer, s\n             cheduler:&lt;module'torch.optim.lr_scheduler'from'/opt/hostedtoo\n             lcache/Python/3.10.15/x64/lib/python3.10/site-\n             packages/torch/optim/lr_scheduler.py'&gt;)\n\nHelper class that provides a standard way to create an ABC using inheritance.\n\nsource\n\n\nplot_classifier_metrics_from_csv\n\n plot_classifier_metrics_from_csv (metrics_csv_path:str|os.PathLike)\n\n\nsource\n\n\nfind_optimal_lr\n\n find_optimal_lr (model, train_loader, criterion=None, optimizer=None,\n                  device='cuda')"
+  },
+  {
+    "objectID": "audio.embeddings.html",
+    "href": "audio.embeddings.html",
+    "title": "Audio Embedders",
+    "section": "",
+    "text": "TODO: figure out encoder from hugging face lib",
+    "crumbs": [
+      "Audio",
+      "Embeddings",
+      "Audio Embedders"
+    ]
+  },
+  {
+    "objectID": "audio.embeddings.html#encodec",
+    "href": "audio.embeddings.html#encodec",
+    "title": "Audio Embedders",
+    "section": "EncoDec",
+    "text": "EncoDec\n\nmodel = EncodecModel.encodec_model_24khz()\n\n\n---------------------------------------------------------------------------\nAttributeError                            Traceback (most recent call last)\nCell In[17], line 1\n----&gt; 1 model = EncodecModel.encodec_model_24khz()\n\nAttributeError: type object 'EncodecModel' has no attribute 'encodec_model_24khz'\n\n\n\n\nUsage\n\nwav, sr = torchaudio.load(\"../data/audio/obama.wav\")\n# wav, sr = torch.rand((1, 24000)), 24000\n# wav, sr = np.random.random((1, 24000)), 24000\n\nencodec = EncoDec(device='cpu')\ncodes = encodec(wav,sr)\nprint(f\"wav: {wav.shape}, code: {codes.shape} \")\nplt.rcParams[\"figure.figsize\"] = (5,5)\nplt.xlabel('frames')\nplt.ylabel('quantization')\nplt.imshow(codes.squeeze().cpu().numpy())\ndecoded = encodec.decode(codes)\nplot_waveform(decoded.detach().cpu().squeeze(0), encodec.sample_rate)\n\n\n---------------------------------------------------------------------------\nAttributeError                            Traceback (most recent call last)\nCell In[12], line 5\n      1 wav, sr = torchaudio.load(\"../data/audio/obama.wav\")\n      2 # wav, sr = torch.rand((1, 24000)), 24000\n      3 # wav, sr = np.random.random((1, 24000)), 24000\n----&gt; 5 encodec = EncoDec(device='cpu')\n      6 codes = encodec(wav,sr)\n      7 print(f\"wav: {wav.shape}, code: {codes.shape} \")\n\nCell In[11], line 4, in EncoDec.__init__(self, device)\n      3 def __init__(self, device:str='cpu'):\n----&gt; 4     self.model = EncodecModel.encodec_model_24khz()\n      5     self._device = device\n      6     self.model.to(self._device)\n\nAttributeError: type object 'EncodecModel' has no attribute 'encodec_model_24khz'\n\n\n\n\nplt.plot(codes[0][0])\nprint(codes[0][0].shape)\n\n\n\nLhotse-style Encodec feature extractor\n\nencodec_extractor = EncoDecExtractor()\n# cuts = CutSet.from_file(\"../recipes/tts/ljspeech/data/first_3.jsonl.gz\")\ncuts = CutSet.from_file(\"../data/en/LJSpeech-1.1/first_3.encodec.jsonl.gz\")\nprint(cuts[0])\nprint(cuts[1])\n\n\n# torch.set_num_threads(1)\n# torch.set_num_interop_threads(1)\n\n\n# feats = cuts.compute_and_store_features(extractor=Fbank(), storage_path=\"../recipes/tts/ljspeech/data/feats\")\n\n\n# storage_path = \"../.data/en/LJSpeech-1.1\"\n# # storage_path = \"../recipes/tts/ljspeech/data/feats\"\n# # TODO: make it work with num_jobs&gt;1\n# cuts = cuts.compute_and_store_features(\n#     extractor=encodec_extractor,\n#     storage_path=storage_path,\n#     num_jobs=1,\n# )\n# cuts.to_file(\"../recipes/tts/ljspeech/data/cuts_encodec.jsonl.gz\")\n# print(cuts[0])\n# cuts[0].plot_features()\n# print(cuts)\n\n\nfiles = \"../data/en/LJSpeech-1.1/cuts_encodec.jsonl.gz\"\n# files = \"../recipes/tts/ljspeech/data/cuts_encodec.jsonl.gz\"\ncuts = CutSet.from_file(files)\nprint(cuts)\n\n\n### HF\n\n# dummy dataset, however you can swap this with an dataset on the 🤗 hub or bring your own\nlibrispeech_dummy = load_dataset(\"hf-internal-testing/librispeech_asr_dummy\", \"clean\", split=\"validation\")\n\n# load the model + processor (for pre-processing the audio)\nmodel = EncodecModel.from_pretrained(\"facebook/encodec_24khz\")\nprocessor = AutoProcessor.from_pretrained(\"facebook/encodec_24khz\")\nlibrispeech_dummy[0]\n# cast the audio data to the correct sampling rate for the model\nlibrispeech_dummy = librispeech_dummy.cast_column(\"audio\", Audio(sampling_rate=processor.sampling_rate))\naudio_sample = librispeech_dummy[0][\"audio\"][\"array\"]",
+    "crumbs": [
+      "Audio",
+      "Embeddings",
+      "Audio Embedders"
+    ]
+  },
+  {
+    "objectID": "audio.embeddings.html#audiolm",
+    "href": "audio.embeddings.html#audiolm",
+    "title": "Audio Embedders",
+    "section": "AudioLM",
+    "text": "AudioLM\n\n# TO DO",
+    "crumbs": [
+      "Audio",
+      "Embeddings",
+      "Audio Embedders"
+    ]
+  },
+  {
+    "objectID": "text.normalizers.html",
+    "href": "text.normalizers.html",
+    "title": "Text Normalizers",
+    "section": "",
+    "text": "source\n\n\n\n TTSTextNormalizer (language='en')\n\nInitialize self. See help(type(self)) for accurate signature.\n\ncleaner = TTSTextNormalizer()\nprint(cleaner.en_normalize_numbers(\"$350\"))\nprint(cleaner.expand_time_english(\"12:05pm\"))\nprint(cleaner(\"Oh my dear! this is $5 too soon... It's 1:04 am!\"))\nprint(cleaner([\"Oh my dear! this is $5 too soon...\", \"It's 1:04 am!\"]))\n\n\nsource\n\n\n\n\n Punctuation (puncs:str=';:,.!?¡¿—…\"«»“”')\n\n*Handle punctuations in text.\nJust strip punctuations from text or strip and restore them later.\nArgs: puncs (str): The punctuations to be processed. Defaults to _DEF_PUNCS.\nExample: &gt;&gt;&gt; punc = Punctuation() &gt;&gt;&gt; punc.strip(“This is. example !”) ‘This is example’\n&gt;&gt;&gt; text_striped, punc_map = punc.strip_to_restore(\"This is. example !\")\n&gt;&gt;&gt; ' '.join(text_striped)\n'This is example'\n\n&gt;&gt;&gt; text_restored = punc.restore(text_striped, punc_map)\n&gt;&gt;&gt; text_restored[0]\n'This is. example !'*\n\nsource\n\n\n\n\n PuncPosition (value, names=None, module=None, qualname=None, type=None,\n               start=1)\n\nEnum for the punctuations positions\n\npunc = Punctuation()\ntext = \"This is. This is, example!\"\nprint(punc.strip(text))\nsplit_text, puncs = punc.strip_to_restore(text)\nprint(split_text, \" ---- \", puncs)\nrestored_text = punc.restore(split_text, puncs)\nprint(restored_text)",
+    "crumbs": [
+      "Text",
+      "Data",
+      "Text Normalizers"
+    ]
+  },
+  {
+    "objectID": "text.normalizers.html#tts-cleaning-normalization",
+    "href": "text.normalizers.html#tts-cleaning-normalization",
+    "title": "Text Normalizers",
+    "section": "",
+    "text": "source\n\n\n\n TTSTextNormalizer (language='en')\n\nInitialize self. See help(type(self)) for accurate signature.\n\ncleaner = TTSTextNormalizer()\nprint(cleaner.en_normalize_numbers(\"$350\"))\nprint(cleaner.expand_time_english(\"12:05pm\"))\nprint(cleaner(\"Oh my dear! this is $5 too soon... It's 1:04 am!\"))\nprint(cleaner([\"Oh my dear! this is $5 too soon...\", \"It's 1:04 am!\"]))\n\n\nsource\n\n\n\n\n Punctuation (puncs:str=';:,.!?¡¿—…\"«»“”')\n\n*Handle punctuations in text.\nJust strip punctuations from text or strip and restore them later.\nArgs: puncs (str): The punctuations to be processed. Defaults to _DEF_PUNCS.\nExample: &gt;&gt;&gt; punc = Punctuation() &gt;&gt;&gt; punc.strip(“This is. example !”) ‘This is example’\n&gt;&gt;&gt; text_striped, punc_map = punc.strip_to_restore(\"This is. example !\")\n&gt;&gt;&gt; ' '.join(text_striped)\n'This is example'\n\n&gt;&gt;&gt; text_restored = punc.restore(text_striped, punc_map)\n&gt;&gt;&gt; text_restored[0]\n'This is. example !'*\n\nsource\n\n\n\n\n PuncPosition (value, names=None, module=None, qualname=None, type=None,\n               start=1)\n\nEnum for the punctuations positions\n\npunc = Punctuation()\ntext = \"This is. This is, example!\"\nprint(punc.strip(text))\nsplit_text, puncs = punc.strip_to_restore(text)\nprint(split_text, \" ---- \", puncs)\nrestored_text = punc.restore(split_text, puncs)\nprint(restored_text)",
+    "crumbs": [
+      "Text",
+      "Data",
+      "Text Normalizers"
+    ]
+  },
+  {
+    "objectID": "models.conv.html",
+    "href": "models.conv.html",
+    "title": "Convolution-based Model",
+    "section": "",
+    "text": "Using a convolution with a stride of 2 instead of max pooling essentially achieves the same goal of downsampling an image by reducing its spatial dimensions, but with the key difference that the convolution layer can learn more complex feature combinations from overlapping regions, while max pooling only selects the maximum value within a window, potentially losing information about the finer details within that region; making the convolution with stride approach often preferred for preserving more spatial information in a neural network.\n\n\n\nB, C, H, W = 64, 1, 28, 28\nX = torch.rand(B, C, H, W)\nc = ConvLayer(1, 16, 3, True)\n# flatten all dims except batch\nY = torch.flatten(c(X), 1)\nprint(Y.shape)"
+  },
+  {
+    "objectID": "models.conv.html#conv-layer",
+    "href": "models.conv.html#conv-layer",
+    "title": "Convolution-based Model",
+    "section": "",
+    "text": "Using a convolution with a stride of 2 instead of max pooling essentially achieves the same goal of downsampling an image by reducing its spatial dimensions, but with the key difference that the convolution layer can learn more complex feature combinations from overlapping regions, while max pooling only selects the maximum value within a window, potentially losing information about the finer details within that region; making the convolution with stride approach often preferred for preserving more spatial information in a neural network.\n\n\n\nB, C, H, W = 64, 1, 28, 28\nX = torch.rand(B, C, H, W)\nc = ConvLayer(1, 16, 3, True)\n# flatten all dims except batch\nY = torch.flatten(c(X), 1)\nprint(Y.shape)"
+  },
+  {
+    "objectID": "models.conv.html#convnet-model",
+    "href": "models.conv.html#convnet-model",
+    "title": "Convolution-based Model",
+    "section": "Convnet Model",
+    "text": "Convnet Model\nSimple convolution network for image recognition\n\nUsage\n\nMock data\n\nB, C, H, W = 64, 1, 28, 28\nX = torch.rand(B, C, H, W)\nX.shape\n\n\n\nModel\n\n# model instantiation\nconvnet = ConvNet()\nout = convnet(X)\nprint(out.shape)\n\n# from config\ncfg = OmegaConf.load('../config/image/model/conv.yaml')\nprint(cfg.nnet)\nconvnet = instantiate(cfg.nnet)\nprint(convnet(X).shape)\n\n\n\n\nTraining\n\nDataloaders\n\n# data module config\ncfg = OmegaConf.load('../config/image/data/mnist.yaml')\n\ndatamodule = instantiate(cfg.datamodule)\n# datamodule.prepare_data()\ndatamodule.batch_size = 2048\ndatamodule.setup()\n\n# one data point \nX,y = datamodule.data_test[0]\nprint(\"X (C,H,W): \", X.shape, \"y: \", y)\n\n# a batch of data via dataloader\nXX,YY = next(iter(datamodule.test_dataloader()))\nprint(\"XX (B,C,H,W): \", XX.shape, \"YY: \", YY.shape)\n\nprint(len(datamodule.data_train))\nprint(len(datamodule.data_train)//cfg.datamodule.batch_size)\n\n\n\nModel & hardware\n\ndevice = get_device()\nprint(device)\nmodel = ConvNet()\nmodel = model.to(device)\n\n\n\nLoss, optimizer, scheduler\n\nLR finder\n\ncriterion = nn.CrossEntropyLoss()\n    \noptimizer = torch.optim.Adam(model.parameters(), lr=1e-7, weight_decay=1e-2)\n    \n# Initialize LR Finder\nlr_finder = LRFinder(model, optimizer, criterion, device=device)\n    \n# Run LR range test\nlr_finder.range_test(\n    datamodule.train_dataloader(),\n    start_lr=1e-6,      # Extremely small starting learning rate\n    end_lr=10,          # Large ending learning rate\n    num_iter=100,   # Number of iterations to test\n    smooth_f=0.05,   # Smoothing factor for the loss\n    diverge_th=5, \n)\n    \n# Plot the learning rate vs loss\n_, lr_found = lr_finder.plot(log_lr=True)\nprint('Suggested lr:', lr_found)\n    \nlr_finder.reset()\n\n\n\n1-cycle training loop\n\n# data module config\ncfg = OmegaConf.load('../config/image/data/mnist.yaml')\ncfg.datamodule.batch_size = 2048\ndatamodule = instantiate(cfg.datamodule)\n# datamodule.prepare_data()\ndatamodule.setup()\n\ndevice = 'mps' if torch.backends.mps.is_available() else 'cuda' if torch.cuda.is_available() else 'cpu'\n# device = 'cpu'\nprint(device)\nmodel = ConvNet()\nmodel = model.to(device)\n\n\ncriterion = nn.CrossEntropyLoss()\noptimizer = torch.optim.Adam(model.parameters(), lr=1e-4)\nsteps_per_epoch = len(datamodule.data_train) // cfg.datamodule.batch_size\ntotal_steps = steps_per_epoch* N_EPOCHS\nprint(len(datamodule.data_train), cfg.datamodule.batch_size, steps_per_epoch, total_steps)\n# scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=0.01, steps_per_epoch=steps_per_epochs, epochs=1)\nN_EPOCHS = 10\nscheduler = torch.optim.lr_scheduler.OneCycleLR(\n        optimizer,\n        max_lr=lr_found,  # Peak learning rate\n        # total_steps=len(datamodule.data_train) * N_EPOCHS,  # Total training iterations\n        steps_per_epoch=steps_per_epoch,\n        epochs=N_EPOCHS,\n        pct_start=0.3,  # 30% of training increasing LR, 70% decreasing\n        anneal_strategy='cos',  # Cosine annealing\n        div_factor=10,  # Initial lr = max_lr / div_factor\n        # final_div_factor=1e4,\n        three_phase=False  # Two phase LR schedule (increase then decrease)\n    )\n\nlosses = []\nlrs = []\ncurrent_step = 0\n\nfor epoch in range(N_EPOCHS):\n    i = 0\n    model.train()\n    for images, labels in datamodule.train_dataloader():\n        if current_step &gt;= total_steps:\n            print(f\"Reached total steps: {current_step}/{total_steps}\")\n            break\n        optimizer.zero_grad()\n        images, labels = images.to(device), labels.to(device)\n        outputs = model(images)\n        loss = criterion(outputs, labels)        \n        loss.backward()\n        optimizer.step()\n        scheduler.step()    \n        current_step += 1\n    \n        losses.append(loss.item())\n        # current_lr = scheduler.get_last_lr()[0]\n        current_lr = optimizer.param_groups[0]['lr']\n        lrs.append(current_lr)\n        if not (i % 100):\n            print(f\"Loss {loss.item():.4f}, Current LR: {current_lr:.10f}, Step: {current_step}/{total_steps}\")\n        i += 1\n    \n    model.eval()\n    with torch.no_grad():\n        correct = 0\n        total = 0\n        for images, labels in datamodule.test_dataloader():\n            # model expects input (B,H*W)\n            images = images.to(device)\n            labels = labels.to(device)\n            # Pass the input through the model\n            outputs = model(images)\n            # Get the predicted labels\n            _, predicted = torch.max(outputs.data, 1)\n\n            # Update the total and correct counts\n            total += labels.size(0)\n            correct += (predicted == labels).sum()\n\n        # Print the accuracy\n    print(f\"Epoch {epoch + 1}: Loss {loss.item():.4f}, Accuracy = {100 * correct / total:.2f}%\")\n    # print(f'Current LR: {optimizer.param_groups[0][\"lr\"]:.5f}')\n\n\nplt.figure(1)\nplt.subplot(211)\nplt.ylabel('loss')\nplt.xlabel('step')\nplt.plot(losses)\nplt.subplot(212)\nplt.ylabel('lr')\nplt.xlabel('step')\nplt.plot(lrs)"
+  },
+  {
+    "objectID": "models.conv.html#convnetx",
+    "href": "models.conv.html#convnetx",
+    "title": "Convolution-based Model",
+    "section": "ConvNetX",
+    "text": "ConvNetX\n\nUsage\n\ncfg = OmegaConf.load('../config/image/model/conv.yaml')\nmodel = instantiate(cfg)\n\n\nB, C, H, W = 64, 1, 28, 28\nX = torch.rand(B, C, H, W)\nX.shape\nprint(model(X).shape)\n\n\n\nNimrod training\n\n# model\ncfg = OmegaConf.load('../config/image/model/conv.yaml')\nmodel = instantiate(cfg)\n\n# data module config\ncfg = OmegaConf.load('../config/image/data/mnist.yaml')\ncfg.datamodule.batch_size = 2048\ncfg.datamodule.num_workers = 0\ndatamodule = instantiate(cfg.datamodule)\n# datamodule.prepare_data()\ndatamodule.setup()\n\n\ntrainer = Trainer(\n    accelerator=\"auto\",\n    max_epochs=3,\n    logger=CSVLogger(\"logs\", name=\"mnist_convnet\")\n    )\n\n\ntrainer.fit(model, datamodule.train_dataloader(), datamodule.val_dataloader())\n\n\ncsv_path = f\"{trainer.logger.log_dir}/metrics.csv\"\nmetrics = pd.read_csv(csv_path)\nmetrics.head(5)\n\n\nplt.figure()\nplt.plot(metrics['step'], metrics['train/loss_step'], 'b.-')\nplt.plot(metrics['step'], metrics['val/loss'],'r.-')\nplt.show()"
+  },
+  {
+    "objectID": "audio.datasets.tts.html",
+    "href": "audio.datasets.tts.html",
+    "title": "Audio TTS Datasets",
+    "section": "",
+    "text": "https://github.com/Lightning-AI/lightning/issues/10358 https://colab.research.google.com/drive/1HKSYPsWx_HoCdrnLpaPdYj5zwlPsM3NH\n\n# tok = TokenCollater()\n# ds = LhotseTTSDataset(tok)\n\n\n\n\n\n\n\n\n#(Waveform, Sample_rate, Original_text, Normalized_text, Speaker_ID, Chapter_ID, Utterance_ID)\nds = LIBRITTS(\"../data/en\", 'test-clean')\nprint(ds[0])\n\n\nplot_waveform(ds[0][0], ds[0][1])\n\n\n\n\n\n# num_jobs=0 turns parallel computing off within jupyter notebook. Else it fails.\ndm = LibriTTSDataModule(\n    target_dir=\"../data/en\", \n    dataset_parts=\"test-clean\",\n    output_dir=\"../data/en/LibriTTS/test-clean\",\n    num_jobs=1\n)\n\n\n# skip download and use local data folder\n# dm.prepare_data()\n\n\n# libri = prepare_libritts(\"../data/en/LibriTTS\", dataset_parts=\"test-clean\")\n\n\ndm.setup(stage='test')\n\n\ntest_dl = dm.test_dataloader()\nbatch = next(iter(test_dl))\nprint(batch.keys())\n\n\nprint(batch['feats_pad'].shape)\nplt.imshow(batch['feats_pad'][3].transpose(0,1))\nprint(batch['feats_lens'])\nprint(batch['tokens_pad'][3], batch['tokens_lens'][3])\n\n\noriginal_sentences = dm.tokenizer.inverse(batch['tokens_pad'], batch['tokens_lens'])\nprint(original_sentences)",
+    "crumbs": [
+      "Audio",
+      "Data",
+      "Audio TTS Datasets"
+    ]
+  },
+  {
+    "objectID": "audio.datasets.tts.html#libritts",
+    "href": "audio.datasets.tts.html#libritts",
+    "title": "Audio TTS Datasets",
+    "section": "",
+    "text": "https://github.com/Lightning-AI/lightning/issues/10358 https://colab.research.google.com/drive/1HKSYPsWx_HoCdrnLpaPdYj5zwlPsM3NH\n\n# tok = TokenCollater()\n# ds = LhotseTTSDataset(tok)\n\n\n\n\n\n\n\n\n#(Waveform, Sample_rate, Original_text, Normalized_text, Speaker_ID, Chapter_ID, Utterance_ID)\nds = LIBRITTS(\"../data/en\", 'test-clean')\nprint(ds[0])\n\n\nplot_waveform(ds[0][0], ds[0][1])\n\n\n\n\n\n# num_jobs=0 turns parallel computing off within jupyter notebook. Else it fails.\ndm = LibriTTSDataModule(\n    target_dir=\"../data/en\", \n    dataset_parts=\"test-clean\",\n    output_dir=\"../data/en/LibriTTS/test-clean\",\n    num_jobs=1\n)\n\n\n# skip download and use local data folder\n# dm.prepare_data()\n\n\n# libri = prepare_libritts(\"../data/en/LibriTTS\", dataset_parts=\"test-clean\")\n\n\ndm.setup(stage='test')\n\n\ntest_dl = dm.test_dataloader()\nbatch = next(iter(test_dl))\nprint(batch.keys())\n\n\nprint(batch['feats_pad'].shape)\nplt.imshow(batch['feats_pad'][3].transpose(0,1))\nprint(batch['feats_lens'])\nprint(batch['tokens_pad'][3], batch['tokens_lens'][3])\n\n\noriginal_sentences = dm.tokenizer.inverse(batch['tokens_pad'], batch['tokens_lens'])\nprint(original_sentences)",
+    "crumbs": [
+      "Audio",
+      "Data",
+      "Audio TTS Datasets"
+    ]
+  },
+  {
+    "objectID": "docker.html",
+    "href": "docker.html",
+    "title": "Docker containerization",
+    "section": "",
+    "text": "Check .devcontainer/Dockerfile\nInstalls basic dependencies for nimrod to work seamlessly\n\n\nbuilds nimrod docker image with automatic tag ‘:latest’\nmake nimrod\n\n\n\nUpload your image to https://hub.docker.com for pulling from cloud instances\nmake push\n\n\n\nimage_name=\"nimrod\"\n./run_docker_locally.sh ${image_name}"
+  },
+  {
+    "objectID": "docker.html#base-image",
+    "href": "docker.html#base-image",
+    "title": "Docker containerization",
+    "section": "",
+    "text": "Check .devcontainer/Dockerfile\nInstalls basic dependencies for nimrod to work seamlessly\n\n\nbuilds nimrod docker image with automatic tag ‘:latest’\nmake nimrod\n\n\n\nUpload your image to https://hub.docker.com for pulling from cloud instances\nmake push\n\n\n\nimage_name=\"nimrod\"\n./run_docker_locally.sh ${image_name}"
+  },
+  {
+    "objectID": "docker.html#docker-compose",
+    "href": "docker.html#docker-compose",
+    "title": "Docker containerization",
+    "section": "Docker compose",
+    "text": "Docker compose\ncheck .devcontainer/docker-compose.yml\nThis defines port sharing, mounts volumes and read api secrets from file\n\nUsage\n# start services\ndocker-compose up\n# stop services\ndocker-compose down"
+  },
+  {
+    "objectID": "image.med.html",
+    "href": "image.med.html",
+    "title": "Image helper modules",
+    "section": "",
+    "text": "'''\n * Copyright (c) 2022, salesforce.com, inc.\n * All rights reserved.\n * SPDX-License-Identifier: BSD-3-Clause\n * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause\n * By Junnan Li\n * Based on huggingface code base\n * https://github.com/huggingface/transformers/blob/v4.15.0/src/transformers/models/bert\n'''\n\n\nsource\n\n\n\n BertEmbeddings (config)\n\nConstruct the embeddings from word and position embeddings.\n\nsource\n\n\n\n\n BertSelfAttention (config, is_cross_attention)\n\n*Base class for all neural network modules.\nYour models should also subclass this class.\nModules can also contain other Modules, allowing to nest them in a tree structure. You can assign the submodules as regular attributes::\nimport torch.nn as nn\nimport torch.nn.functional as F\n\nclass Model(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.conv1 = nn.Conv2d(1, 20, 5)\n        self.conv2 = nn.Conv2d(20, 20, 5)\n\n    def forward(self, x):\n        x = F.relu(self.conv1(x))\n        return F.relu(self.conv2(x))\nSubmodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:to, etc.\n.. note:: As per the example above, an __init__() call to the parent class must be made before assignment on the child.\n:ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*\n\nsource\n\n\n\n\n BertSelfOutput (config)\n\n*Base class for all neural network modules.\nYour models should also subclass this class.\nModules can also contain other Modules, allowing to nest them in a tree structure. You can assign the submodules as regular attributes::\nimport torch.nn as nn\nimport torch.nn.functional as F\n\nclass Model(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.conv1 = nn.Conv2d(1, 20, 5)\n        self.conv2 = nn.Conv2d(20, 20, 5)\n\n    def forward(self, x):\n        x = F.relu(self.conv1(x))\n        return F.relu(self.conv2(x))\nSubmodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:to, etc.\n.. note:: As per the example above, an __init__() call to the parent class must be made before assignment on the child.\n:ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*\n\nsource\n\n\n\n\n BertAttention (config, is_cross_attention=False)\n\n*Base class for all neural network modules.\nYour models should also subclass this class.\nModules can also contain other Modules, allowing to nest them in a tree structure. You can assign the submodules as regular attributes::\nimport torch.nn as nn\nimport torch.nn.functional as F\n\nclass Model(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.conv1 = nn.Conv2d(1, 20, 5)\n        self.conv2 = nn.Conv2d(20, 20, 5)\n\n    def forward(self, x):\n        x = F.relu(self.conv1(x))\n        return F.relu(self.conv2(x))\nSubmodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:to, etc.\n.. note:: As per the example above, an __init__() call to the parent class must be made before assignment on the child.\n:ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*\n\nsource\n\n\n\n\n BertIntermediate (config)\n\n*Base class for all neural network modules.\nYour models should also subclass this class.\nModules can also contain other Modules, allowing to nest them in a tree structure. You can assign the submodules as regular attributes::\nimport torch.nn as nn\nimport torch.nn.functional as F\n\nclass Model(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.conv1 = nn.Conv2d(1, 20, 5)\n        self.conv2 = nn.Conv2d(20, 20, 5)\n\n    def forward(self, x):\n        x = F.relu(self.conv1(x))\n        return F.relu(self.conv2(x))\nSubmodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:to, etc.\n.. note:: As per the example above, an __init__() call to the parent class must be made before assignment on the child.\n:ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*\n\nsource\n\n\n\n\n BertOutput (config)\n\n*Base class for all neural network modules.\nYour models should also subclass this class.\nModules can also contain other Modules, allowing to nest them in a tree structure. You can assign the submodules as regular attributes::\nimport torch.nn as nn\nimport torch.nn.functional as F\n\nclass Model(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.conv1 = nn.Conv2d(1, 20, 5)\n        self.conv2 = nn.Conv2d(20, 20, 5)\n\n    def forward(self, x):\n        x = F.relu(self.conv1(x))\n        return F.relu(self.conv2(x))\nSubmodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:to, etc.\n.. note:: As per the example above, an __init__() call to the parent class must be made before assignment on the child.\n:ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*\n\nsource\n\n\n\n\n BertLayer (config, layer_num)\n\n*Base class for all neural network modules.\nYour models should also subclass this class.\nModules can also contain other Modules, allowing to nest them in a tree structure. You can assign the submodules as regular attributes::\nimport torch.nn as nn\nimport torch.nn.functional as F\n\nclass Model(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.conv1 = nn.Conv2d(1, 20, 5)\n        self.conv2 = nn.Conv2d(20, 20, 5)\n\n    def forward(self, x):\n        x = F.relu(self.conv1(x))\n        return F.relu(self.conv2(x))\nSubmodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:to, etc.\n.. note:: As per the example above, an __init__() call to the parent class must be made before assignment on the child.\n:ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*\n\nsource\n\n\n\n\n BertLMHeadModel (config)\n\nAn abstract class to handle weights initialization and a simple interface for downloading and loading pretrained models.\n\nsource\n\n\n\n\n BertModel (config, add_pooling_layer=True)\n\nThe model can behave as an encoder (with only self-attention) as well as a decoder, in which case a layer of cross-attention is added between the self-attention layers, following the architecture described in Attention is all you need &lt;https://arxiv.org/abs/1706.03762&gt;__ by Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, Lukasz Kaiser and Illia Polosukhin. argument and :obj:add_cross_attention set to :obj:True; an :obj:encoder_hidden_states is then expected as an input to the forward pass.\n\nsource\n\n\n\n\n BertPreTrainedModel\n                      (config:transformers.configuration_utils.PretrainedC\n                      onfig, *inputs, **kwargs)\n\nAn abstract class to handle weights initialization and a simple interface for downloading and loading pretrained models.\n\nsource\n\n\n\n\n BertOnlyMLMHead (config)\n\n*Base class for all neural network modules.\nYour models should also subclass this class.\nModules can also contain other Modules, allowing to nest them in a tree structure. You can assign the submodules as regular attributes::\nimport torch.nn as nn\nimport torch.nn.functional as F\n\nclass Model(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.conv1 = nn.Conv2d(1, 20, 5)\n        self.conv2 = nn.Conv2d(20, 20, 5)\n\n    def forward(self, x):\n        x = F.relu(self.conv1(x))\n        return F.relu(self.conv2(x))\nSubmodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:to, etc.\n.. note:: As per the example above, an __init__() call to the parent class must be made before assignment on the child.\n:ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*\n\nsource\n\n\n\n\n BertLMPredictionHead (config)\n\n*Base class for all neural network modules.\nYour models should also subclass this class.\nModules can also contain other Modules, allowing to nest them in a tree structure. You can assign the submodules as regular attributes::\nimport torch.nn as nn\nimport torch.nn.functional as F\n\nclass Model(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.conv1 = nn.Conv2d(1, 20, 5)\n        self.conv2 = nn.Conv2d(20, 20, 5)\n\n    def forward(self, x):\n        x = F.relu(self.conv1(x))\n        return F.relu(self.conv2(x))\nSubmodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:to, etc.\n.. note:: As per the example above, an __init__() call to the parent class must be made before assignment on the child.\n:ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*\n\nsource\n\n\n\n\n BertPredictionHeadTransform (config)\n\n*Base class for all neural network modules.\nYour models should also subclass this class.\nModules can also contain other Modules, allowing to nest them in a tree structure. You can assign the submodules as regular attributes::\nimport torch.nn as nn\nimport torch.nn.functional as F\n\nclass Model(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.conv1 = nn.Conv2d(1, 20, 5)\n        self.conv2 = nn.Conv2d(20, 20, 5)\n\n    def forward(self, x):\n        x = F.relu(self.conv1(x))\n        return F.relu(self.conv2(x))\nSubmodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:to, etc.\n.. note:: As per the example above, an __init__() call to the parent class must be made before assignment on the child.\n:ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*\n\nsource\n\n\n\n\n BertPooler (config)\n\n*Base class for all neural network modules.\nYour models should also subclass this class.\nModules can also contain other Modules, allowing to nest them in a tree structure. You can assign the submodules as regular attributes::\nimport torch.nn as nn\nimport torch.nn.functional as F\n\nclass Model(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.conv1 = nn.Conv2d(1, 20, 5)\n        self.conv2 = nn.Conv2d(20, 20, 5)\n\n    def forward(self, x):\n        x = F.relu(self.conv1(x))\n        return F.relu(self.conv2(x))\nSubmodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:to, etc.\n.. note:: As per the example above, an __init__() call to the parent class must be made before assignment on the child.\n:ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*\n\nsource\n\n\n\n\n BertEncoder (config)\n\n*Base class for all neural network modules.\nYour models should also subclass this class.\nModules can also contain other Modules, allowing to nest them in a tree structure. You can assign the submodules as regular attributes::\nimport torch.nn as nn\nimport torch.nn.functional as F\n\nclass Model(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.conv1 = nn.Conv2d(1, 20, 5)\n        self.conv2 = nn.Conv2d(20, 20, 5)\n\n    def forward(self, x):\n        x = F.relu(self.conv1(x))\n        return F.relu(self.conv2(x))\nSubmodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:to, etc.\n.. note:: As per the example above, an __init__() call to the parent class must be made before assignment on the child.\n:ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*"
+  },
+  {
+    "objectID": "image.med.html#modules",
+    "href": "image.med.html#modules",
+    "title": "Image helper modules",
+    "section": "",
+    "text": "'''\n * Copyright (c) 2022, salesforce.com, inc.\n * All rights reserved.\n * SPDX-License-Identifier: BSD-3-Clause\n * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause\n * By Junnan Li\n * Based on huggingface code base\n * https://github.com/huggingface/transformers/blob/v4.15.0/src/transformers/models/bert\n'''\n\n\nsource\n\n\n\n BertEmbeddings (config)\n\nConstruct the embeddings from word and position embeddings.\n\nsource\n\n\n\n\n BertSelfAttention (config, is_cross_attention)\n\n*Base class for all neural network modules.\nYour models should also subclass this class.\nModules can also contain other Modules, allowing to nest them in a tree structure. You can assign the submodules as regular attributes::\nimport torch.nn as nn\nimport torch.nn.functional as F\n\nclass Model(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.conv1 = nn.Conv2d(1, 20, 5)\n        self.conv2 = nn.Conv2d(20, 20, 5)\n\n    def forward(self, x):\n        x = F.relu(self.conv1(x))\n        return F.relu(self.conv2(x))\nSubmodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:to, etc.\n.. note:: As per the example above, an __init__() call to the parent class must be made before assignment on the child.\n:ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*\n\nsource\n\n\n\n\n BertSelfOutput (config)\n\n*Base class for all neural network modules.\nYour models should also subclass this class.\nModules can also contain other Modules, allowing to nest them in a tree structure. You can assign the submodules as regular attributes::\nimport torch.nn as nn\nimport torch.nn.functional as F\n\nclass Model(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.conv1 = nn.Conv2d(1, 20, 5)\n        self.conv2 = nn.Conv2d(20, 20, 5)\n\n    def forward(self, x):\n        x = F.relu(self.conv1(x))\n        return F.relu(self.conv2(x))\nSubmodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:to, etc.\n.. note:: As per the example above, an __init__() call to the parent class must be made before assignment on the child.\n:ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*\n\nsource\n\n\n\n\n BertAttention (config, is_cross_attention=False)\n\n*Base class for all neural network modules.\nYour models should also subclass this class.\nModules can also contain other Modules, allowing to nest them in a tree structure. You can assign the submodules as regular attributes::\nimport torch.nn as nn\nimport torch.nn.functional as F\n\nclass Model(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.conv1 = nn.Conv2d(1, 20, 5)\n        self.conv2 = nn.Conv2d(20, 20, 5)\n\n    def forward(self, x):\n        x = F.relu(self.conv1(x))\n        return F.relu(self.conv2(x))\nSubmodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:to, etc.\n.. note:: As per the example above, an __init__() call to the parent class must be made before assignment on the child.\n:ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*\n\nsource\n\n\n\n\n BertIntermediate (config)\n\n*Base class for all neural network modules.\nYour models should also subclass this class.\nModules can also contain other Modules, allowing to nest them in a tree structure. You can assign the submodules as regular attributes::\nimport torch.nn as nn\nimport torch.nn.functional as F\n\nclass Model(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.conv1 = nn.Conv2d(1, 20, 5)\n        self.conv2 = nn.Conv2d(20, 20, 5)\n\n    def forward(self, x):\n        x = F.relu(self.conv1(x))\n        return F.relu(self.conv2(x))\nSubmodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:to, etc.\n.. note:: As per the example above, an __init__() call to the parent class must be made before assignment on the child.\n:ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*\n\nsource\n\n\n\n\n BertOutput (config)\n\n*Base class for all neural network modules.\nYour models should also subclass this class.\nModules can also contain other Modules, allowing to nest them in a tree structure. You can assign the submodules as regular attributes::\nimport torch.nn as nn\nimport torch.nn.functional as F\n\nclass Model(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.conv1 = nn.Conv2d(1, 20, 5)\n        self.conv2 = nn.Conv2d(20, 20, 5)\n\n    def forward(self, x):\n        x = F.relu(self.conv1(x))\n        return F.relu(self.conv2(x))\nSubmodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:to, etc.\n.. note:: As per the example above, an __init__() call to the parent class must be made before assignment on the child.\n:ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*\n\nsource\n\n\n\n\n BertLayer (config, layer_num)\n\n*Base class for all neural network modules.\nYour models should also subclass this class.\nModules can also contain other Modules, allowing to nest them in a tree structure. You can assign the submodules as regular attributes::\nimport torch.nn as nn\nimport torch.nn.functional as F\n\nclass Model(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.conv1 = nn.Conv2d(1, 20, 5)\n        self.conv2 = nn.Conv2d(20, 20, 5)\n\n    def forward(self, x):\n        x = F.relu(self.conv1(x))\n        return F.relu(self.conv2(x))\nSubmodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:to, etc.\n.. note:: As per the example above, an __init__() call to the parent class must be made before assignment on the child.\n:ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*\n\nsource\n\n\n\n\n BertLMHeadModel (config)\n\nAn abstract class to handle weights initialization and a simple interface for downloading and loading pretrained models.\n\nsource\n\n\n\n\n BertModel (config, add_pooling_layer=True)\n\nThe model can behave as an encoder (with only self-attention) as well as a decoder, in which case a layer of cross-attention is added between the self-attention layers, following the architecture described in Attention is all you need &lt;https://arxiv.org/abs/1706.03762&gt;__ by Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, Lukasz Kaiser and Illia Polosukhin. argument and :obj:add_cross_attention set to :obj:True; an :obj:encoder_hidden_states is then expected as an input to the forward pass.\n\nsource\n\n\n\n\n BertPreTrainedModel\n                      (config:transformers.configuration_utils.PretrainedC\n                      onfig, *inputs, **kwargs)\n\nAn abstract class to handle weights initialization and a simple interface for downloading and loading pretrained models.\n\nsource\n\n\n\n\n BertOnlyMLMHead (config)\n\n*Base class for all neural network modules.\nYour models should also subclass this class.\nModules can also contain other Modules, allowing to nest them in a tree structure. You can assign the submodules as regular attributes::\nimport torch.nn as nn\nimport torch.nn.functional as F\n\nclass Model(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.conv1 = nn.Conv2d(1, 20, 5)\n        self.conv2 = nn.Conv2d(20, 20, 5)\n\n    def forward(self, x):\n        x = F.relu(self.conv1(x))\n        return F.relu(self.conv2(x))\nSubmodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:to, etc.\n.. note:: As per the example above, an __init__() call to the parent class must be made before assignment on the child.\n:ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*\n\nsource\n\n\n\n\n BertLMPredictionHead (config)\n\n*Base class for all neural network modules.\nYour models should also subclass this class.\nModules can also contain other Modules, allowing to nest them in a tree structure. You can assign the submodules as regular attributes::\nimport torch.nn as nn\nimport torch.nn.functional as F\n\nclass Model(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.conv1 = nn.Conv2d(1, 20, 5)\n        self.conv2 = nn.Conv2d(20, 20, 5)\n\n    def forward(self, x):\n        x = F.relu(self.conv1(x))\n        return F.relu(self.conv2(x))\nSubmodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:to, etc.\n.. note:: As per the example above, an __init__() call to the parent class must be made before assignment on the child.\n:ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*\n\nsource\n\n\n\n\n BertPredictionHeadTransform (config)\n\n*Base class for all neural network modules.\nYour models should also subclass this class.\nModules can also contain other Modules, allowing to nest them in a tree structure. You can assign the submodules as regular attributes::\nimport torch.nn as nn\nimport torch.nn.functional as F\n\nclass Model(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.conv1 = nn.Conv2d(1, 20, 5)\n        self.conv2 = nn.Conv2d(20, 20, 5)\n\n    def forward(self, x):\n        x = F.relu(self.conv1(x))\n        return F.relu(self.conv2(x))\nSubmodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:to, etc.\n.. note:: As per the example above, an __init__() call to the parent class must be made before assignment on the child.\n:ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*\n\nsource\n\n\n\n\n BertPooler (config)\n\n*Base class for all neural network modules.\nYour models should also subclass this class.\nModules can also contain other Modules, allowing to nest them in a tree structure. You can assign the submodules as regular attributes::\nimport torch.nn as nn\nimport torch.nn.functional as F\n\nclass Model(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.conv1 = nn.Conv2d(1, 20, 5)\n        self.conv2 = nn.Conv2d(20, 20, 5)\n\n    def forward(self, x):\n        x = F.relu(self.conv1(x))\n        return F.relu(self.conv2(x))\nSubmodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:to, etc.\n.. note:: As per the example above, an __init__() call to the parent class must be made before assignment on the child.\n:ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*\n\nsource\n\n\n\n\n BertEncoder (config)\n\n*Base class for all neural network modules.\nYour models should also subclass this class.\nModules can also contain other Modules, allowing to nest them in a tree structure. You can assign the submodules as regular attributes::\nimport torch.nn as nn\nimport torch.nn.functional as F\n\nclass Model(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.conv1 = nn.Conv2d(1, 20, 5)\n        self.conv2 = nn.Conv2d(20, 20, 5)\n\n    def forward(self, x):\n        x = F.relu(self.conv1(x))\n        return F.relu(self.conv2(x))\nSubmodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:to, etc.\n.. note:: As per the example above, an __init__() call to the parent class must be made before assignment on the child.\n:ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*"
+  },
+  {
+    "objectID": "image.blip.html",
+    "href": "image.blip.html",
+    "title": "BLIP: Bootstrapping Language-Image Pre-training",
+    "section": "",
+    "text": "https://github.com/salesforce/BLIP\n\nCopyright (c) 2022, salesforce.com, inc.\nAll rights reserved.\nSPDX-License-Identifier: BSD-3-Clause\nFor full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause\nBy Junnan Li"
+  },
+  {
+    "objectID": "image.blip.html#references",
+    "href": "image.blip.html#references",
+    "title": "BLIP: Bootstrapping Language-Image Pre-training",
+    "section": "",
+    "text": "https://github.com/salesforce/BLIP\n\nCopyright (c) 2022, salesforce.com, inc.\nAll rights reserved.\nSPDX-License-Identifier: BSD-3-Clause\nFor full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause\nBy Junnan Li"
+  },
+  {
+    "objectID": "image.blip.html#imports",
+    "href": "image.blip.html#imports",
+    "title": "BLIP: Bootstrapping Language-Image Pre-training",
+    "section": "Imports",
+    "text": "Imports"
+  },
+  {
+    "objectID": "image.blip.html#base",
+    "href": "image.blip.html#base",
+    "title": "BLIP: Bootstrapping Language-Image Pre-training",
+    "section": "Base",
+    "text": "Base"
+  },
+  {
+    "objectID": "image.blip.html#decoder",
+    "href": "image.blip.html#decoder",
+    "title": "BLIP: Bootstrapping Language-Image Pre-training",
+    "section": "Decoder",
+    "text": "Decoder"
+  },
+  {
+    "objectID": "image.blip.html#helpers",
+    "href": "image.blip.html#helpers",
+    "title": "BLIP: Bootstrapping Language-Image Pre-training",
+    "section": "Helpers",
+    "text": "Helpers"
+  },
+  {
+    "objectID": "image.blip.html#usage",
+    "href": "image.blip.html#usage",
+    "title": "BLIP: Bootstrapping Language-Image Pre-training",
+    "section": "Usage",
+    "text": "Usage\n\ndevice = get_device()\nprint(\"DEVICE: \", device)\n\ndef load_demo_image(image_size,device):\n    img_url = 'https://storage.googleapis.com/sfr-vision-language-research/BLIP/demo.jpg' \n    raw_image = Image.open(requests.get(img_url, stream=True).raw).convert('RGB')   \n\n    w,h = raw_image.size\n    display(raw_image.resize((w//5,h//5)))\n    \n    transform = transforms.Compose([\n        transforms.Resize((image_size,image_size),interpolation=InterpolationMode.BICUBIC),\n        transforms.ToTensor(),\n        transforms.Normalize((0.48145466, 0.4578275, 0.40821073), (0.26862954, 0.26130258, 0.27577711))\n        ]) \n    image = transform(raw_image).unsqueeze(0).to(device)   \n    return image\n\nDEVICE:  mps\n\n\n\n# # from nimrod.image.blip import blip_decoder\n# image_size = 384\n# image = load_demo_image(image_size=image_size, device=device)\n\n# model_url = 'https://storage.googleapis.com/sfr-vision-language-research/BLIP/models/model_base_capfilt_large.pth'\n    \n# model = blip_decoder(pretrained=model_url, image_size=image_size, vit='base')\n# model.eval()\n# model = model.to(device)\n\n# with torch.no_grad():\n#     # beam search\n#     caption = model.generate(image, sample=False, num_beams=3, max_length=20, min_length=5) \n#     # nucleus sampling\n#     # caption = model.generate(image, sample=True, top_p=0.9, max_length=20, min_length=5) \n#     print('caption: '+caption[0])"
+  },
+  {
+    "objectID": "image.blip.html#hf-transformer-version",
+    "href": "image.blip.html#hf-transformer-version",
+    "title": "BLIP: Bootstrapping Language-Image Pre-training",
+    "section": "HF Transformer version",
+    "text": "HF Transformer version\n\nprocessor = BlipProcessor.from_pretrained(\"Salesforce/blip-image-captioning-base\")\nmodel = BlipForConditionalGeneration.from_pretrained(\"Salesforce/blip-image-captioning-base\")\n\n\n# Load an image\n# image = Image.open(\"path_to_your_image.jpg\")\nimg_url = 'https://storage.googleapis.com/sfr-vision-language-research/BLIP/demo.jpg' \nimage = Image.open(requests.get(img_url, stream=True).raw).convert('RGB')\n\n# Conditional image captioning\ntext = \"a photography of\"\ninputs = processor(image, text=text, return_tensors=\"pt\")\n\n\noutputs = model.generate(**inputs)\ncaption = processor.decode(outputs[0], skip_special_tokens=True)\nprint(\"Generated Caption:\", caption)\ndisplay(image)\n\n\n# unConditional image captioning\ninputs = processor(image, return_tensors=\"pt\")\n\noutputs = model.generate(**inputs)\ncaption = processor.decode(outputs[0], skip_special_tokens=True)\nprint(\"Generated Caption:\", caption)\n\nGenerated Caption: a woman sitting on the beach with her dog\n\n\n\n# Load an image\n# image = Image.open(\"path_to_your_image.jpg\")\n\n# img_url = \"https://images.artnet.com/aoa_lot_images/141282/shepard-fairey-kurt-cobain-endless-nameless-prints-and-multiples-zoom_374_500.jpg\"\nimg_url = \"https://images.artnet.com/aoa_lot_images/141287/hiroshi-sugimoto-gulf-of-bothnia-photographs.jpeg\"\nimage = Image.open(requests.get(img_url, stream=True).raw).convert('RGB')\n\n# Conditional image captioning\ntext = \"a painting of\"\ninputs = processor(image, text=text, return_tensors=\"pt\")\noutputs = model.generate(**inputs)\ncaption = processor.decode(outputs[0], skip_special_tokens=True)\nprint(\"Generated Caption:\", caption)\ndisplay(image)\n\nGenerated Caption: a painting of a body of water in the middle of the ocean"
+  },
+  {
+    "objectID": "text.tokenizers.html",
+    "href": "text.tokenizers.html",
+    "title": "Text tokenizers",
+    "section": "",
+    "text": "https://pytorch.org/text/0.16.0/data_utils.html\n\n\n\n\n\ntok = Tokenizer(backend='character_based', bos=True, eos=True)\n# str -&gt; List[str]\ns = \"Oh, yeah I'm not sure...\"\ntokenized = tok(s)\nprint(\"original sentence: \", s)\nprint(\"tokenized: \", tokenized)\nprint(\"un-tokenized: \", tok.inverse(tokenized))\n\ntok = Tokenizer(backend='spacy', bos=True, eos=True)\n# str -&gt; List[str]\ns = \"Oh, yeah I'm not sure...\"\ntokenized = tok(s)\nprint(\"original sentence: \", s)\nprint(\"tokenized: \", tokenized)\nprint(\"un-tokenized: \", tok.inverse(tokenized))\n\ntok = Tokenizer(backend='basic_english', bos=True, eos=True)\n# str -&gt; List[str]\ns = \"Oh, yeah I'm not sure...\"\ntokenized = tok(s)\nprint(\"original sentence: \", s)\nprint(\"tokenized: \", tokenized)\nprint(\"un-tokenized: \", tok.inverse(tokenized))\n\n\n\n\n\n# List[str]-&gt;List[List[str]]\ns = [\"Oh, yeah I don't know dude...\", \"this is a test\"]\ntokenized = tok(s)\nprint(\"original sentence: \", s)\nprint(\"tokenized: \", tokenized)\nprint(\"un-tokenized: \", tok.inverse(tokenized))\n\n\n\n\n\n# Iterable -&gt; Iterable\ntok = Tokenizer()\nds = AG_NEWS(split='test') # data pipe\nsample = next(iter(ds)) # (label, text)\nprint(sample)\nit = tok(ds)\ntokens = [token for token in it]\nprint(len(tokens))\nprint(tokens[:2])",
+    "crumbs": [
+      "Text",
+      "Data",
+      "Text tokenizers"
+    ]
+  },
+  {
+    "objectID": "text.tokenizers.html#torchtext",
+    "href": "text.tokenizers.html#torchtext",
+    "title": "Text tokenizers",
+    "section": "",
+    "text": "https://pytorch.org/text/0.16.0/data_utils.html\n\n\n\n\n\ntok = Tokenizer(backend='character_based', bos=True, eos=True)\n# str -&gt; List[str]\ns = \"Oh, yeah I'm not sure...\"\ntokenized = tok(s)\nprint(\"original sentence: \", s)\nprint(\"tokenized: \", tokenized)\nprint(\"un-tokenized: \", tok.inverse(tokenized))\n\ntok = Tokenizer(backend='spacy', bos=True, eos=True)\n# str -&gt; List[str]\ns = \"Oh, yeah I'm not sure...\"\ntokenized = tok(s)\nprint(\"original sentence: \", s)\nprint(\"tokenized: \", tokenized)\nprint(\"un-tokenized: \", tok.inverse(tokenized))\n\ntok = Tokenizer(backend='basic_english', bos=True, eos=True)\n# str -&gt; List[str]\ns = \"Oh, yeah I'm not sure...\"\ntokenized = tok(s)\nprint(\"original sentence: \", s)\nprint(\"tokenized: \", tokenized)\nprint(\"un-tokenized: \", tok.inverse(tokenized))\n\n\n\n\n\n# List[str]-&gt;List[List[str]]\ns = [\"Oh, yeah I don't know dude...\", \"this is a test\"]\ntokenized = tok(s)\nprint(\"original sentence: \", s)\nprint(\"tokenized: \", tokenized)\nprint(\"un-tokenized: \", tok.inverse(tokenized))\n\n\n\n\n\n# Iterable -&gt; Iterable\ntok = Tokenizer()\nds = AG_NEWS(split='test') # data pipe\nsample = next(iter(ds)) # (label, text)\nprint(sample)\nit = tok(ds)\ntokens = [token for token in it]\nprint(len(tokens))\nprint(tokens[:2])",
+    "crumbs": [
+      "Text",
+      "Data",
+      "Text tokenizers"
+    ]
+  },
+  {
+    "objectID": "text.tokenizers.html#hugging-face-tokenizers",
+    "href": "text.tokenizers.html#hugging-face-tokenizers",
+    "title": "Text tokenizers",
+    "section": "Hugging Face tokenizers",
+    "text": "Hugging Face tokenizers\nhttps://huggingface.co/learn/nlp-course/chapter2/4?fw=pt\n\ntokenizer = AutoTokenizer.from_pretrained(\"gpt2\")\n\n\nsequence = \"Using a Transformer network is simple\"\ntokens = tokenizer.tokenize(sequence)\nprint(tokens)\n\n\nids = tokenizer.convert_tokens_to_ids(tokens)\nprint(ids)",
+    "crumbs": [
+      "Text",
+      "Data",
+      "Text tokenizers"
+    ]
+  },
+  {
+    "objectID": "audio.features.html",
+    "href": "audio.features.html",
+    "title": "Audio features",
+    "section": "",
+    "text": "source\n\n\n\n MelSpecgram (sampling_rate:int=22050, win_length:int=1024,\n              hop_length:int=256, n_fft:int=1024, f_min:float=0.0,\n              f_max:float=8000.0, n_mels:int=80, power:float=1.0,\n              mel_scale:str='slaney', normalized:bool=True, _target_=None)\n\n*MelSpecgram\nuse torchaudio mel computation and add clamping & scaling to mimic taco2*\n\n\n\n\ncfg = OmegaConf.load(\"../config/audio/features/mel_spectrogram.yaml\")\ncfg.sampling_rate = 16000\nprint(type(cfg), cfg)\nwav, sr = torchaudio.load(\"../data/audio/obama.wav\")\nprint(wav.shape,sr)\n\n\nmel_spectrogramer = MelSpecgram(**cfg)\n# mel_spectrogramer = instantiate(cfg)\nprint(mel_spectrogramer)\nmels = mel_spectrogramer(wav)\nprint(mels.shape)\n\n\nplt.imshow(mels.squeeze(0))"
+  },
+  {
+    "objectID": "audio.features.html#mel-spectrogram",
+    "href": "audio.features.html#mel-spectrogram",
+    "title": "Audio features",
+    "section": "",
+    "text": "source\n\n\n\n MelSpecgram (sampling_rate:int=22050, win_length:int=1024,\n              hop_length:int=256, n_fft:int=1024, f_min:float=0.0,\n              f_max:float=8000.0, n_mels:int=80, power:float=1.0,\n              mel_scale:str='slaney', normalized:bool=True, _target_=None)\n\n*MelSpecgram\nuse torchaudio mel computation and add clamping & scaling to mimic taco2*\n\n\n\n\ncfg = OmegaConf.load(\"../config/audio/features/mel_spectrogram.yaml\")\ncfg.sampling_rate = 16000\nprint(type(cfg), cfg)\nwav, sr = torchaudio.load(\"../data/audio/obama.wav\")\nprint(wav.shape,sr)\n\n\nmel_spectrogramer = MelSpecgram(**cfg)\n# mel_spectrogramer = instantiate(cfg)\nprint(mel_spectrogramer)\nmels = mel_spectrogramer(wav)\nprint(mels.shape)\n\n\nplt.imshow(mels.squeeze(0))"
+  },
+  {
+    "objectID": "data.core.html",
+    "href": "data.core.html",
+    "title": "Core data utils",
+    "section": "",
+    "text": "source\n\n\n\n DataModule (train_val_test_split:Tuple[float,float,float]=[0.8, 0.1,\n             0.1], batch_size:int=64, num_workers:int=0,\n             pin_memory:bool=False, persistent_workers:bool=False,\n             shuffle:bool=True)\n\nHelper class that provides a standard way to create an ABC using inheritance.\n\n\n\n\n\n\n\n\n\n\nType\nDefault\nDetails\n\n\n\n\ntrain_val_test_split\nTuple\n[0.8, 0.1, 0.1]\ntrain val test %\n\n\nbatch_size\nint\n64\nsize of compute batch\n\n\nnum_workers\nint\n0\nnum_workers equal 0 means that it’s the main process that will do the data loading when needed, num_workers equal 1 is the same as any n, but you’ll only have a single worker, so it might be slow\n\n\npin_memory\nbool\nFalse\nIf you load your samples in the Dataset on CPU and would like to push it during training to the GPU, you can speed up the host to device transfer by enabling pin_memory. This lets your DataLoader allocate the samples in page-locked memory, which speeds-up the transfer\n\n\npersistent_workers\nbool\nFalse\n\n\n\nshuffle\nbool\nTrue\nshuffle training data\n\n\nReturns\nNone\n\n\n\n\n\n\nsource\n\n\n\n\n split_train_valid_test (dataset:torch.utils.data.dataset.Dataset,\n                         splits:List[float])"
+  },
+  {
+    "objectID": "data.core.html#data-module",
+    "href": "data.core.html#data-module",
+    "title": "Core data utils",
+    "section": "",
+    "text": "source\n\n\n\n DataModule (train_val_test_split:Tuple[float,float,float]=[0.8, 0.1,\n             0.1], batch_size:int=64, num_workers:int=0,\n             pin_memory:bool=False, persistent_workers:bool=False,\n             shuffle:bool=True)\n\nHelper class that provides a standard way to create an ABC using inheritance.\n\n\n\n\n\n\n\n\n\n\nType\nDefault\nDetails\n\n\n\n\ntrain_val_test_split\nTuple\n[0.8, 0.1, 0.1]\ntrain val test %\n\n\nbatch_size\nint\n64\nsize of compute batch\n\n\nnum_workers\nint\n0\nnum_workers equal 0 means that it’s the main process that will do the data loading when needed, num_workers equal 1 is the same as any n, but you’ll only have a single worker, so it might be slow\n\n\npin_memory\nbool\nFalse\nIf you load your samples in the Dataset on CPU and would like to push it during training to the GPU, you can speed up the host to device transfer by enabling pin_memory. This lets your DataLoader allocate the samples in page-locked memory, which speeds-up the transfer\n\n\npersistent_workers\nbool\nFalse\n\n\n\nshuffle\nbool\nTrue\nshuffle training data\n\n\nReturns\nNone\n\n\n\n\n\n\nsource\n\n\n\n\n split_train_valid_test (dataset:torch.utils.data.dataset.Dataset,\n                         splits:List[float])"
+  },
+  {
+    "objectID": "audio.datasets.stt.html",
+    "href": "audio.datasets.stt.html",
+    "title": "Speech to Text Datasets",
+    "section": "",
+    "text": "source\n\n\n\n STTDataset (tokenizer:lhotse.dataset.collation.TokenCollater,\n             num_mel_bins:int=80)\n\n*An abstract class representing a :class:Dataset.\nAll datasets that represent a map from keys to data samples should subclass it. All subclasses should overwrite :meth:__getitem__, supporting fetching a data sample for a given key. Subclasses could also optionally overwrite :meth:__len__, which is expected to return the size of the dataset by many :class:~torch.utils.data.Sampler implementations and the default options of :class:~torch.utils.data.DataLoader. Subclasses could also optionally implement :meth:__getitems__, for speedup batched samples loading. This method accepts list of indices of samples of batch and returns list of samples.\n.. note:: :class:~torch.utils.data.DataLoader by default constructs an index sampler that yields integral indices. To make it work with a map-style dataset with non-integral indices/keys, a custom sampler must be provided.*\n\n\n\n\nType\nDefault\nDetails\n\n\n\n\ntokenizer\nTokenCollater\n\ntext tokenizer\n\n\nnum_mel_bins\nint\n80\nnumber of mel spectrogram bins",
+    "crumbs": [
+      "Audio",
+      "Data",
+      "Speech to Text Datasets"
+    ]
+  },
+  {
+    "objectID": "audio.datasets.stt.html#base-class",
+    "href": "audio.datasets.stt.html#base-class",
+    "title": "Speech to Text Datasets",
+    "section": "",
+    "text": "source\n\n\n\n STTDataset (tokenizer:lhotse.dataset.collation.TokenCollater,\n             num_mel_bins:int=80)\n\n*An abstract class representing a :class:Dataset.\nAll datasets that represent a map from keys to data samples should subclass it. All subclasses should overwrite :meth:__getitem__, supporting fetching a data sample for a given key. Subclasses could also optionally overwrite :meth:__len__, which is expected to return the size of the dataset by many :class:~torch.utils.data.Sampler implementations and the default options of :class:~torch.utils.data.DataLoader. Subclasses could also optionally implement :meth:__getitems__, for speedup batched samples loading. This method accepts list of indices of samples of batch and returns list of samples.\n.. note:: :class:~torch.utils.data.DataLoader by default constructs an index sampler that yields integral indices. To make it work with a map-style dataset with non-integral indices/keys, a custom sampler must be provided.*\n\n\n\n\nType\nDefault\nDetails\n\n\n\n\ntokenizer\nTokenCollater\n\ntext tokenizer\n\n\nnum_mel_bins\nint\n80\nnumber of mel spectrogram bins",
+    "crumbs": [
+      "Audio",
+      "Data",
+      "Speech to Text Datasets"
+    ]
+  },
+  {
+    "objectID": "audio.datasets.stt.html#librispeech-datamodule",
+    "href": "audio.datasets.stt.html#librispeech-datamodule",
+    "title": "Speech to Text Datasets",
+    "section": "LibriSpeech DataModule",
+    "text": "LibriSpeech DataModule\n\nsource\n\nLibriSpeechDataModule\n\n LibriSpeechDataModule (target_dir='../data/en',\n                        dataset_parts='mini_librispeech',\n                        output_dir='../recipes/stt/librispeech/data',\n                        num_jobs=1)\n\n*A DataModule standardizes the training, val, test splits, data preparation and transforms. The main advantage is consistent data splits, data preparation and transforms across models.\nExample::\nimport lightning as L\nimport torch.utils.data as data\nfrom lightning.pytorch.demos.boring_classes import RandomDataset\n\nclass MyDataModule(L.LightningDataModule):\n    def prepare_data(self):\n        # download, IO, etc. Useful with shared filesystems\n        # only called on 1 GPU/TPU in distributed\n        ...\n\n    def setup(self, stage):\n        # make assignments here (val/train/test split)\n        # called on every process in DDP\n        dataset = RandomDataset(1, 100)\n        self.train, self.val, self.test = data.random_split(\n            dataset, [80, 10, 10], generator=torch.Generator().manual_seed(42)\n        )\n\n    def train_dataloader(self):\n        return data.DataLoader(self.train)\n\n    def val_dataloader(self):\n        return data.DataLoader(self.val)\n\n    def test_dataloader(self):\n        return data.DataLoader(self.test)\n\n    def on_exception(self, exception):\n        # clean up state after the trainer faced an exception\n        ...\n\n    def teardown(self):\n        # clean up state after the trainer stops, delete files...\n        # called on every process in DDP\n        ...*\n\n\n\n\n\n\n\n\n\n\nType\nDefault\nDetails\n\n\n\n\ntarget_dir\nstr\n../data/en\nwhere data will be saved / retrieved\n\n\ndataset_parts\nstr\nmini_librispeech\neither full librispeech or mini subset\n\n\noutput_dir\nstr\n../recipes/stt/librispeech/data\nwhere to save manifest\n\n\nnum_jobs\nint\n1\nnum_jobs depending on number of cpus available",
+    "crumbs": [
+      "Audio",
+      "Data",
+      "Speech to Text Datasets"
+    ]
+  },
+  {
+    "objectID": "audio.datasets.stt.html#usage",
+    "href": "audio.datasets.stt.html#usage",
+    "title": "Speech to Text Datasets",
+    "section": "Usage",
+    "text": "Usage\n\ndm = LibriSpeechDataModule(\n    target_dir=\"../data/en\", \n    dataset_parts=\"mini_librispeech\",\n    output_dir=\"../data/en/LibriSpeech\",\n    num_jobs=1\n)\n\n\n# skip this at export time to not waste time\n# download\ndm.prepare_data()\n\n\n# libri = prepare_librispeech(\"../data/en/LibriSpeech\", dataset_parts='mini_librispeech')\n\n\n! rm ../data/en/LibriSpeech/*.gz\n\n\ndm.setup(stage='test')\n\n\ndm.cuts_test\n\n\nrecs = RecordingSet.from_file(\"../data/en/LibriSpeech/librispeech_recordings_dev-clean-2.jsonl.gz\")\nsup = SupervisionSet(\"../data/en/LibriSpeech/librispeech_supervisions_dev-clean-2.jsonl.gz\")\nprint(len(recs),len(sup))\n\n\ntest_dl = dm.test_dataloader()\nb = next(iter(test_dl))\nprint(b[\"feats_pad\"].shape, b[\"tokens_pad\"].shape, b[\"ilens\"].shape)\nplt.imshow(b[\"feats_pad\"][0].transpose(0,1), origin='lower')\n\n# dm.tokenizer.idx2token(b[\"tokens_pad\"][0])\n# dm.tokenizer.inverse(b[\"tokens_pad\"][0], b[\"ilens\"][0])\n\n\nprint(dm.cuts_test)\ncut = dm.cuts_test[0]\n# pprint(cut.to_dict())\ncut.plot_audio()",
+    "crumbs": [
+      "Audio",
+      "Data",
+      "Speech to Text Datasets"
+    ]
+  },
+  {
+    "objectID": "models.autoencoders.html",
+    "href": "models.autoencoders.html",
+    "title": "Autoencoders",
+    "section": "",
+    "text": "enc = Encoder()\ndec = Decoder()\na = AutoEncoder(enc, dec)\nbatch = torch.rand((10, 28*28))\ny = a(batch)\nprint(y.shape)\n\n\nds = MNISTDataset(data_dir='../data/image/')\ndl = DataLoader(ds)\nb = next(iter(dl))\nprint(len(b), b[0].shape, b[1].shape)\n\n\nautoencoder_pl = AutoEncoderPL(a)\nb = torch.rand((5,28*28))\ny = autoencoder_pl(b)\nprint(y.shape)",
+    "crumbs": [
+      "Image",
+      "Models",
+      "Autoencoders"
+    ]
+  },
+  {
+    "objectID": "models.mlp.html",
+    "href": "models.mlp.html",
+    "title": "Multi Layer Perceptron (MLP)",
+    "section": "",
+    "text": "image = torch.rand((5, 28*28))\nmlp = MLP(n_in=28*28, n_h=64, n_out=10, dropout=0.1)\nout = mlp(image)\nprint(out.shape)\ncfg = OmegaConf.load('../config/image/model/mlp.yaml')\nmodel = instantiate(cfg.nnet)\nout = model(image)\nprint(out.shape)\n\n\n\n\n\n# load from config file\ncfg = OmegaConf.load('../config/image/data/mnist.yaml')\ndatamodule = instantiate(cfg.datamodule)\ndatamodule.prepare_data()\ndatamodule.setup()\n\nx = datamodule.data_test[0][0] # (C, H, W)\nprint(len(datamodule.data_test))\nlabel = datamodule.data_test[0][1] #(int)\nprint(\"original shape (C,H,W): \", x.shape)\nprint(\"reshape (C,HxW): \", x.view(x.size(0), -1).shape)\nprint(x[0][1])\n\n\n# using nimrod datamodule\ntrain_loader = datamodule.train_dataloader()\nval_loader = datamodule.val_dataloader()\ntest_loader = datamodule.test_dataloader()\n\n\ndevice = \"mps\" if torch.backends.mps.is_available() else \"cpu\"\n# device = \"cpu\" # for CI on cpu instance\ndevice = torch.device(device)\n\n\n\n\n# data\ncfg = OmegaConf.load('../config/image/data/mnist.yaml')\ncfg.batch_size = 2048\ndatamodule = instantiate(cfg.datamodule)\ndatamodule.prepare_data()\ndatamodule.setup()\n\n# model\nmodel = mlp.to(device)\ncriterion = nn.CrossEntropyLoss()\noptimizer = torch.optim.Adam(model.parameters(), lr=1e-3)\n\n\nn_epochs = 2\nlosses = []\nlrs = []\ncurrent_step = 0\nsteps_per_epoch = len(datamodule.data_train) // cfg.datamodule.batch_size\ntotal_steps = steps_per_epoch * n_epochs\nprint(f\"steps_per_epoch: {steps_per_epoch}, total_steps: {total_steps}\")\n\nfor epoch in range(n_epochs):\n    model.train()\n    for images, labels in datamodule.train_dataloader():\n        optimizer.zero_grad()\n        images = images.view(-1, 28*28)\n        images = images.to(device)\n        labels = labels.to(device)\n        outputs = model(images)\n        loss = criterion(outputs, labels)        \n        loss.backward()\n        optimizer.step()\n        losses.append(loss.item())\n        current_lr = optimizer.param_groups[0]['lr']\n        lrs.append(current_lr)\n        if not (current_step % 100):\n            print(f\"Loss {loss.item():.4f}, Current LR: {current_lr:.10f}, Step: {current_step}/{total_steps}\")\n        current_step += 1\n\n    model.eval()\n    with torch.no_grad():\n        correct = 0\n        total = 0\n        for images, labels in datamodule.test_dataloader():\n            # model expects input (B,H*W)\n            images = images.view(-1, 28*28).to(device)\n            images = images.to(device)\n            labels = labels.to(device)\n            # Pass the input through the model\n            outputs = model(images)\n            # Get the predicted labels\n            _, predicted = torch.max(outputs.data, 1)\n\n            # Update the total and correct counts\n            total += labels.size(0)\n            correct += (predicted == labels).sum()\n\n        # Print the accuracy\n        print(f\"Epoch {epoch + 1}: Accuracy = {100 * correct / total:.2f}%\")\n\n\n# plt.figure(1)\n# plt.subplot(211)\nplt.ylabel('loss')\nplt.xlabel('step')\nplt.plot(losses)\n# plt.subplot(212)\n# plt.ylabel('lr')\n# plt.xlabel('step')\n# plt.plot(lrs)",
+    "crumbs": [
+      "Image",
+      "Models",
+      "Multi Layer Perceptron (MLP)"
+    ]
+  },
+  {
+    "objectID": "models.mlp.html#mlp",
+    "href": "models.mlp.html#mlp",
+    "title": "Multi Layer Perceptron (MLP)",
+    "section": "",
+    "text": "image = torch.rand((5, 28*28))\nmlp = MLP(n_in=28*28, n_h=64, n_out=10, dropout=0.1)\nout = mlp(image)\nprint(out.shape)\ncfg = OmegaConf.load('../config/image/model/mlp.yaml')\nmodel = instantiate(cfg.nnet)\nout = model(image)\nprint(out.shape)\n\n\n\n\n\n# load from config file\ncfg = OmegaConf.load('../config/image/data/mnist.yaml')\ndatamodule = instantiate(cfg.datamodule)\ndatamodule.prepare_data()\ndatamodule.setup()\n\nx = datamodule.data_test[0][0] # (C, H, W)\nprint(len(datamodule.data_test))\nlabel = datamodule.data_test[0][1] #(int)\nprint(\"original shape (C,H,W): \", x.shape)\nprint(\"reshape (C,HxW): \", x.view(x.size(0), -1).shape)\nprint(x[0][1])\n\n\n# using nimrod datamodule\ntrain_loader = datamodule.train_dataloader()\nval_loader = datamodule.val_dataloader()\ntest_loader = datamodule.test_dataloader()\n\n\ndevice = \"mps\" if torch.backends.mps.is_available() else \"cpu\"\n# device = \"cpu\" # for CI on cpu instance\ndevice = torch.device(device)\n\n\n\n\n# data\ncfg = OmegaConf.load('../config/image/data/mnist.yaml')\ncfg.batch_size = 2048\ndatamodule = instantiate(cfg.datamodule)\ndatamodule.prepare_data()\ndatamodule.setup()\n\n# model\nmodel = mlp.to(device)\ncriterion = nn.CrossEntropyLoss()\noptimizer = torch.optim.Adam(model.parameters(), lr=1e-3)\n\n\nn_epochs = 2\nlosses = []\nlrs = []\ncurrent_step = 0\nsteps_per_epoch = len(datamodule.data_train) // cfg.datamodule.batch_size\ntotal_steps = steps_per_epoch * n_epochs\nprint(f\"steps_per_epoch: {steps_per_epoch}, total_steps: {total_steps}\")\n\nfor epoch in range(n_epochs):\n    model.train()\n    for images, labels in datamodule.train_dataloader():\n        optimizer.zero_grad()\n        images = images.view(-1, 28*28)\n        images = images.to(device)\n        labels = labels.to(device)\n        outputs = model(images)\n        loss = criterion(outputs, labels)        \n        loss.backward()\n        optimizer.step()\n        losses.append(loss.item())\n        current_lr = optimizer.param_groups[0]['lr']\n        lrs.append(current_lr)\n        if not (current_step % 100):\n            print(f\"Loss {loss.item():.4f}, Current LR: {current_lr:.10f}, Step: {current_step}/{total_steps}\")\n        current_step += 1\n\n    model.eval()\n    with torch.no_grad():\n        correct = 0\n        total = 0\n        for images, labels in datamodule.test_dataloader():\n            # model expects input (B,H*W)\n            images = images.view(-1, 28*28).to(device)\n            images = images.to(device)\n            labels = labels.to(device)\n            # Pass the input through the model\n            outputs = model(images)\n            # Get the predicted labels\n            _, predicted = torch.max(outputs.data, 1)\n\n            # Update the total and correct counts\n            total += labels.size(0)\n            correct += (predicted == labels).sum()\n\n        # Print the accuracy\n        print(f\"Epoch {epoch + 1}: Accuracy = {100 * correct / total:.2f}%\")\n\n\n# plt.figure(1)\n# plt.subplot(211)\nplt.ylabel('loss')\nplt.xlabel('step')\nplt.plot(losses)\n# plt.subplot(212)\n# plt.ylabel('lr')\n# plt.xlabel('step')\n# plt.plot(lrs)",
+    "crumbs": [
+      "Image",
+      "Models",
+      "Multi Layer Perceptron (MLP)"
+    ]
+  },
+  {
+    "objectID": "models.mlp.html#mlp_x",
+    "href": "models.mlp.html#mlp_x",
+    "title": "Multi Layer Perceptron (MLP)",
+    "section": "MLP_X",
+    "text": "MLP_X\n\nUsage\n\ncfg = OmegaConf.load('../config/image/model/mlp.yaml')\nmodel = instantiate(cfg)\nb = torch.rand((16,1, 28*28))\ny = model(b)\nprint(y.shape)\n\n\n\nNimrod training\n\n# model\ncfg = OmegaConf.load('../config/image/model/conv.yaml')\nmodel = instantiate(cfg)\n\n# data module config\ncfg = OmegaConf.load('../config/image/data/mnist.yaml')\ncfg.datamodule.batch_size = 2048\ncfg.datamodule.num_workers = 0\ndatamodule = instantiate(cfg.datamodule)\n# datamodule.prepare_data()\ndatamodule.setup()\n\n\ntrainer = Trainer(\n    accelerator=\"auto\",\n    max_epochs=3,\n    logger=CSVLogger(\"logs\", name=\"mnist_mlp\")\n    )\n\n\ntrainer.fit(model, datamodule.train_dataloader(), datamodule.val_dataloader())\n\n\ncsv_path = f\"{trainer.logger.log_dir}/metrics.csv\"\nmetrics = pd.read_csv(csv_path)\nmetrics.head(5)\n\n\nplt.figure()\nplt.plot(metrics['step'], metrics['train/loss_step'], 'b.-')\nplt.plot(metrics['step'], metrics['val/loss'],'r.-')\nplt.show()\n\n\ntrainer.test(model, datamodule.test_dataloader())",
+    "crumbs": [
+      "Image",
+      "Models",
+      "Multi Layer Perceptron (MLP)"
+    ]
+  },
+  {
+    "objectID": "utils.html",
+    "href": "utils.html",
+    "title": "Utils",
+    "section": "",
+    "text": "source\n\n\n\n get_device ()\n\n\n\n\n\ndevice = get_device()\nprint(device)\nprint(f\"Is MPS (Metal Performance Shader) built? {torch.backends.mps.is_built()}\")"
+  },
+  {
+    "objectID": "utils.html#device",
+    "href": "utils.html#device",
+    "title": "Utils",
+    "section": "",
+    "text": "source\n\n\n\n get_device ()\n\n\n\n\n\ndevice = get_device()\nprint(device)\nprint(f\"Is MPS (Metal Performance Shader) built? {torch.backends.mps.is_built()}\")"
+  },
+  {
+    "objectID": "utils.html#seeding",
+    "href": "utils.html#seeding",
+    "title": "Utils",
+    "section": "Seeding",
+    "text": "Seeding\n\nsource\n\nset_seed\n\n set_seed (seed:int=42)\n\n\n\nUsage\n\nset_seed()"
+  },
+  {
+    "objectID": "utils.html#logging",
+    "href": "utils.html#logging",
+    "title": "Utils",
+    "section": "Logging",
+    "text": "Logging\n\nsource\n\nget_logger\n\n get_logger (name='__main__')"
+  },
+  {
+    "objectID": "image.vit.html",
+    "href": "image.vit.html",
+    "title": "Vit",
+    "section": "",
+    "text": "source\n\n\n\n Mlp (in_features, hidden_features=None, out_features=None,\n      act_layer=&lt;class 'torch.nn.modules.activation.GELU'&gt;, drop=0.0)\n\nMLP as used in Vision Transformer, MLP-Mixer and related networks\n\nsource\n\n\n\n\n Attention (dim, num_heads=8, qkv_bias=False, qk_scale=None,\n            attn_drop=0.0, proj_drop=0.0)\n\n*Base class for all neural network modules.\nYour models should also subclass this class.\nModules can also contain other Modules, allowing to nest them in a tree structure. You can assign the submodules as regular attributes::\nimport torch.nn as nn\nimport torch.nn.functional as F\n\nclass Model(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.conv1 = nn.Conv2d(1, 20, 5)\n        self.conv2 = nn.Conv2d(20, 20, 5)\n\n    def forward(self, x):\n        x = F.relu(self.conv1(x))\n        return F.relu(self.conv2(x))\nSubmodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:to, etc.\n.. note:: As per the example above, an __init__() call to the parent class must be made before assignment on the child.\n:ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*\n\nsource\n\n\n\n\n Block (dim, num_heads, mlp_ratio=4.0, qkv_bias=False, qk_scale=None,\n        drop=0.0, attn_drop=0.0, drop_path=0.0, act_layer=&lt;class\n        'torch.nn.modules.activation.GELU'&gt;, norm_layer=&lt;class\n        'torch.nn.modules.normalization.LayerNorm'&gt;,\n        use_grad_checkpointing=False)\n\n*Base class for all neural network modules.\nYour models should also subclass this class.\nModules can also contain other Modules, allowing to nest them in a tree structure. You can assign the submodules as regular attributes::\nimport torch.nn as nn\nimport torch.nn.functional as F\n\nclass Model(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.conv1 = nn.Conv2d(1, 20, 5)\n        self.conv2 = nn.Conv2d(20, 20, 5)\n\n    def forward(self, x):\n        x = F.relu(self.conv1(x))\n        return F.relu(self.conv2(x))\nSubmodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:to, etc.\n.. note:: As per the example above, an __init__() call to the parent class must be made before assignment on the child.\n:ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*\n\nsource\n\n\n\n\n interpolate_pos_embed (pos_embed_checkpoint, visual_encoder)\n\n\nsource\n\n\n\n\n VisionTransformer (img_size=224, patch_size=16, in_chans=3,\n                    num_classes=1000, embed_dim=768, depth=12,\n                    num_heads=12, mlp_ratio=4.0, qkv_bias=True,\n                    qk_scale=None, representation_size=None,\n                    drop_rate=0.0, attn_drop_rate=0.0, drop_path_rate=0.0,\n                    norm_layer=None, use_grad_checkpointing=False,\n                    ckpt_layer=0)\n\nVision Transformer A PyTorch impl of : An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale - https://arxiv.org/abs/2010.11929"
+  },
+  {
+    "objectID": "image.vit.html#modules",
+    "href": "image.vit.html#modules",
+    "title": "Vit",
+    "section": "",
+    "text": "source\n\n\n\n Mlp (in_features, hidden_features=None, out_features=None,\n      act_layer=&lt;class 'torch.nn.modules.activation.GELU'&gt;, drop=0.0)\n\nMLP as used in Vision Transformer, MLP-Mixer and related networks\n\nsource\n\n\n\n\n Attention (dim, num_heads=8, qkv_bias=False, qk_scale=None,\n            attn_drop=0.0, proj_drop=0.0)\n\n*Base class for all neural network modules.\nYour models should also subclass this class.\nModules can also contain other Modules, allowing to nest them in a tree structure. You can assign the submodules as regular attributes::\nimport torch.nn as nn\nimport torch.nn.functional as F\n\nclass Model(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.conv1 = nn.Conv2d(1, 20, 5)\n        self.conv2 = nn.Conv2d(20, 20, 5)\n\n    def forward(self, x):\n        x = F.relu(self.conv1(x))\n        return F.relu(self.conv2(x))\nSubmodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:to, etc.\n.. note:: As per the example above, an __init__() call to the parent class must be made before assignment on the child.\n:ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*\n\nsource\n\n\n\n\n Block (dim, num_heads, mlp_ratio=4.0, qkv_bias=False, qk_scale=None,\n        drop=0.0, attn_drop=0.0, drop_path=0.0, act_layer=&lt;class\n        'torch.nn.modules.activation.GELU'&gt;, norm_layer=&lt;class\n        'torch.nn.modules.normalization.LayerNorm'&gt;,\n        use_grad_checkpointing=False)\n\n*Base class for all neural network modules.\nYour models should also subclass this class.\nModules can also contain other Modules, allowing to nest them in a tree structure. You can assign the submodules as regular attributes::\nimport torch.nn as nn\nimport torch.nn.functional as F\n\nclass Model(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.conv1 = nn.Conv2d(1, 20, 5)\n        self.conv2 = nn.Conv2d(20, 20, 5)\n\n    def forward(self, x):\n        x = F.relu(self.conv1(x))\n        return F.relu(self.conv2(x))\nSubmodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:to, etc.\n.. note:: As per the example above, an __init__() call to the parent class must be made before assignment on the child.\n:ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*\n\nsource\n\n\n\n\n interpolate_pos_embed (pos_embed_checkpoint, visual_encoder)\n\n\nsource\n\n\n\n\n VisionTransformer (img_size=224, patch_size=16, in_chans=3,\n                    num_classes=1000, embed_dim=768, depth=12,\n                    num_heads=12, mlp_ratio=4.0, qkv_bias=True,\n                    qk_scale=None, representation_size=None,\n                    drop_rate=0.0, attn_drop_rate=0.0, drop_path_rate=0.0,\n                    norm_layer=None, use_grad_checkpointing=False,\n                    ckpt_layer=0)\n\nVision Transformer A PyTorch impl of : An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale - https://arxiv.org/abs/2010.11929"
+  },
+  {
+    "objectID": "models.ngram.html",
+    "href": "models.ngram.html",
+    "title": "N-Gram Language modeling",
+    "section": "",
+    "text": "https://github.com/karpathy/makemore",
+    "crumbs": [
+      "Text",
+      "Models",
+      "N-Gram Language modeling"
+    ]
+  },
+  {
+    "objectID": "models.ngram.html#unigram",
+    "href": "models.ngram.html#unigram",
+    "title": "N-Gram Language modeling",
+    "section": "Unigram",
+    "text": "Unigram\n\nsource\n\nCharUnigram\n\n CharUnigram (data:List[str])\n\nInitialize self. See help(type(self)) for accurate signature.\n\n\nUsage\n\n# without pandas\nwith open('../data/text/names.txt', 'r') as f:\n    list_of_words = f.read().splitlines()\n# with pandas\ndf = pd.read_csv('../data/text/names.txt', names=['name'], header=None)\nlist_of_words = list(df.head().name)\n\nunigram = CharUnigram(list_of_words)\nprint(\"sorted counts: \", unigram.counts)\nprint(\"sorted probs: \", unigram.probs)\nprint(len(unigram))\nprint(unigram.chars)\nprint(unigram._stoi)\nprint(unigram.stoi('a'))\nprint(unigram.itos(0))\n\n\ndf = pd.DataFrame.from_dict(unigram.counts, orient='index')\ndf.plot(kind='bar')\n\n\nsamples = []\nfor i in range(10000):\n    s = unigram.sample()\n    samples.append(s)\n\n# sampled\ncount = Counter([c for w in samples for c in w])\ndf = pd.DataFrame.from_dict(count, orient='index')\ndf[0].sort_values(ascending=False).plot(kind='bar')",
+    "crumbs": [
+      "Text",
+      "Models",
+      "N-Gram Language modeling"
+    ]
+  },
+  {
+    "objectID": "models.ngram.html#bigram",
+    "href": "models.ngram.html#bigram",
+    "title": "N-Gram Language modeling",
+    "section": "Bigram",
+    "text": "Bigram\n\nclass CharBigram():\n    def __init__(self):\n        pass\n\n\nUsage\n\n# data\nwith open('../data/text/names.txt', 'r') as f:\n    data = f.read().splitlines()\nprint(\"first lines of text: \", data[:10])\n\n# data = [\"this is a text\"]\n\n\n# bigram counts\nbigrams = {}\nunique_tokens = set()\nfor name in data:\n    line = list(name)\n    unique_tokens.update(line)\n    line.append('&lt;stop&gt;')\n    line.insert(0, '&lt;stop&gt;')\n    for i,v in enumerate(range(len(line)-1)):\n        bigram = (line[i], line[i+1])\n        if bigram in bigrams:\n            bigrams[bigram] += 1\n        else:\n            bigrams[bigram] = 1\n\n# print(\"unsorted: \", list(bigrams)[:10])\n# print(\"sorted: \", sort_dict_by_value(bigrams))\n\n\n\nNumericalization\n\ntokens = sorted(unique_tokens)\n# use same for start & stop in this case (separate lines of names)\n# tokens.append('&lt;start&gt;')\ntokens.append('&lt;stop&gt;')\nprint(tokens)\nstoi = {v:i for i,v in enumerate(tokens)}\nitos = {i:v for i, v in enumerate(tokens)}\nprint(stoi, itos)\n\n\n\nMatrix representation\n\nn_toks = len(tokens)\nprint(n_toks)\nN = torch.zeros((n_toks, n_toks)).long()\nprint(N.shape)\n\n\nfor bigram, value in bigrams.items():\n    idx1, idx2 = stoi[bigram[0]], stoi[bigram[1]]\n    N[idx1, idx2] = value\n\nplt.xlabel('char_t+1')\nplt.ylabel('char_t')\ni = [i for i, v in itos.items()]\nv = [v for i,v in itos.items()]\nplt.xticks(i, v)\nplt.yticks(i, v)\nplt.imshow(N, origin='lower')\n\n\n\nFrom counts to probabilities\n\nprint(N)\n\n\n# smoothing avoids having log(0) = inf when computing NLL loss\nsmoothing = 1\nP = (N.float()+smoothing) / N.sum(1,keepdim=True)\nplt.imshow(P, origin='lower')\n\n\nrow_6 = (N[6,:]/N[6,:].sum())\nprint(row_6)\nprint(row_6.sum())\n\n\np = P[6, :]\nprint(p.sum(), p.max(), torch.argmax(p))\n\n\n\nSampling\n\nfor i in range(10):\n    res = []\n    prev = stoi['&lt;stop&gt;']\n    while True:\n        # max prob sampling\n        next = int(torch.argmax(P[prev, :]))\n        # multinomial sampling\n        next = int(torch.multinomial(P[prev,:],num_samples=1,replacement=True))\n        if next == stoi['&lt;stop&gt;']:\n            print(''.join(res))\n            break\n        else:\n            res.append(itos[next])\n            prev = next\n\n\n\nLog likelihood loss function\n\nbigram_p = {}\nfor bigram, value in bigrams.items():\n    idx1, idx2 = stoi[bigram[0]], stoi[bigram[1]]\n    bigram_p[bigram] = P[idx1,idx2]\n\nprint(bigram_p)\n\n\nbigram_p_sorted = {k: v.float() for k, v in sorted(bigram_p.items(), reverse=True, key=lambda x: x[1])}\nprint(bigram_p_sorted)\n\n\n# likelihood of full corpus = product of all bigram prods\nl = 0\nfor bigram, prob in bigram_p_sorted.items():\n    l += torch.log(prob)\n\n# negative log likelihood loss nll\nnll = -l /len(bigram_p_sorted)\nprint(nll)\n\n\n\nGenerate training data\n\nword = \"this\"\nsample = [(word[i], word[i+1]) for i,c in enumerate(word) if i &lt; len(word)-1]\nprint(list(zip(*sample)))\n\n\nxs, ys = [], []\nfor word in data:\n    sample = [(stoi[word[i]], stoi[word[i+1]]) for i,c in enumerate(word) if i &lt; len(word)-1]\n    x, y = list(zip(*sample)) # inverse of zip\n    xs.append(torch.tensor(x))\n    ys.append(torch.tensor(y))\n\n\nprint('x:', xs[:3])\nprint('y', ys[:3])\n\n\n\n1-hot encoded input\n\nenc = [F.one_hot(x, num_classes=len(tokens)).float() for x in xs]\nprint(enc[:3])\n\n\nplt.imshow(enc[0])\n\n\nX = enc[0]\nprint(X.shape)\n\n\n\n‘Neural net’ modeling\nwe model the transition probability matrix by neural net activations\n\nW = torch.randn(27, 27)\n\n\nlogits = X @ W\ncounts = logits.exp()\nprobs = counts / counts.sum(1, keepdims=True)\nprint(probs)",
+    "crumbs": [
+      "Text",
+      "Models",
+      "N-Gram Language modeling"
+    ]
+  },
+  {
+    "objectID": "models.ngram.html#kenlm",
+    "href": "models.ngram.html#kenlm",
+    "title": "N-Gram Language modeling",
+    "section": "KenLM",
+    "text": "KenLM\nWe refer to efficient kenlm implementation for larger n-gram models usable for production\n\nsource\n\nKenLM\n\n KenLM (arpa_path:str, vocab:List)\n\nInitialize self. See help(type(self)) for accurate signature.\n\n\nPreprocess data into kenlm format\ntokens separated by space with new sentence at each line\n\ndf = pd.read_csv('../data/text/names.txt', header=None, names=['name']) \ndf = df.name.apply(lambda x: list(x)) # str into list of char\n# df.apply(lambda x: x.append('&lt;eos&gt;')) # if eos needed\nprint(df.head())\ndf_toks = df.str.join(' ') # for kenlm input format tokens are separated by space\nprint(df_toks.head())\n\n\nUnique tokens\n\ndf.head()\n# for row in df.iterrows():\n#     print(row)\ntokens = set()\nfor k,v in df.items():\n    tokens.update(list(v))\n\nprint(tokens)\nlen(tokens)\n\n\n\nSave data to kenlm format for training\n\ndata_file = df.to_csv('../data/text/names.kenlm.txt', header=None, index=None)\n! bzip2 -kz ../data/text/names.kenlm.txt\n! bzcat ../data/text/names.kenlm.txt.bz2 | head\n\n\n\n\nTrain KenLM n-gram model\nhttps://lukesalamone.github.io/posts/running-simple-language-model/\nKenLM requires data to be one sentence per line lowercase\n\n# ! if [ ! -f \"../data/text/names.2gram.arpa\" ]; then lmplz --discount_fallback -o 2 &lt; ../data/text/names.kenlm.txt.bz2&gt;../data/text/names.2gram.arpa; fi\n\n\n# ! if [ ! -f \"../data/text/names.2gram.kenlm\" ]; then build_binary ../data/text/names.2gram.arpa ../data/text/names.2gram.kenlm; fi\n\n\nTest original Kenlm python api probs\n\nmodel = kenlm.LanguageModel('../data/text/names.2gram.kenlm')\nsentence = \"emma\"\ntokenized = \"e m m a\"\n# model.score(\"emma\", bos = False, eos = False)\nwords = ['&lt;s&gt;'] + list(sentence) + ['&lt;/s&gt;']\nprint(words)\nfinal = 0\nfor i, (prob, length, oov) in enumerate(model.full_scores(tokenized)):\n    print(f'words: {words[i:i+length]} index:{i}, prob:{prob}, length:{length}, oov:{oov}')\n    final += prob\n\nprint(final)\nprint(model.score(\"e m m a\"))\nprint(f'prob &lt;s&gt; e: {model.score(\"e\", bos=True, eos=False)}')\nprint(f'prob e: {model.score(\"e\", bos=False, eos=False)}')\nprint(f'prob &lt;s&gt; e m: {model.score(\"e m\", bos=True, eos=False)}')\nprint(f'prob e m: {model.score(\"e m\", bos=False, eos=False)}')\nstate = kenlm.State()\nstate2 = kenlm.State()\nmodel.BeginSentenceWrite(state)\naccum = 0\naccum += model.BaseScore(state, \"e\", state2)\nprint(f'prob &lt;s&gt; e: {accum}')\nstate, state2 = state2, state\naccum += model.BaseScore(state, \"m\", state2)\nprint(f'prob &lt;s&gt; e m: {accum}')\n\n\n\nDefine LM vocabulary\n\n# add special tokens to vocabulary\ntokens.add('&lt;s&gt;')\ntokens.add('&lt;/s&gt;')\ntokens.add('&lt;unk&gt;')\nprint(tokens, len(tokens))\nvocab = list(tokens)\n\n\n\n\nInference / Sampling from prob distributions\n\nlm = KenLM('../data/text/names.2gram.kenlm', vocab)\ninit_char = '&lt;s&gt; e m m'\n# probs = lm.nbest(len(vocab), log_prob=False)\n# print(np.sum([p for char, p in probs]))\n# res = [init_char]\n# next = int(torch.multinomial(P[prev,:],num_samples=1,replacement=True))\nfor i in range(50):\n    lm.new_sentence_init()\n    lm.append(init_char)\n    while True:\n        # nbest probs at current state\n        probs = lm.nbest(len(vocab), log_prob=False)\n        # print(probs)\n        # print(np.sum(probs))\n        # sample from prob distribution\n        try:\n            index_next = int(torch.multinomial(torch.tensor([prob for char, prob in probs]),num_samples=1,replacement=True))\n        except:\n            print(\"probs too small\")\n            break\n        char_next = probs[index_next][0]\n        lm.append(char_next)\n        # print(init_char + '&lt;s&gt;')\n        if char_next == '&lt;/s&gt;' or char_next == '&lt;s&gt;' and lm.text != init_char and (lm.text != init_char+' &lt;s&gt;'):\n            print(lm.text.replace(' ', ''))\n            break",
+    "crumbs": [
+      "Text",
+      "Models",
+      "N-Gram Language modeling"
+    ]
+  },
+  {
+    "objectID": "index.html#description",
+    "href": "index.html#description",
+    "title": "Nimrod",
+    "section": "Description",
+    "text": "Description\nThis is a repo with minimal tooling, modules, models and recipes to get easily get started with deep learning training and experimentation with an emphasis on speech, audio and language modeling.",
+    "crumbs": [
+      "Nimrod"
+    ]
+  },
+  {
+    "objectID": "index.html#install",
+    "href": "index.html#install",
+    "title": "Nimrod",
+    "section": "Install",
+    "text": "Install\nyou need python &lt;3.12\n\nInstall using Pip\npip install slg-nimrod",
+    "crumbs": [
+      "Nimrod"
+    ]
+  },
+  {
+    "objectID": "index.html#usage",
+    "href": "index.html#usage",
+    "title": "Nimrod",
+    "section": "Usage",
+    "text": "Usage\nCheck recipes in recipes/ folder. E.g. for a simple digit recognizer on MNIST:\ngit clone https://github.com/slegroux/nimrod.git\ncd nimrod/recipes/images/mnist\npython train.py datamodule.num_workers=8 trainer.max_epochs=20 trainer.accelerator='mps' loggers='tensorboard'\nhead conf/train.yaml\nAll the parameters of the experiment are editable and read from a .yaml file which details:\n\ndata and logging directory paths\ndata module with data source path and batching parameters\nmodel architecture\ntrainer with hardware acceleration and number of epochs\ncallbacks for early stopping and automatic logging to Wandb",
+    "crumbs": [
+      "Nimrod"
+    ]
+  },
+  {
+    "objectID": "index.html#docker",
+    "href": "index.html#docker",
+    "title": "Nimrod",
+    "section": "Docker",
+    "text": "Docker\nYou might want to use docker containers for reproductible development environment or run your project in the cloud\nmake container\ndocker pull slegroux/nimrod\ndocker run -it --rm -p 8888:8888 slegroux/nimrod /bin/bash\nYou can also use docker-compose to define services and volumes\ncd .devcontainer\ndocker-compose up\ndocker-compose down",
+    "crumbs": [
+      "Nimrod"
+    ]
+  },
+  {
+    "objectID": "index.html#develop",
+    "href": "index.html#develop",
+    "title": "Nimrod",
+    "section": "Develop",
+    "text": "Develop\npip install -e .",
+    "crumbs": [
+      "Nimrod"
+    ]
+  },
+  {
+    "objectID": "index.html#hyperparameter-tuning",
+    "href": "index.html#hyperparameter-tuning",
+    "title": "Nimrod",
+    "section": "Hyperparameter tuning",
+    "text": "Hyperparameter tuning\nto compare training results on different model parameters:\ncd nimrod/recipes/images/mnist\npython train.py --multirun model.n_h=16,64,256 loggers='tensorboard' trainer.max_epochs=5",
+    "crumbs": [
+      "Nimrod"
+    ]
+  },
+  {
+    "objectID": "index.html#server",
+    "href": "index.html#server",
+    "title": "Nimrod",
+    "section": "Server",
+    "text": "Server\n\nst webapp\nRun a simple digit recognizer webapp with GUI\ncd server\n./run_st_app.sh",
+    "crumbs": [
+      "Nimrod"
+    ]
+  },
+  {
+    "objectID": "index.html#authors",
+    "href": "index.html#authors",
+    "title": "Nimrod",
+    "section": "Authors",
+    "text": "Authors\n2023 Sylvain Le Groux sylvain.legroux@gmail.com",
+    "crumbs": [
+      "Nimrod"
+    ]
+  },
+  {
+    "objectID": "audio.utils.html",
+    "href": "audio.utils.html",
+    "title": "Audio Utilities",
+    "section": "",
+    "text": "source\n\nplot_waveform\n\n plot_waveform (waveform, sample_rate, title='Waveform', xlim=None,\n                ylim=None)\n\n\nwav, sr = torchaudio.load(\"../data/audio/obama.wav\")\nplot_waveform(wav,sr)",
+    "crumbs": [
+      "Audio",
+      "Utils",
+      "Audio Utilities"
+    ]
+  },
+  {
+    "objectID": "image.clip.html",
+    "href": "image.clip.html",
+    "title": "CLIP",
+    "section": "",
+    "text": "model = CLIPModel.from_pretrained(\"openai/clip-vit-base-patch32\")\nprocessor = CLIPProcessor.from_pretrained(\"openai/clip-vit-base-patch32\")\n\nurl = \"http://images.cocodataset.org/val2017/000000039769.jpg\"\nimage = Image.open(requests.get(url, stream=True).raw)\n\ninputs = processor(text=[\"a photo of a cat\", \"a photo of a dog\"], images=image, return_tensors=\"pt\", padding=True)\n\noutputs = model(**inputs)\nlogits_per_image = outputs.logits_per_image  # this is the image-text similarity score\nprobs = logits_per_image.softmax(dim=1)  # we can \nprint(probs)\n\n\ndef embed_image(images):\n    if not isinstance(images, list): images = [images]\n    inputs = processor(images=images, return_tensors=\"pt\", padding=True)\n    with torch.no_grad(): return model.get_image_features(**inputs)\n\ndef embed_text(text):\n    inputs = processor(text=text, return_tensors=\"pt\", padding=True)\n    with torch.no_grad(): return model.get_text_features(**inputs)\n\ndef normalize(a): return a / a.norm(dim=-1, keepdim=True)\n\ndef cosine_sim(a, b): return normalize(a) @ normalize(b).T\n\ndef logits(a, b): return model.logit_scale.exp() * cosine_sim(a, b)\n\ndef probs(a, b): return logits(a, b).softmax(dim=0)\n\ndef classify(image, classes, template=\"a photo of a {}\"):\n    image_embs = embed_image(image)\n    text_embs = embed_text([template.format(o) for o in classes])\n    return probs(text_embs, image_embs)\n\ndef search(image_embs, query_embs):\n    sims = cosine_sim(image_embs, query_embs).flatten()\n    indices = sims.argsort(descending=True)\n    return indices, sims[indices]\n\ndef thumbnail(image, scale=3):\n    return image.resize(np.array(image.size)//scale)\n\n\npaintings = load_dataset(\"huggan/few-shot-art-painting\")\n\n\nall_image_embs_path = Path(\"paintings_embeddings.npy\")\nif all_image_embs_path.exists():\n    all_image_embs = torch.tensor(np.load(all_image_embs_path))\nelse:\n    all_image_embs = torch.cat([embed_image(row['image']) for row in tqdm(paintings['train'])])\n    np.save(all_image_embs_path, np.array(all_image_embs))"
+  },
+  {
+    "objectID": "image.clip.html#hf",
+    "href": "image.clip.html#hf",
+    "title": "CLIP",
+    "section": "",
+    "text": "model = CLIPModel.from_pretrained(\"openai/clip-vit-base-patch32\")\nprocessor = CLIPProcessor.from_pretrained(\"openai/clip-vit-base-patch32\")\n\nurl = \"http://images.cocodataset.org/val2017/000000039769.jpg\"\nimage = Image.open(requests.get(url, stream=True).raw)\n\ninputs = processor(text=[\"a photo of a cat\", \"a photo of a dog\"], images=image, return_tensors=\"pt\", padding=True)\n\noutputs = model(**inputs)\nlogits_per_image = outputs.logits_per_image  # this is the image-text similarity score\nprobs = logits_per_image.softmax(dim=1)  # we can \nprint(probs)\n\n\ndef embed_image(images):\n    if not isinstance(images, list): images = [images]\n    inputs = processor(images=images, return_tensors=\"pt\", padding=True)\n    with torch.no_grad(): return model.get_image_features(**inputs)\n\ndef embed_text(text):\n    inputs = processor(text=text, return_tensors=\"pt\", padding=True)\n    with torch.no_grad(): return model.get_text_features(**inputs)\n\ndef normalize(a): return a / a.norm(dim=-1, keepdim=True)\n\ndef cosine_sim(a, b): return normalize(a) @ normalize(b).T\n\ndef logits(a, b): return model.logit_scale.exp() * cosine_sim(a, b)\n\ndef probs(a, b): return logits(a, b).softmax(dim=0)\n\ndef classify(image, classes, template=\"a photo of a {}\"):\n    image_embs = embed_image(image)\n    text_embs = embed_text([template.format(o) for o in classes])\n    return probs(text_embs, image_embs)\n\ndef search(image_embs, query_embs):\n    sims = cosine_sim(image_embs, query_embs).flatten()\n    indices = sims.argsort(descending=True)\n    return indices, sims[indices]\n\ndef thumbnail(image, scale=3):\n    return image.resize(np.array(image.size)//scale)\n\n\npaintings = load_dataset(\"huggan/few-shot-art-painting\")\n\n\nall_image_embs_path = Path(\"paintings_embeddings.npy\")\nif all_image_embs_path.exists():\n    all_image_embs = torch.tensor(np.load(all_image_embs_path))\nelse:\n    all_image_embs = torch.cat([embed_image(row['image']) for row in tqdm(paintings['train'])])\n    np.save(all_image_embs_path, np.array(all_image_embs))"
+  },
+  {
+    "objectID": "text.embeddings.html",
+    "href": "text.embeddings.html",
+    "title": "Text embeddings",
+    "section": "",
+    "text": "https://towardsdatascience.com/word2vec-research-paper-explained-205cb7eecc30 https://muhark.github.io/python/ml/nlp/2021/10/21/word2vec-from-scratch.html\n\nsource\n\n\n\n Decoder ()\n\n*Base class for all neural network modules.\nYour models should also subclass this class.\nModules can also contain other Modules, allowing to nest them in a tree structure. You can assign the submodules as regular attributes::\nimport torch.nn as nn\nimport torch.nn.functional as F\n\nclass Model(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.conv1 = nn.Conv2d(1, 20, 5)\n        self.conv2 = nn.Conv2d(20, 20, 5)\n\n    def forward(self, x):\n        x = F.relu(self.conv1(x))\n        return F.relu(self.conv2(x))\nSubmodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:to, etc.\n.. note:: As per the example above, an __init__() call to the parent class must be made before assignment on the child.\n:ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*\n\nsource\n\n\n\n\n Encoder ()\n\n*Base class for all neural network modules.\nYour models should also subclass this class.\nModules can also contain other Modules, allowing to nest them in a tree structure. You can assign the submodules as regular attributes::\nimport torch.nn as nn\nimport torch.nn.functional as F\n\nclass Model(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.conv1 = nn.Conv2d(1, 20, 5)\n        self.conv2 = nn.Conv2d(20, 20, 5)\n\n    def forward(self, x):\n        x = F.relu(self.conv1(x))\n        return F.relu(self.conv2(x))\nSubmodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:to, etc.\n.. note:: As per the example above, an __init__() call to the parent class must be made before assignment on the child.\n:ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*\n\n\n\n\nenc = Encoder()\nbatch = torch.rand((10, 28*28))\nencoded = enc(batch)\nprint(encoded.shape)\n\n\ndec = Decoder()\ndecoded = dec(encoded)\nprint(decoded.shape)"
+  },
+  {
+    "objectID": "text.embeddings.html#word2vec",
+    "href": "text.embeddings.html#word2vec",
+    "title": "Text embeddings",
+    "section": "",
+    "text": "https://towardsdatascience.com/word2vec-research-paper-explained-205cb7eecc30 https://muhark.github.io/python/ml/nlp/2021/10/21/word2vec-from-scratch.html\n\nsource\n\n\n\n Decoder ()\n\n*Base class for all neural network modules.\nYour models should also subclass this class.\nModules can also contain other Modules, allowing to nest them in a tree structure. You can assign the submodules as regular attributes::\nimport torch.nn as nn\nimport torch.nn.functional as F\n\nclass Model(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.conv1 = nn.Conv2d(1, 20, 5)\n        self.conv2 = nn.Conv2d(20, 20, 5)\n\n    def forward(self, x):\n        x = F.relu(self.conv1(x))\n        return F.relu(self.conv2(x))\nSubmodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:to, etc.\n.. note:: As per the example above, an __init__() call to the parent class must be made before assignment on the child.\n:ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*\n\nsource\n\n\n\n\n Encoder ()\n\n*Base class for all neural network modules.\nYour models should also subclass this class.\nModules can also contain other Modules, allowing to nest them in a tree structure. You can assign the submodules as regular attributes::\nimport torch.nn as nn\nimport torch.nn.functional as F\n\nclass Model(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.conv1 = nn.Conv2d(1, 20, 5)\n        self.conv2 = nn.Conv2d(20, 20, 5)\n\n    def forward(self, x):\n        x = F.relu(self.conv1(x))\n        return F.relu(self.conv2(x))\nSubmodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:to, etc.\n.. note:: As per the example above, an __init__() call to the parent class must be made before assignment on the child.\n:ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*\n\n\n\n\nenc = Encoder()\nbatch = torch.rand((10, 28*28))\nencoded = enc(batch)\nprint(encoded.shape)\n\n\ndec = Decoder()\ndecoded = dec(encoded)\nprint(decoded.shape)"
+  },
+  {
+    "objectID": "models.lm.html",
+    "href": "models.lm.html",
+    "title": "Neural Net Language models",
+    "section": "",
+    "text": "# N_EPOCHS for training debuggging\nITER_MAX = 1\nset_seed(42)\n# reading with pandas\ndf = pd.read_csv('../data/text/names.txt', header=None, names=['name'])\ndata = list(df.name)\nprint(\"names: \", data[:3])",
+    "crumbs": [
+      "Text",
+      "Models",
+      "Neural Net Language models"
+    ]
+  },
+  {
+    "objectID": "models.lm.html#data-formatting",
+    "href": "models.lm.html#data-formatting",
+    "title": "Neural Net Language models",
+    "section": "Data formatting",
+    "text": "Data formatting\ngiven last n tokens we predict token n+1\n\ns = list(\"alexandra\")\nprint(s)\nbigram = [(x,y) for x, y in zip(s, s[1:])]\nprint(bigram)\ntrigram = [ (x,y,z) for x, y, z in zip(s, s[1:], s[2:])]\nprint(trigram)\n\n\nTiny shakespeare LM char dataset\n\n# reading directly in plain python\nlines = []\nwith open('../data/text/tiny_shakespeare.txt', 'r', encoding='utf-8') as f:\n    for line in f.readlines():\n        if line.strip():\n            # only append non blank lines\n            lines.append(line)\n\n# add sentence tokens\n# data = [['&lt;bos&gt;'] +list(line.strip()) + ['&lt;eos&gt;'] for line in lines]\n# data = [list(line.strip()) for line in lines]\ndata = [list(line) for line in lines]\nprint(\"data: \", data[:3])\n\n\ndef make_dataset(\n        words:List[str], # data is a list of sentences which are a list of words\n        v:Vocab,# vocabulary class for mapping words to indices\n        verbose:bool=False, # print debug info\n        context_length=3 # number of words/tokens to use as context\n        ):\n    X = []\n    y = []\n    for word in words:\n        s = list(word)\n        if verbose:\n            print('row: ', s)\n        # init prefix with padding while len &lt; context_length\n        for i in range(context_length-1):\n            sequence = v.stoi(s[:i+1])\n            pad_len = context_length - len(sequence)\n            pad = [v.stoi(\"&lt;pad&gt;\")] * pad_len\n            X.append(pad + sequence)\n            y.append(v.stoi(s[i+1]))\n\n            if verbose:\n                print([\"&lt;pad&gt;\"]+ s[:i+1], s[i+1])\n\n        # for length seq = context_length\n        i = 0\n        while i &lt; (len(s) - context_length):\n            X.append(v.stoi(s[i:context_length+i]))\n            y.append(v.stoi(s[i+context_length]))\n            if verbose:\n                print(s[i:context_length+i], s[i+context_length])\n            i += 1\n    return torch.tensor(X),torch.tensor(y)\n\nfor each row in the dataset we expand all the combinations of ngrams\n\nv = Vocab(data_path='../data/text/tiny_shakespeare.txt', specials=['&lt;unk&gt;','&lt;pad&gt;'])\nprint(\"vocabulary: \", v.vocabulary)\nprint(\"vocabulary size: \", len(v))\n\n\nCONTEXT_LEN = 3\nX, y = make_dataset(data[:80], v, verbose=True, context_length=CONTEXT_LEN)\nprint(\"X: \", X.shape, \"y:\", y.shape)",
+    "crumbs": [
+      "Text",
+      "Models",
+      "Neural Net Language models"
+    ]
+  },
+  {
+    "objectID": "models.lm.html#mlp-lm-model",
+    "href": "models.lm.html#mlp-lm-model",
+    "title": "Neural Net Language models",
+    "section": "MLP LM Model",
+    "text": "MLP LM Model\nhttps://www.jmlr.org/papers/volume3/bengio03a/bengio03a.pdf\n\n# F.one_hot(torch.tensor(5), num_classes=n_vocab).float()@C # == C[5]\n\n\nsource\n\nNNLM\n\n NNLM (n_vocab:int=30, n_emb:int=10, n_context:int=3, n_h:int=100)\n\n*Base class for all neural network modules.\nYour models should also subclass this class.\nModules can also contain other Modules, allowing to nest them in a tree structure. You can assign the submodules as regular attributes::\nimport torch.nn as nn\nimport torch.nn.functional as F\n\nclass Model(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.conv1 = nn.Conv2d(1, 20, 5)\n        self.conv2 = nn.Conv2d(20, 20, 5)\n\n    def forward(self, x):\n        x = F.relu(self.conv1(x))\n        return F.relu(self.conv2(x))\nSubmodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:to, etc.\n.. note:: As per the example above, an __init__() call to the parent class must be made before assignment on the child.\n\nivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*\n\n\n\nType\nDefault\nDetails\n\n\n\n\nn_vocab\nint\n30\nvocabulary size\n\n\nn_emb\nint\n10\nembedding dimension\n\n\nn_context\nint\n3\ncontext size bigram/trigram, etc.\n\n\nn_h\nint\n100\nhidden layer size\n\n\n\n\nsource\n\n\nNNLMConfig\n\n NNLMConfig (n_vocab:int=30, n_emb:int=10, n_context:int=3, n_h:int=100)\n\n\n\nUsage\n\n# config model\nconf = NNLMConfig(n_vocab=len(v), n_context=CONTEXT_LEN)\nlm = NNLM(**asdict(conf))\n\n# test data\nbs = 25\nx = torch.randint(conf.n_vocab, (bs, conf.n_context)) # (B, T) with values between 0 and n_vocab\nprint(\"X (B, T):\", x.shape)\n\n# prediction\ny = lm(x)\nprint(\"Y_hat logits (B, n_vocab):\", y.shape)",
+    "crumbs": [
+      "Text",
+      "Models",
+      "Neural Net Language models"
+    ]
+  },
+  {
+    "objectID": "models.lm.html#train-mlp-lm",
+    "href": "models.lm.html#train-mlp-lm",
+    "title": "Neural Net Language models",
+    "section": "Train MLP LM",
+    "text": "Train MLP LM\n\nhandmade dataset\n\nXtr, Ytr = make_dataset(data[:80], v, context_length=CONTEXT_LEN)\nXdev, Ydev = make_dataset(data[80:90], v)\nXte, Yte = make_dataset(data[90:100], v)\nprint(\"Xtr (B, T): \", Xtr.shape, \"Ytr (B): \", Ytr.shape, \"data:\", len(data[:80]))\nprint(\"len Xtr: \", len(Xtr))\nprint(\"CONTEXT_LEN: \", CONTEXT_LEN)\n\n\nOverfit on subset of 80 first rows\n\ndevice = get_device()\ndevice = 'cpu'\n# lm.to(device)\n\n# overfit on one big batch\noptim = SGD(lm.parameters(), lr=0.01, momentum=0.9)\ntrain_loss = []\nITER_MAX = 1000\nfor i in tqdm(range(ITER_MAX)):\n    # for batch in dm.train_dataloader():\n        # Xtr, Ytr = batch\n        # Ytr = Ytr[:, -1]\n        Xtr = Xtr.to(device)\n        Ytr = Ytr.to(device)\n        optim.zero_grad()\n        logits = lm(Xtr)\n        loss = F.cross_entropy(logits, Ytr)\n        loss.backward()\n        optim.step()\n        train_loss.append(loss.item())\n        if not(i%250):\n            print(loss.item())\n\n\nplt.plot(train_loss)\n\n\n\nSample\n\n# infer on CPU\nlm.to('cpu')\nprompt = \"The country of \"\nsequences = lm.sample(prompt, v, max_new_tokens=250, temperature=0.6)\nprint(sequences)\n\n\n\n\nDataloader\n\ncfg = OmegaConf.load(\"../config/text/data/tinyshakespeare.yaml\")\n# use &lt;unk&gt; and &lt;pad&gt; to be consistent with manual data preprocessing and have smae vocabulary size\nv = Vocab(data_path='../data/text/tiny_shakespeare.txt', specials=['&lt;unk&gt;','&lt;pad&gt;'])\nprint(\"vocabulary: \", v.vocabulary)\nprint(\"vocabulary size: \", len(v))\nprint(cfg)\ncfg.train_val_test_split = [0.8, 0.1, 0.1]\n# by default data_path is relative to the recipe folder so need to update for nbs\ncfg.data_path = \"../data/text/tiny_shakespeare.txt\"\ncfg.context_size = CONTEXT_LEN\ncfg.batch_size = 2700 # large batch to mimic manual data order of magnitude\ncfg.random_split = False\ncfg.specials=['&lt;unk&gt;', '&lt;pad&gt;']\ncfg.add_sentence_tokens = False\nprint(cfg)\ndm = instantiate(cfg)\ndm.setup()\nprint(\"vocab size: \", dm.vocab_size)\n# setup large batch to overfit / test model\nXtr, Ytr= next(iter(dm.train_dataloader()))\n# target is last token in sequence\nYtr = Ytr[:, -1]\nprint(\"Xtr (B, T): \", Xtr.shape, \"Ytr (B): \", Ytr.shape)\nX, Y = dm.data_train[0]\nprint(dm.ds.from_tokens(X), dm.ds.from_tokens(Y))\n\n\nconf = NNLMConfig(n_vocab=len(v), n_context=CONTEXT_LEN)\nprint(len(v), CONTEXT_LEN)\nlm = NNLM(**asdict(conf))\nbs = 10\nx = torch.randint(conf.n_vocab, (bs, conf.n_context)) # (B, T) with values between 0 and n_vocab\nprint(\"X (B, T):\", x.shape)\nlm(x).shape\n\n\n# checking data tokens are between 0 and vocab size\nprint(Xtr.min(),  Xtr.max())\n\n\noverfit\n\n# device = get_device()\ndevice = 'cpu'\nlm.to(device)\n\n# overfit on one big batch\noptim = SGD(lm.parameters(), lr=0.01, momentum=0.9)\ntrain_loss = []\nITER_MAX = 1000\nfor i in tqdm(range(ITER_MAX)):\n    # for batch in dm.train_dataloader():\n        # Xtr, Ytr = batch\n        # Ytr = Ytr[:, -1]\n        Xtr = Xtr.to(device)\n        Ytr = Ytr.to(device)\n        optim.zero_grad()\n        logits = lm(Xtr)\n        loss = F.cross_entropy(logits, Ytr)\n        loss.backward()\n        optim.step()\n        train_loss.append(loss.item())\n        if not(i%250):\n            print(loss.item())\n\n\nplt.plot(train_loss)\n\n\n# infer on CPU\nlm.to('cpu')\nprompt = \"The country of \"\nsequences = lm.sample(prompt, v, max_new_tokens=250, temperature=0.6)\nprint(sequences)\n\n\n\nBatching with dataloaders\n\n# mini batch gradient descent with datamodule\ncfg = OmegaConf.load(\"../config/text/data/tinyshakespeare.yaml\")\ncfg.train_val_test_split = [0.8, 0.1, 0.1]\ncfg.data_path = \"../data/text/tiny_shakespeare.txt\"\ncfg.context_size = CONTEXT_LEN\ncfg.batch_size = 2048\ncfg.random_split = False\ncfg.specials=['&lt;unk&gt;', '&lt;pad&gt;']\ncfg.add_sentence_tokens = False\ndm = instantiate(cfg)\ndm.setup()\n\nconf = NNLMConfig(n_vocab=len(v), n_context=CONTEXT_LEN)\nlm = NNLM(**asdict(conf))\n\n\noptim = SGD(lm.parameters(), lr=0.01, momentum=0.9)\ntrain_loss = []\n# device = get_device()\ndevice = 'cpu'\nlm.to(device)\ni = 0\nEPOCHS = 1\nfor epoch in tqdm(range(EPOCHS)):\n    print(f\"epoch {epoch}\")\n    for batch in tqdm(dm.train_dataloader()):\n        Xtr, Ytr = batch\n        # target is last token in sequence\n        Ytr = Ytr[:, -1] # BxT\n        Xtr = Xtr.to(device)\n        Ytr = Ytr.to(device)\n        \n        logits = lm(Xtr)\n        loss = F.cross_entropy(logits, Ytr)\n\n        optim.zero_grad()\n        loss.backward()\n        optim.step()\n\n        train_loss.append(loss.item())\n        if not(i%1000):\n            print(loss.item())\n        i += 1\n\n\nplt.plot(train_loss)\n\n\n\nSample\n\n# infer on CPU\nlm.to('cpu')\nprompt = \"The country of \"\nsequences = lm.sample(prompt, v, max_new_tokens=500, temperature=0.9)\nprint(sequences)",
+    "crumbs": [
+      "Text",
+      "Models",
+      "Neural Net Language models"
+    ]
+  },
+  {
+    "objectID": "models.lm.html#mlp-lm-x-model",
+    "href": "models.lm.html#mlp-lm-x-model",
+    "title": "Neural Net Language models",
+    "section": "MLP LM X Model",
+    "text": "MLP LM X Model\n\nsource\n\nNNLM_X\n\n NNLM_X (nnet:__main__.NNLM, num_classes:int,\n         optimizer:torch.optim.optimizer.Optimizer, scheduler:&lt;module'torc\n         h.optim.lr_scheduler'from'/opt/hostedtoolcache/Python/3.10.15/x64\n         /lib/python3.10/site-packages/torch/optim/lr_scheduler.py'&gt;)\n\nHelper class that provides a standard way to create an ABC using inheritance.\n\n\nUsage\n\n# omegaconf\ncfg = OmegaConf.load(\"../config/text/model/nnlm.yaml\")\ncfg.num_classes = len(v)\nprint(len(v))\n# have to convert omegaconf dict to dict for pprint\nopt = instantiate(cfg.optimizer)\nprint(opt.keywords['lr'])\n\npprint.pprint(dict(cfg))\nlm  = instantiate(cfg)\nprint(lm.hparams.optimizer)\n\n\nn_samples = 25\nx = torch.randint(conf.n_vocab, (n_samples, cfg.nnet.n_context))\nprint(\"X:\", x.shape)\n\n\ny = lm(x)\nprint(\"Y_hat logits:\", y.shape)\n\n\n# v = Vocab(data_path='../data/text/tiny_shakespeare.txt', specials=['&lt;unk&gt;','&lt;pad&gt;'])\nlm.sample(\"The country of \", v, max_new_tokens=500, temperature=0.9)\n\n\n\nL Training Loop\n\n# vocab\nprint(len(v))\n\n# data\ncfg = OmegaConf.load(\"../config/text/data/tinyshakespeare.yaml\")\ncfg.context_size = CONTEXT_LEN\ncfg.specials: [\"&lt;pad&gt;\", \"&lt;unk&gt;\"]\ncfg.batch_size = 2048\ncfg.random_split = False\ndm = instantiate(cfg)\ndm.setup()\n\n# model\ncfg = OmegaConf.load(\"../config/text/model/nnlm.yaml\")\nlm  = instantiate(cfg)\n\n\nprint(lm.__dict__)\n\nmodel can be easily trained with L trainer (c.f. recipes/text/ for examples)\n\ntrainer = Trainer(\n    accelerator=\"auto\",\n    max_epochs=1,\n    logger=CSVLogger(\"logs\", name=\"nnlm\")\n    )\n\n\ntrainer.fit(lm, dm.train_dataloader(), dm.val_dataloader())\n\n\ncsv_path = f\"{trainer.logger.log_dir}/metrics.csv\"\nmetrics = pd.read_csv(csv_path)\nmetrics.head()\n\n\nplt.plot(metrics['step'], metrics['train/loss_step'],'b.-')\nplt.plot(metrics['step'], metrics['val/loss'],'r.-')\nplt.show()\n\n\ntrainer.test(lm, dm.test_dataloader())\n\n\n# infer on CPU\nlm.to('cpu')\nprompt = \"The country of \"\nsequences = lm.sample(prompt, v, max_new_tokens=500, temperature=0.9)\nprint(sequences)\n\n\n\nLearning Rate Finder\n\nlm.hparams\n\n\ntrainer = L.Trainer(\n    accelerator=\"auto\",\n    max_epochs=1,\n)\ntuner = Tuner(trainer)\nlr_finder = tuner.lr_find(\n    lm,\n    datamodule=dm,\n    min_lr=1e-6,\n    max_lr=1.0,\n    num_training=100,  # number of iterations\n    # attr_name=\"optimizer.lr\",\n)\nfig = lr_finder.plot(suggest=True)\nplt.show()\nprint(f\"Suggested learning rate: {lr_finder.suggestion()}\")\n\n\n\nre-train with new lr\n\nnew_lr = lr_finder.suggestion()\nlm.lr = new_lr\n\n\ntrainer = L.Trainer(\n    accelerator=\"auto\",\n    max_epochs=1,\n    logger=CSVLogger(\"logs\", name=\"nnlm\"),\n)\ntrainer.fit(lm, dm.train_dataloader(), dm.val_dataloader())\ntrainer.test(lm, dm.test_dataloader())\n\n\ncsv_path = f\"{trainer.logger.log_dir}/metrics.csv\"\nmetrics = pd.read_csv(csv_path)\nplt.plot(metrics['step'], metrics['train/loss_step'],'.-')\n# plt.figure()\n# plot_classifier_metrics_from_csv(csv_path)\n\n\n# infer on CPU\nlm.to('cpu')\nprompt = \"The country of \"\nsequences = lm.sample(prompt, v, max_new_tokens=500, temperature=0.9)\nprint(sequences)",
+    "crumbs": [
+      "Text",
+      "Models",
+      "Neural Net Language models"
+    ]
+  },
+  {
+    "objectID": "models.lm.html#nn-bigram",
+    "href": "models.lm.html#nn-bigram",
+    "title": "Neural Net Language models",
+    "section": "NN Bigram",
+    "text": "NN Bigram\n\nsource\n\nNNBigram\n\n NNBigram (vocab_size:int)\n\n*Base class for all neural network modules.\nYour models should also subclass this class.\nModules can also contain other Modules, allowing to nest them in a tree structure. You can assign the submodules as regular attributes::\nimport torch.nn as nn\nimport torch.nn.functional as F\n\nclass Model(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.conv1 = nn.Conv2d(1, 20, 5)\n        self.conv2 = nn.Conv2d(20, 20, 5)\n\n    def forward(self, x):\n        x = F.relu(self.conv1(x))\n        return F.relu(self.conv2(x))\nSubmodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:to, etc.\n.. note:: As per the example above, an __init__() call to the parent class must be made before assignment on the child.\n:ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*\n\n\nUsage\n\nB, T, C = 32, 8, 65\nvocab_size = C\nmodel = NNBigram(vocab_size)\nprint(\"vocab size: \",  model.vocab_size)\nX = torch.randint(0,C,(B,T))\nY = torch.randint(0,C,(B,T))\nbatch = (X,Y)\nlogits = model(X) # (B, T, C)\nprint(\"X: \", X.shape, \"Y: \", Y.shape, \"logits: \", logits.shape)\n\n\n# generate\nmodel.predict(idx=torch.zeros((1,1), dtype=torch.long), max_new_tokens=100)[0]\n\n\n# #| export\n# class NNBigramL(ModelModule):\n#     def __init__(self, vocab_size:int, lr:float=1e-3):\n#         model = NNBigram(vocab_size)\n#         super().__init__(model, lr)\n#         self.accuracy = Accuracy(task='multiclass', num_classes=model.vocab_size)\n\n#     def _step(self, batch:torch.tensor, batch_idx:int):\n#         x, y = batch\n#         logits = self.model(x) # (B,T,C)\n#         B, T, C = logits.shape\n#         logits = logits.view(B*T, C)\n#         y = y.view(B*T)\n#         loss = self.loss(logits, y)\n#         acc = self.accuracy(logits, y)\n#         return loss, acc\n    \n#     def predict(self,idx:torch.IntTensor, max_new_tokens:int):\n#         return self.model.predict(idx, max_new_tokens)\n\n\n# model_pl = NNBigramL(vocab_size)\n# logits = model_pl(X) # (B, T, C)\n# print(logits.shape)\n# model_pl.training_step(batch, 0)\n# model_pl._step(batch, 0)\n\n\n\nData\n\nwith open('../data/text/tiny_shakespeare.txt') as f:\n    text = f.read()\n\n\n# dataset\nblock_size = 8\nds = CharDataset(data_path='../data/text/tiny_shakespeare.txt', context_length=block_size)\nX,Y = ds[0]\nprint(\"x:\",  ds.from_tokens(X), \"\\ny:\", ds.from_tokens(Y))\n\n\n# dataloader\ndl = DataLoader(ds, batch_size=32, num_workers=0)\nX, Y = next(iter(dl))\nprint(\"x:\", X.shape, \"\\ny:\", Y.shape)\n\n\n\nTraining\n\nmodel = NNBigram(ds.vocab_size)\n\n\ncriterion = nn.CrossEntropyLoss()\noptimizer = torch.optim.AdamW(model.parameters(), lr=1e-3)\ndevice = torch.device('cpu')\n\n\nITER_MAX = 1000\ntrain_loss = []\nfor epoch in tqdm(range(ITER_MAX)):\n    model.train()\n    X = X.to(device) # (B,T)\n    Y = Y.to(device) # (B,T)\n    logits = model(X)\n    B, T, C = logits.shape\n    loss = criterion(logits.view(B*T, C), Y.view(B*T))\n    loss.backward()\n    optimizer.step()\n    train_loss.append(loss.item())\n    if not(epoch % 1000):\n        print(loss.item())\n\n    model.eval()\n    with torch.no_grad():\n        correct = 0\n        total = 0\n        logits = model(X).view(B*T,C) \n        # _, predicted = torch.max(logits.data, 1)\n        probs = F.softmax(logits, dim=-1)\n        # print(\"probs: \", probs.shape)\n        preds = torch.argmax(probs, dim=1)\n        # print(\"pred:\", preds.shape)\n        # print(\"Y:\", Y.shape)\n        # print(predicted)\n        # total += Y.size(0)\n        # correct += (predicted == Y).sum()\n        # print(f\"Epoch {epoch + 1}: Accuracy = {100 * correct / total:.2f}%\")\n\n\nplt.plot(train_loss)\n\n\nprint(ds.from_tokens(model.predict(idx=torch.zeros((1,1), dtype=torch.long), max_new_tokens=500)[0].tolist()))",
+    "crumbs": [
+      "Text",
+      "Models",
+      "Neural Net Language models"
+    ]
+  },
+  {
+    "objectID": "models.lm.html#training-from-module",
+    "href": "models.lm.html#training-from-module",
+    "title": "Neural Net Language models",
+    "section": "training from module",
+    "text": "training from module\n\n# %%time\n# n_epochs = 1\n# train_loss = []\n# for epoch in range(n_epochs):\n#     model_pl.model.train()\n#     loss = model_pl.training_step(batch, None)\n#     loss.backward()\n#     optimizer.step()\n#     train_loss.append(loss.item())\n#     if not(epoch % 100):\n#         print(loss.item())\n\n\n# print(ds.from_tokens(model_pl.predict(idx=torch.zeros((1,1), dtype=torch.long), max_new_tokens=500)[0].tolist()))",
+    "crumbs": [
+      "Text",
+      "Models",
+      "Neural Net Language models"
+    ]
+  },
+  {
+    "objectID": "modules.html",
+    "href": "modules.html",
+    "title": "Modules",
+    "section": "",
+    "text": "source\n\n\n\n Decoder ()\n\n*Base class for all neural network modules.\nYour models should also subclass this class.\nModules can also contain other Modules, allowing to nest them in a tree structure. You can assign the submodules as regular attributes::\nimport torch.nn as nn\nimport torch.nn.functional as F\n\nclass Model(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.conv1 = nn.Conv2d(1, 20, 5)\n        self.conv2 = nn.Conv2d(20, 20, 5)\n\n    def forward(self, x):\n        x = F.relu(self.conv1(x))\n        return F.relu(self.conv2(x))\nSubmodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:to, etc.\n.. note:: As per the example above, an __init__() call to the parent class must be made before assignment on the child.\n:ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*\n\nsource\n\n\n\n\n Encoder ()\n\n*Base class for all neural network modules.\nYour models should also subclass this class.\nModules can also contain other Modules, allowing to nest them in a tree structure. You can assign the submodules as regular attributes::\nimport torch.nn as nn\nimport torch.nn.functional as F\n\nclass Model(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.conv1 = nn.Conv2d(1, 20, 5)\n        self.conv2 = nn.Conv2d(20, 20, 5)\n\n    def forward(self, x):\n        x = F.relu(self.conv1(x))\n        return F.relu(self.conv2(x))\nSubmodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:to, etc.\n.. note:: As per the example above, an __init__() call to the parent class must be made before assignment on the child.\n:ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*\n\n\n\n\nenc = Encoder()\nbatch = torch.rand((10, 28*28))\nencoded = enc(batch)\nprint(encoded.shape)\n\n\ndec = Decoder()\ndecoded = dec(encoded)\nprint(decoded.shape)",
+    "crumbs": [
+      "Misc",
+      "Modules"
+    ]
+  },
+  {
+    "objectID": "modules.html#modules",
+    "href": "modules.html#modules",
+    "title": "Modules",
+    "section": "",
+    "text": "source\n\n\n\n Decoder ()\n\n*Base class for all neural network modules.\nYour models should also subclass this class.\nModules can also contain other Modules, allowing to nest them in a tree structure. You can assign the submodules as regular attributes::\nimport torch.nn as nn\nimport torch.nn.functional as F\n\nclass Model(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.conv1 = nn.Conv2d(1, 20, 5)\n        self.conv2 = nn.Conv2d(20, 20, 5)\n\n    def forward(self, x):\n        x = F.relu(self.conv1(x))\n        return F.relu(self.conv2(x))\nSubmodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:to, etc.\n.. note:: As per the example above, an __init__() call to the parent class must be made before assignment on the child.\n:ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*\n\nsource\n\n\n\n\n Encoder ()\n\n*Base class for all neural network modules.\nYour models should also subclass this class.\nModules can also contain other Modules, allowing to nest them in a tree structure. You can assign the submodules as regular attributes::\nimport torch.nn as nn\nimport torch.nn.functional as F\n\nclass Model(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.conv1 = nn.Conv2d(1, 20, 5)\n        self.conv2 = nn.Conv2d(20, 20, 5)\n\n    def forward(self, x):\n        x = F.relu(self.conv1(x))\n        return F.relu(self.conv2(x))\nSubmodules assigned in this way will be registered, and will have their parameters converted too when you call :meth:to, etc.\n.. note:: As per the example above, an __init__() call to the parent class must be made before assignment on the child.\n:ivar training: Boolean represents whether this module is in training or evaluation mode. :vartype training: bool*\n\n\n\n\nenc = Encoder()\nbatch = torch.rand((10, 28*28))\nencoded = enc(batch)\nprint(encoded.shape)\n\n\ndec = Decoder()\ndecoded = dec(encoded)\nprint(decoded.shape)",
+    "crumbs": [
+      "Misc",
+      "Modules"
+    ]
+  },
+  {
+    "objectID": "models.aligners.html",
+    "href": "models.aligners.html",
+    "title": "Aligners",
+    "section": "",
+    "text": "source\n\n\n\n AlignerWAV2VEC2 (text_normalizer, device='cuda')\n\nInitialize self. See help(type(self)) for accurate signature.\n\nsource\n\n\n\n\n Point (token_index:int, time_index:int, score:float)\n\n\nsource\n\n\n\n\n Segment (label:str, start:int, end:int, score:float)",
+    "crumbs": [
+      "Text",
+      "Models",
+      "Aligners"
+    ]
+  },
+  {
+    "objectID": "models.aligners.html#wav2vec2.0-aligner",
+    "href": "models.aligners.html#wav2vec2.0-aligner",
+    "title": "Aligners",
+    "section": "",
+    "text": "source\n\n\n\n AlignerWAV2VEC2 (text_normalizer, device='cuda')\n\nInitialize self. See help(type(self)) for accurate signature.\n\nsource\n\n\n\n\n Point (token_index:int, time_index:int, score:float)\n\n\nsource\n\n\n\n\n Segment (label:str, start:int, end:int, score:float)",
+    "crumbs": [
+      "Text",
+      "Models",
+      "Aligners"
+    ]
+  },
+  {
+    "objectID": "models.aligners.html#usage",
+    "href": "models.aligners.html#usage",
+    "title": "Aligners",
+    "section": "Usage",
+    "text": "Usage\n\ntext_normalizer = TTSTextNormalizer().english_cleaners\naligner = AlignerWAV2VEC2(text_normalizer, device='cpu') # for CI on cpu\nwav_path = \"../data/en/LibriTTS/test-clean/1089/134686/1089_134686_000015_000001.wav\"\ntxt_path = \"../data/en/LibriTTS/test-clean/1089/134686/1089_134686_000015_000001.original.txt\"\nwav, sr = torchaudio.load(wav_path)\nwith open(txt_path, 'r') as f: txt = f.read()\nalignments = aligner.get_alignments(wav, txt)",
+    "crumbs": [
+      "Text",
+      "Models",
+      "Aligners"
+    ]
+  },
+  {
+    "objectID": "data.lhotse.html",
+    "href": "data.lhotse.html",
+    "title": "Lhotse support for datasets",
+    "section": "",
+    "text": "# download_ljspeech('~/Data/en/')\n# skip this step already done\nljspeech = prepare_ljspeech('../data/en/LJSpeech-1.1', '../recipes/tts/ljspeech/data')\n\n\ncut_set = CutSet.from_manifests(**ljspeech)\nsubset = cut_set.subset(first=3)\nsubset.to_file('../recipes/tts/ljspeech/data/first_3.jsonl.gz')\nreload_subset = CutSet.from_file('../recipes/tts/ljspeech/data/first_3.jsonl.gz')\n\n\nprint(subset[1])\nprint(reload_subset[1])\nprint(len(subset))\n\n\n\n\n\nencodec_extractor = EncoDecExtractor()\n\n\n# torch.set_num_threads(1)\n# torch.set_num_interop_threads(1)\n\n\n# TODO: fix bug for n_jobs &gt;1\ncuts = subset.compute_and_store_features(\n    extractor=encodec_extractor,\n    storage_path=\"../recipes/tts/ljspeech/data/encodec\",\n    num_jobs=1,\n    # storage_type=NumpyHdf5Writer\n)\n\n\nprint(cuts[0])\n\n\ncuts.to_file(\"../recipes/tts/ljspeech/data/first_3.encodec.jsonl.gz\")\ncuts[0]\nreload_cuts = CutSet.from_file(\"../recipes/tts/ljspeech/data/first_3.encodec.jsonl.gz\")\nreload_cuts[0]\n\n\n# cuts[0].recording\n!soxi '../data/en/LJSpeech-1.1/wavs/LJ001-0001.wav'\n\n\nstrategy = PrecomputedFeatures()\nfeats, feats_len = strategy(cuts)\n\n# print([(f\"feat: {feat.shape}\", f\"len: {feat_len}\") for feat in feats for feat_len in feats_len])\nprint([feat.shape for feat in feats])\nprint([int(feat_len) for feat_len in feats_len])\nprint(feats.shape, feats_len.shape)\n# TODO: debug OnTheFlyFeature case\n# strategy = OnTheFlyFeatures(extractor=encodec_extractor)\n# feats, feats_len = strategy(cuts)\n# print(feats, feats_len)\n\n\n\n\n\ncleaner = TTSTextNormalizer()\ntokenizer = Phonemizer()\n\n\ncleaner(\"tutu. this is ture!\")\n\n\nn_jobs = 1\nunique_phonemes = set()\nwith CutSet.open_writer('../recipes/tts/ljspeech/data/first_3.final.jsonl.gz', overwrite=True) as writer:\n    for cut in cuts:\n        text = cut.supervisions[0].text\n        print(text)\n        normalized = cleaner(text)\n        print(normalized)\n        phonemes = tokenizer(text)\n        print(phonemes)\n        cut.custom = {'normalized': normalized, 'phonemes': phonemes}\n        writer.write(cut, flush=True)\n        unique_phonemes.update(list(phonemes))\n\n\n\n\n\ncuts = CutSet.from_file(\"../data/en/LJSpeech-1.1/first_3.final.jsonl.gz\")\nprint(cuts[0])\nmap = {}\nunique_syms = set()\nfor cut in cuts:\n    unique_syms.update(list(cut.custom['phonemes']))\nfor (i, v) in enumerate(sorted(list(unique_syms))):\n    map[i] = v\nmap[len(map)] = \"&lt;eps&gt;\"\nprint(map, len(map))\n\njson_map = json.dumps(map)\nwith open(\"../data/en/LJSpeech-1.1/map.json\",\"w\") as f:\n    f.write(json_map)\n\n\nwith open('../data/en/LJSpeech-1.1/map.json', 'r') as f:\n    data = json.load(f)\n\nprint(data)\n\n\n\n\n\ncuts[0]\n\n\npc = PhonemeCollater(cuts)\ntokens, tokens_len = pc(cuts)\nprint(tokens, tokens_len)\nprint(pc.inverse(tokens, tokens_len))\n\n\nclass ValleDataset(Dataset):\n    def __init__(\n            self,\n            cuts:CutSet,\n            strategy:BatchIO=PrecomputedFeatures()\n        ):\n        self.extractor = strategy\n        self.tokenizer = PhonemeCollater(cuts)\n\n    def __getitem__(self, cuts: CutSet) -&gt; Dict[str, torch.Tensor]:\n        # getitem is on full cutset not just one cut like usual for pytorch datasets\n        cuts = cuts.sort_by_duration()\n        feats, feat_lens = self.extractor(cuts)\n        tokens, token_lens = self.tokenizer(cuts)\n        return {\"feats_pad\": feats, \"feats_lens\": feat_lens, \"tokens_pad\": tokens, \"tokens_lens\": token_lens}\n\n\nds = ValleDataset(cuts)\n# Dataset performs batching by itself, so we have to indicate that to the DataLoader with batch_size=None\n# train_sampler = BucketingSampler(cuts, max_duration=300, shuffle=True, bucket_method=\"equal_duration\")\ntrain_sampler = DynamicBucketingSampler(cuts, max_duration=300, shuffle=True, num_buckets=2)\ndl = DataLoader(ds, sampler=train_sampler, batch_size=None, num_workers=0)\nprint(next(iter(dl)))"
+  },
+  {
+    "objectID": "data.lhotse.html#tts-lhotse",
+    "href": "data.lhotse.html#tts-lhotse",
+    "title": "Lhotse support for datasets",
+    "section": "",
+    "text": "# download_ljspeech('~/Data/en/')\n# skip this step already done\nljspeech = prepare_ljspeech('../data/en/LJSpeech-1.1', '../recipes/tts/ljspeech/data')\n\n\ncut_set = CutSet.from_manifests(**ljspeech)\nsubset = cut_set.subset(first=3)\nsubset.to_file('../recipes/tts/ljspeech/data/first_3.jsonl.gz')\nreload_subset = CutSet.from_file('../recipes/tts/ljspeech/data/first_3.jsonl.gz')\n\n\nprint(subset[1])\nprint(reload_subset[1])\nprint(len(subset))\n\n\n\n\n\nencodec_extractor = EncoDecExtractor()\n\n\n# torch.set_num_threads(1)\n# torch.set_num_interop_threads(1)\n\n\n# TODO: fix bug for n_jobs &gt;1\ncuts = subset.compute_and_store_features(\n    extractor=encodec_extractor,\n    storage_path=\"../recipes/tts/ljspeech/data/encodec\",\n    num_jobs=1,\n    # storage_type=NumpyHdf5Writer\n)\n\n\nprint(cuts[0])\n\n\ncuts.to_file(\"../recipes/tts/ljspeech/data/first_3.encodec.jsonl.gz\")\ncuts[0]\nreload_cuts = CutSet.from_file(\"../recipes/tts/ljspeech/data/first_3.encodec.jsonl.gz\")\nreload_cuts[0]\n\n\n# cuts[0].recording\n!soxi '../data/en/LJSpeech-1.1/wavs/LJ001-0001.wav'\n\n\nstrategy = PrecomputedFeatures()\nfeats, feats_len = strategy(cuts)\n\n# print([(f\"feat: {feat.shape}\", f\"len: {feat_len}\") for feat in feats for feat_len in feats_len])\nprint([feat.shape for feat in feats])\nprint([int(feat_len) for feat_len in feats_len])\nprint(feats.shape, feats_len.shape)\n# TODO: debug OnTheFlyFeature case\n# strategy = OnTheFlyFeatures(extractor=encodec_extractor)\n# feats, feats_len = strategy(cuts)\n# print(feats, feats_len)\n\n\n\n\n\ncleaner = TTSTextNormalizer()\ntokenizer = Phonemizer()\n\n\ncleaner(\"tutu. this is ture!\")\n\n\nn_jobs = 1\nunique_phonemes = set()\nwith CutSet.open_writer('../recipes/tts/ljspeech/data/first_3.final.jsonl.gz', overwrite=True) as writer:\n    for cut in cuts:\n        text = cut.supervisions[0].text\n        print(text)\n        normalized = cleaner(text)\n        print(normalized)\n        phonemes = tokenizer(text)\n        print(phonemes)\n        cut.custom = {'normalized': normalized, 'phonemes': phonemes}\n        writer.write(cut, flush=True)\n        unique_phonemes.update(list(phonemes))\n\n\n\n\n\ncuts = CutSet.from_file(\"../data/en/LJSpeech-1.1/first_3.final.jsonl.gz\")\nprint(cuts[0])\nmap = {}\nunique_syms = set()\nfor cut in cuts:\n    unique_syms.update(list(cut.custom['phonemes']))\nfor (i, v) in enumerate(sorted(list(unique_syms))):\n    map[i] = v\nmap[len(map)] = \"&lt;eps&gt;\"\nprint(map, len(map))\n\njson_map = json.dumps(map)\nwith open(\"../data/en/LJSpeech-1.1/map.json\",\"w\") as f:\n    f.write(json_map)\n\n\nwith open('../data/en/LJSpeech-1.1/map.json', 'r') as f:\n    data = json.load(f)\n\nprint(data)\n\n\n\n\n\ncuts[0]\n\n\npc = PhonemeCollater(cuts)\ntokens, tokens_len = pc(cuts)\nprint(tokens, tokens_len)\nprint(pc.inverse(tokens, tokens_len))\n\n\nclass ValleDataset(Dataset):\n    def __init__(\n            self,\n            cuts:CutSet,\n            strategy:BatchIO=PrecomputedFeatures()\n        ):\n        self.extractor = strategy\n        self.tokenizer = PhonemeCollater(cuts)\n\n    def __getitem__(self, cuts: CutSet) -&gt; Dict[str, torch.Tensor]:\n        # getitem is on full cutset not just one cut like usual for pytorch datasets\n        cuts = cuts.sort_by_duration()\n        feats, feat_lens = self.extractor(cuts)\n        tokens, token_lens = self.tokenizer(cuts)\n        return {\"feats_pad\": feats, \"feats_lens\": feat_lens, \"tokens_pad\": tokens, \"tokens_lens\": token_lens}\n\n\nds = ValleDataset(cuts)\n# Dataset performs batching by itself, so we have to indicate that to the DataLoader with batch_size=None\n# train_sampler = BucketingSampler(cuts, max_duration=300, shuffle=True, bucket_method=\"equal_duration\")\ntrain_sampler = DynamicBucketingSampler(cuts, max_duration=300, shuffle=True, num_buckets=2)\ndl = DataLoader(ds, sampler=train_sampler, batch_size=None, num_workers=0)\nprint(next(iter(dl)))"
+  }
+]
