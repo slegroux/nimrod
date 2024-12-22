@@ -3,14 +3,14 @@
 # %% auto 0
 __all__ = ['logger', 'Vocab', 'CharDataset', 'CharDataModule']
 
-# %% ../../nbs/text.datasets.ipynb 4
+# %% ../../nbs/text.datasets.ipynb 3
 # torch
 import torch
 from torch.optim import SGD
-import torchtext; torchtext.disable_torchtext_deprecation_warning()
-from torchtext.datasets import WikiText2
-from torchtext.data.utils import get_tokenizer
-from torchtext.vocab import vocab as torchtext_vocab
+# import torchtext; torchtext.disable_torchtext_deprecation_warning()
+# from torchtext.datasets import WikiText2
+# from torchtext.data.utils import get_tokenizer
+# from torchtext.vocab import vocab as torchtext_vocab
 from torch.utils.data import DataLoader, dataset, Dataset, random_split
 
 # L
@@ -52,7 +52,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-# %% ../../nbs/text.datasets.ipynb 8
+# %% ../../nbs/text.datasets.ipynb 7
 class Vocab:
     def __init__(self,
                 data_path: str | os.PathLike='../data/text/tiny_shakespeare.txt', # path to text data file
@@ -121,7 +121,7 @@ class Vocab:
         return sorted(set([k for k,v in self._stoi.items()]))
 
 
-# %% ../../nbs/text.datasets.ipynb 15
+# %% ../../nbs/text.datasets.ipynb 14
 class CharDataset(Dataset):
     def __init__(self,
                 data_path: str | os.PathLike='../data/text/tiny_shakespeare.txt', # path to the data file
@@ -193,7 +193,7 @@ class CharDataset(Dataset):
     def from_tokens(self, tokens: torch.Tensor) -> str:
         return "".join([self.v.itos(int(i)) for i in tokens])
 
-# %% ../../nbs/text.datasets.ipynb 21
+# %% ../../nbs/text.datasets.ipynb 20
 class CharDataModule(DataModule, LightningDataModule):
     def __init__(self,
             # dataset

@@ -5,7 +5,7 @@
 # %% auto 0
 __all__ = ['logger', 'ImageDataset', 'download_mnist_from_mirror', 'MNISTDataset', 'MNISTDataModule']
 
-# %% ../../nbs/image.datasets.ipynb 3
+# %% ../../nbs/image.datasets.ipynb 4
 import torch
 import torch.utils.data as data
 from torch.utils.data import ConcatDataset, DataLoader, Dataset, random_split
@@ -32,13 +32,13 @@ import urllib.request
 import logging
 
 
-# %% ../../nbs/image.datasets.ipynb 4
+# %% ../../nbs/image.datasets.ipynb 5
 set_seed(42)
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 # plt.set_loglevel('INFO')
 
-# %% ../../nbs/image.datasets.ipynb 6
+# %% ../../nbs/image.datasets.ipynb 7
 class ImageDataset(Dataset):
     " Base class for image datasets providing visualization of (image, label) samples"
 
@@ -88,7 +88,7 @@ class ImageDataset(Dataset):
         self.show_grid(images)
         
 
-# %% ../../nbs/image.datasets.ipynb 9
+# %% ../../nbs/image.datasets.ipynb 10
 def download_mnist_from_mirror(root='.', train=False, transform=None):
     """
     Download MNIST dataset from alternative mirror and ensure it's ready
@@ -142,7 +142,7 @@ def download_mnist_from_mirror(root='.', train=False, transform=None):
         print(f"Failed to create MNIST dataset: {e}")
         raise
 
-# %% ../../nbs/image.datasets.ipynb 11
+# %% ../../nbs/image.datasets.ipynb 12
 class MNISTDataset(ImageDataset):
     "MNIST digit dataset"
 
@@ -196,7 +196,7 @@ class MNISTDataset(ImageDataset):
 
 
 
-# %% ../../nbs/image.datasets.ipynb 19
+# %% ../../nbs/image.datasets.ipynb 20
 class MNISTDataModule(DataModule, LightningDataModule):
     def __init__(self,
                  data_dir: str | os.PathLike = "~/Data/", # path to source data dir
