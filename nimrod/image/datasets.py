@@ -35,6 +35,7 @@ import logging
 # %% ../../nbs/image.datasets.ipynb 4
 set_seed(42)
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 # plt.set_loglevel('INFO')
 
 # %% ../../nbs/image.datasets.ipynb 6
@@ -160,19 +161,15 @@ class MNISTDataset(ImageDataset):
         logger.info("MNISTDataset: init")
         abs_data_dir = os.path.abspath(data_dir)
         logger.info(f"Data directory: {abs_data_dir}")
-        os.makedirs(data_dir, exist_ok=True)
+        # os.makedirs(data_dir, exist_ok=True)
         super().__init__()
-        self.ds = None
-        
-        try:
-            self.ds = download_mnist_from_mirror(
+
+        self.ds = download_mnist_from_mirror(
                 data_dir,
                 train = train,
                 transform=transform, 
             )
-            logger.info(f"MNIST dataset loaded with total {len(self.ds)} samples")
-        except Exception as e:
-            logger.error(f"Failed to load MNIST dataset: {e}")
+
 
     def __len__(self) -> int: # length of dataset
         return len(self.ds)
