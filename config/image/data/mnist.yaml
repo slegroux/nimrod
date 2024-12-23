@@ -2,7 +2,7 @@ dataset:
   _target_: nimrod.image.datasets.MNISTDataset
   data_dir: "../data/image"
   train: False
-  transform: 
+  transforms: 
     _target_: torchvision.transforms.ToTensor
 
 datamodule:
