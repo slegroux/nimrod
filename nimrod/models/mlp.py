@@ -5,7 +5,7 @@
 # %% auto 0
 __all__ = ['logger', 'MLP', 'MLP_X']
 
-# %% ../../nbs/models.mlp.ipynb 4
+# %% ../../nbs/models.mlp.ipynb 3
 import torch.nn as nn
 import torch
 from torchvision.transforms import ToTensor
@@ -32,7 +32,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-# %% ../../nbs/models.mlp.ipynb 6
+# %% ../../nbs/models.mlp.ipynb 5
 class MLP(nn.Module):
     def __init__(
                 self,
@@ -53,7 +53,7 @@ class MLP(nn.Module):
                 ) -> torch.Tensor:
         return self.layers(x)
 
-# %% ../../nbs/models.mlp.ipynb 19
+# %% ../../nbs/models.mlp.ipynb 18
 class MLP_X(Classifier, LightningModule):
     def __init__(
             self,

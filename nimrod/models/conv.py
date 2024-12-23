@@ -3,34 +3,28 @@
 # %% auto 0
 __all__ = ['logger', 'ConvLayer', 'ConvNet', 'ConvNetX']
 
-# %% ../../nbs/models.conv.ipynb 4
+# %% ../../nbs/models.conv.ipynb 3
 import torch.nn as nn
 import torch
-from torchvision.transforms import ToTensor
-from torch.utils.data import DataLoader
-from torchvision.datasets import MNIST
 
 from lightning import LightningModule, Trainer
-from lightning.pytorch.tuner.tuning import Tuner
-from lightning.pytorch.callbacks import LearningRateFinder
 from lightning.pytorch.loggers import CSVLogger
 
 from torch_lr_finder import LRFinder
-from torchmetrics import Accuracy
+
 from hydra.utils import instantiate
 from omegaconf import OmegaConf
 
 from matplotlib import pyplot as plt
 import pandas as pd
 
-from ..image.datasets import MNISTDataModule
 from ..utils import get_device
-from .core import Classifier, find_optimal_lr
+from .core import Classifier
 
 import logging
 logger = logging.getLogger(__name__)
 
-# %% ../../nbs/models.conv.ipynb 6
+# %% ../../nbs/models.conv.ipynb 5
 class ConvLayer(nn.Module):
     def __init__(self,
                 in_channels:int=3, # input channels
@@ -51,7 +45,7 @@ class ConvLayer(nn.Module):
             x = self.relu(x)
         return x
 
-# %% ../../nbs/models.conv.ipynb 10
+# %% ../../nbs/models.conv.ipynb 9
 class ConvNet(nn.Module):
     def __init__(
             self,
@@ -79,7 +73,7 @@ class ConvNet(nn.Module):
 
         return self.net(x)
 
-# %% ../../nbs/models.conv.ipynb 28
+# %% ../../nbs/models.conv.ipynb 27
 class ConvNetX(Classifier, LightningModule):
     def __init__(
             self,
