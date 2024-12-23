@@ -24,14 +24,37 @@ from .core import Classifier
 import logging
 logger = logging.getLogger(__name__)
 
-# %% ../../nbs/models.conv.ipynb 5
+# %% ../../nbs/models.conv.ipynb 6
 class ConvLayer(nn.Module):
-    def __init__(self,
-                in_channels:int=3, # input channels
-                out_channels:int=16, # output channels
-                kernel_size:int=3, # kernel size
-                activation:bool=True
-                ):
+    """
+    Convolutional layer for 2D images.
+
+    Parameters
+    ----------
+    in_channels : int, optional
+        Number of input channels. The default is 3.
+    out_channels : int, optional
+        Number of output channels. The default is 16.
+    kernel_size : int, optional
+        Size of the kernel (filter). The default is 3.
+    activation : bool, optional
+        Whether to apply ReLU activation after convolution. The default is True.
+
+    Returns
+    -------
+    torch.Tensor
+        Output image tensor of dimension (B, C, W/2, H/2)
+
+    """
+
+    
+    def __init__(
+        self,
+        in_channels:int=3, # input channels
+        out_channels:int=16, # output channels
+        kernel_size:int=3, # kernel size
+        activation:bool=True
+    ):
 
         super().__init__()
         self.activation = activation
@@ -39,14 +62,35 @@ class ConvLayer(nn.Module):
         self.conv = nn.Conv2d(in_channels, out_channels, kernel_size, 2, kernel_size//2)
         self.relu = nn.ReLU()
 
-    def forward(self, x):
+    def forward(self, x:torch.Tensor # input image tensor of dimension (B, C, W, H)
+                ) -> torch.Tensor: # output image tensor of dimension (B, C, W/2, H/2)
         x = self.conv(x)
         if self.activation:
             x = self.relu(x)
         return x
 
-# %% ../../nbs/models.conv.ipynb 9
+# %% ../../nbs/models.conv.ipynb 11
 class ConvNet(nn.Module):
+    """
+    Convolutional neural network for 2D images.
+
+    Parameters
+    ----------
+    in_channels : int, optional
+        Number of input channels. The default is 1.
+    out_channels : int, optional
+        Number of output channels (number of classes in classification).
+        The default is 10.
+
+    Returns
+    -------
+    torch.Tensor
+        Output probability tensor of dimension (B, N_classes)
+
+    """
+    
+
+    
     def __init__(
             self,
             in_channels:int=1, # input channels
@@ -68,12 +112,26 @@ class ConvNet(nn.Module):
 
         )
 
-    def forward(self, x:torch.Tensor # input image tensor of dimension (B, C, W, H)
-                ) -> torch.Tensor: # output probs (B, N_classes)
+    def forward(
+        self,
+        x:torch.Tensor # input image tensor of dimension (B, C, W, H)
+        ) -> torch.Tensor: # output probs (B, N_classes)
+
+        """
+        Parameters
+        ----------
+        x : torch.Tensor
+            Input image tensor of dimension (B, C, W, H)
+
+        Returns
+        -------
+        torch.Tensor
+            Output probs of dimension (B, N_classes)
+        """
 
         return self.net(x)
 
-# %% ../../nbs/models.conv.ipynb 27
+# %% ../../nbs/models.conv.ipynb 30
 class ConvNetX(Classifier, LightningModule):
     def __init__(
             self,

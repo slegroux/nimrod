@@ -12,7 +12,6 @@ from torch import Tensor # type hint
 import torch.utils.data as data
 from torch.utils.data import ConcatDataset, DataLoader, Dataset, random_split
 # torchvision
-import torchvision
 from torchvision.transforms import transforms
 # lightning
 from lightning import LightningDataModule
@@ -25,6 +24,7 @@ import numpy as np
 # python libs
 import os
 import logging
+from pprint import pprint
 # conigs
 from omegaconf import OmegaConf
 from hydra.utils import instantiate
@@ -40,7 +40,7 @@ logger = logging.getLogger(__name__)
 # logger.setLevel(logging.DEBUG)
 plt.set_loglevel('INFO')
 
-# %% ../../nbs/image.datasets.ipynb 6
+# %% ../../nbs/image.datasets.ipynb 7
 class ImageDataset(Dataset):
     " Base class for image datasets providing visualization of (image, label) samples"
 

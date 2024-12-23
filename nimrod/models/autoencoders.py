@@ -14,36 +14,57 @@ from lightning import LightningModule
 from ..image.datasets import MNISTDataset
 from torch.utils.data import DataLoader
 
-# %% ../../nbs/models.autoencoders.ipynb 4
+# %% ../../nbs/models.autoencoders.ipynb 5
 class AutoEncoder(nn.Module):
+    """ A modular autoencoder with configurable encoder and decoder """
     def __init__(self,
         encoder:Encoder, # Encoder layer
         decoder:Decoder # Decoder layer
         ):
+
         super().__init__()
         self.encoder = encoder
         self.decoder = decoder
     
-    def forward(self,
+    def forward(
+        self,
         x:torch.Tensor # Tensor B x L
-        )->torch.Tensor:
+        )->torch.Tensor: # Reconstructed input tensor of shape B x L
+
+        """
+        Forward pass of the AutoEncoder model.
+        """
+
         z = self.encoder(x)
         x_hat = self.decoder(z)
         return x_hat
 
-# %% ../../nbs/models.autoencoders.ipynb 7
+# %% ../../nbs/models.autoencoders.ipynb 9
 class AutoEncoderPL(LightningModule):
-    def __init__(self, autoencoder:AutoEncoder):
+    """ LightningModule for AutoEncoder """
+    def __init__(
+        self,
+        autoencoder:AutoEncoder # AutoEncoder instance
+        ):
         super().__init__()
         # self.save_hyperparameters()
         self.save_hyperparameters(ignore=['autoencoder'])
         self.autoencoder = autoencoder
         self.metric = torch.nn.MSELoss()
 
-    def forward(self, x):
+    def forward(
+        self,
+        x: torch.Tensor # Tensor B x L
+        )->torch.Tensor: # Reconstructed input tensor of shape B x L
+        """
+        Forward pass of the AutoEncoder model.
+        """
         return self.autoencoder(x)
     
     def predict_step(self, batch, batch_idx):
+        """
+        Forward pass of the AutoEncoder model.
+        """
         x, y = batch
         x = x.view(x.size(0), -1)
         with torch.no_grad():

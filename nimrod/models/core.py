@@ -8,22 +8,20 @@ __all__ = ['logger', 'Classifier', 'plot_classifier_metrics_from_csv', 'find_opt
 # %% ../../nbs/models.core.ipynb 3
 import torch.nn as nn
 import torch
+from torchmetrics import Accuracy, MaxMetric, MeanMetric
+from torch_lr_finder import LRFinder
 
 from abc import ABC, abstractmethod
-# from nimrod.utils import logger
-
-from torchmetrics import Accuracy, MaxMetric, MeanMetric
-import torch
-from torch_lr_finder import LRFinder
 import logging
-logger = logging.getLogger(__name__)
-
-import pandas as pd
-from matplotlib import pyplot as plt
 import os
 from typing import Any, Dict
 
-# %% ../../nbs/models.core.ipynb 4
+import pandas as pd
+from matplotlib import pyplot as plt
+
+logger = logging.getLogger(__name__)
+
+# %% ../../nbs/models.core.ipynb 5
 class Classifier(ABC):
     def __init__(
             self,
@@ -131,7 +129,7 @@ class Classifier(ABC):
         pass
 
 
-# %% ../../nbs/models.core.ipynb 5
+# %% ../../nbs/models.core.ipynb 6
 def plot_classifier_metrics_from_csv(metrics_csv_path:str | os.PathLike):
     metrics = pd.read_csv(metrics_csv_path)
     # Create figure with secondary y-axis
@@ -159,7 +157,7 @@ def plot_classifier_metrics_from_csv(metrics_csv_path:str | os.PathLike):
     plt.title('Training Metrics')
     plt.show()
 
-# %% ../../nbs/models.core.ipynb 6
+# %% ../../nbs/models.core.ipynb 7
 def find_optimal_lr(model, train_loader, criterion=None, optimizer=None, device='cuda'):
     # If no criterion provided, use default CrossEntropyLoss
     if criterion is None:

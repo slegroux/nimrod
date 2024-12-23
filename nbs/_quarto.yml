@@ -8,6 +8,11 @@ format:
     toc: true
 
 website:
+  title: "Nimrod"
+  description: "A minimal deep learning framework"
+  repo-url: "https://github.com/slegroux/nimrod"
+  repo-branch: main
+  site-url: "https://slegroux.github.io/nimrod"
   twitter-card: true
   open-graph: true
   repo-actions: [issue]
@@ -15,6 +20,7 @@ website:
     background: primary
     search: true
   sidebar:
-    style: floating
+    style: docked
+
 
 metadata-files: [nbdev.yml, sidebar.yml]

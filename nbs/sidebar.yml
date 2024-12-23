@@ -22,16 +22,17 @@ website:
             - image.datasets.ipynb
           - section: Models
             contents:
-            - models.mlp.ipynb  
             - models.autoencoders.ipynb
+            - models.conv.ipynb
+            - models.mlp.ipynb
       - section: Text
         contents:
         - section: Data
           contents:
+          - text.datasets.ipynb
           - text.phonemizers.ipynb
           - text.normalizers.ipynb
           - text.tokenizers.ipynb
-          - text.datasets.ipynb
         - section: Models
           contents:
           - models.aligners.ipynb
@@ -40,6 +41,7 @@ website:
           - models.transformer.ipynb
       - section: Misc
         contents:
-        - models.mlp.ipynb  
-        - modules.ipynb
+        - models.core.ipynb
+        - data.core.ipynb
+        - utils.ipynb
   
