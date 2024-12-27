@@ -16,7 +16,7 @@ from torchvision.transforms import transforms
 # lightning
 from lightning import LightningDataModule
 # hugging face
-from datasets import load_dataset
+from datasets import load_dataset, load_dataset_builder
 # math
 import pandas as pd
 from matplotlib import pyplot as plt
@@ -90,7 +90,7 @@ class ImageDataset(Dataset):
         self.show_grid(images)
         
 
-# %% ../../nbs/image.datasets.ipynb 10
+# %% ../../nbs/image.datasets.ipynb 11
 class MNISTDataset(ImageDataset):
     "MNIST digit dataset"
 
@@ -150,7 +150,7 @@ class MNISTDataset(ImageDataset):
 
 
 
-# %% ../../nbs/image.datasets.ipynb 18
+# %% ../../nbs/image.datasets.ipynb 19
 class MNISTDataModule(DataModule, LightningDataModule):
     def __init__(self,
                  data_dir: Optional[str] = "~/Data/", # path to source data dir

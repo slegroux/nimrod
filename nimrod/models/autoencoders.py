@@ -9,17 +9,17 @@ __all__ = ['AutoEncoder', 'AutoEncoderPL']
 import torch.nn.functional as F
 import torch.nn as nn
 import torch
-from ..modules import Encoder, Decoder
 from lightning import LightningModule
 from ..image.datasets import MNISTDataset
 from torch.utils.data import DataLoader
+from ..modules import Encoder, Decoder
 
 # %% ../../nbs/models.autoencoders.ipynb 5
 class AutoEncoder(nn.Module):
     """ A modular autoencoder with configurable encoder and decoder """
     def __init__(self,
-        encoder:Encoder, # Encoder layer
-        decoder:Decoder # Decoder layer
+        encoder:nn.Module, # Encoder layer
+        decoder:nn.Module # Decoder layer
         ):
 
         super().__init__()
@@ -28,8 +28,8 @@ class AutoEncoder(nn.Module):
     
     def forward(
         self,
-        x:torch.Tensor # Tensor B x L
-        )->torch.Tensor: # Reconstructed input tensor of shape B x L
+        x:torch.Tensor # Tensor B x C X H X W
+        )->torch.Tensor: # Reconstructed input tensor of shape B x C X H X W
 
         """
         Forward pass of the AutoEncoder model.
