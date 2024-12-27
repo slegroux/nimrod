@@ -34,6 +34,7 @@ class Classifier(ABC):
 
         super().__init__()
         self.save_hyperparameters()
+        self.automatic_optimization = False
 
         self.loss = nn.CrossEntropyLoss()
         
@@ -46,6 +47,7 @@ class Classifier(ABC):
         self.test_loss = MeanMetric()
 
         self.val_acc_best = MaxMetric()
+        self.step = 0
 
     
 
@@ -59,15 +61,19 @@ class Classifier(ABC):
         :return: A dict containing the configured optimizers and learning-rate schedulers to be used for training.
         """
         optimizer = self.hparams.optimizer(params=self.trainer.model.parameters())
+        logger.info(f"Optimizer: {optimizer}")
         if self.hparams.scheduler is not None:
             scheduler = self.hparams.scheduler(optimizer=optimizer)
+            self.scheduler = scheduler
+            logger.info(f"Scheduler: {scheduler}")
             return {
                 "optimizer": optimizer,
                 "lr_scheduler": {
                     "scheduler": scheduler,
                     "monitor": "val/loss",
-                    "interval": "epoch",
+                    "interval": "step",
                     "frequency": 1,
+                    "strict": False,
                 },
             }
         return {"optimizer": optimizer}
@@ -88,7 +94,19 @@ class Classifier(ABC):
         self.val_acc_best.reset()
 
     def training_step(self, batch, batch_idx):
+        if self.step >= self.scheduler.total_steps:
+            logger.warning("Max steps reached for 1-cycle LR scheduler")
+            return
+        
+        self.step += 1
+
+        opt = self.optimizers()
+        sched = self.lr_schedulers()
+        opt.zero_grad()
         loss, preds, y = self._step(batch, batch_idx)
+        self.manual_backward(loss)
+        opt.step()
+        sched.step()
 
         self.train_loss(loss)
         self.train_acc(preds, y)

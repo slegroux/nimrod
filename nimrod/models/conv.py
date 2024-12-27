@@ -8,7 +8,9 @@ import torch.nn as nn
 import torch
 
 from lightning import LightningModule, Trainer
-from lightning.pytorch.loggers import CSVLogger
+from lightning.pytorch.loggers import CSVLogger, TensorBoardLogger
+from lightning.pytorch.tuner.tuning import Tuner
+from lightning.pytorch.callbacks import LearningRateMonitor
 
 from torch_lr_finder import LRFinder
 
@@ -58,8 +60,8 @@ class ConvLayer(nn.Module):
 
         super().__init__()
         self.activation = activation
-        # use stride 2 for downsampling instead of max or average pooling with stride 1
-        self.conv = nn.Conv2d(in_channels, out_channels, kernel_size, 2, kernel_size//2)
+        # use stride 2 for downsampling to (W/2, H/2) instead of max or average pooling with stride 1
+        self.conv = nn.Conv2d(in_channels, out_channels, kernel_size, stride=2, padding=kernel_size//2)
         self.relu = nn.ReLU()
 
     def forward(self, x:torch.Tensor # input image tensor of dimension (B, C, W, H)

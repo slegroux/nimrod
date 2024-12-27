@@ -9,12 +9,24 @@ nnet:
 optimizer:
   _target_: torch.optim.Adam
   _partial_: true
-  lr: 0.001
-  weight_decay: 1e-5 # mild regularization
+  lr: 1e-4
+  # weight_decay: 1e-5 # mild regularization
+
+# scheduler:
+#   _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
+#   _partial_: true
+#   mode: min
+#   factor: 0.1
+#   patience: 10
 
 scheduler:
-  _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
+  _target_: torch.optim.lr_scheduler.OneCycleLR
   _partial_: true
-  mode: min
-  factor: 0.1
-  patience: 10
+  max_lr: 0.01
+  # steps_per_epoch: 100
+  # epochs: 1
+  total_steps: 100
+  pct_start: 0.1
+  anneal_strategy: 'cos'
+  div_factor: 25
+  three_phase: False
