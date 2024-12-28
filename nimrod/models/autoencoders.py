@@ -6,11 +6,10 @@
 __all__ = ['AutoEncoder', 'AutoEncoderPL']
 
 # %% ../../nbs/models.autoencoders.ipynb 3
-import torch.nn.functional as F
 import torch.nn as nn
 import torch
 from lightning import LightningModule
-from ..image.datasets import MNISTDataset
+from ..image.datasets import ImageDataset
 from torch.utils.data import DataLoader
 from ..modules import Encoder, Decoder
 

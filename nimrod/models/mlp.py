@@ -8,13 +8,8 @@ __all__ = ['logger', 'MLP', 'MLP_X']
 # %% ../../nbs/models.mlp.ipynb 3
 import torch.nn as nn
 import torch
-from torchvision.transforms import ToTensor
-from torch.utils.data import DataLoader
-from torchvision.datasets import MNIST
 
 from lightning import LightningModule, Trainer
-from lightning.pytorch.tuner.tuning import Tuner
-from lightning.pytorch.callbacks import LearningRateFinder
 from lightning.pytorch.loggers import CSVLogger
 
 from hydra.utils import instantiate
@@ -23,7 +18,6 @@ from matplotlib import pyplot as plt
 import pandas as pd
 
 from ..utils import get_device
-from ..image.datasets import MNISTDataModule
 from .core import Classifier
 # torch.set_num_interop_threads(1)
 # from IPython.core.debugger import set_trace
@@ -53,7 +47,7 @@ class MLP(nn.Module):
                 ) -> torch.Tensor:
         return self.layers(x)
 
-# %% ../../nbs/models.mlp.ipynb 18
+# %% ../../nbs/models.mlp.ipynb 17
 class MLP_X(Classifier, LightningModule):
     def __init__(
             self,

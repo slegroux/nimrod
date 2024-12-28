@@ -210,10 +210,9 @@ class CharDataModule(DataModule, LightningDataModule):
             random_split: bool = True
             ):
 
-        logger.info(f"CharDataModule: init")
+        logger.info("CharDataModule: init")
 
         super().__init__(
-            train_val_test_split=train_val_test_split,
             batch_size=batch_size,
             num_workers=num_workers,
             pin_memory=pin_memory,
@@ -238,9 +237,10 @@ class CharDataModule(DataModule, LightningDataModule):
         if self.hparams.random_split:
             lengths = [int(p * len(self.ds)) for p in self.hparams.train_val_test_split]
             lengths[-1] = len(self.ds) - sum(lengths[:-1])
-            self.data_train, self.data_val, self.data_test = random_split(self.ds, lengths)
+            self.train_ds, self.val_ds, self.test_ds = random_split(self.ds, lengths)
+            logger.info(f"CharDataModule: train: {len(self.train_ds)} val: {len(self.val_ds)}, test: {len(self.test_ds)}")
         else:
-            self.data_train, self.data_val, self.data_test = self._sequential_split(self.ds, self.hparams.train_val_test_split)
+            self.train_ds, self.val_ds, self.test_ds = self._sequential_split(self.ds, self.hparams.train_val_test_split)
     
     @property
     def vocab_size(self)->int:
