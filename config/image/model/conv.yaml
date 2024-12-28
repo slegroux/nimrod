@@ -24,7 +24,7 @@ scheduler:
   _partial_: true
   max_lr: 0.01
   # steps_per_epoch: 100
-  # epochs: 1
+  epochs: 1
   total_steps: 100
   pct_start: 0.1
   anneal_strategy: 'cos'

@@ -241,10 +241,11 @@ class ImageDataModule(ImagePlotMixin, DataModule, LightningDataModule):
         self.save_hyperparameters()
         self.train_ds, self.test_ds, self.val_ds = None, None, None
         self.int2str = None
+        self._num_classes = None
 
     @property
     def num_classes(self) -> int: # num of classes in dataset
-        return self.train_ds.num_classes
+        return self._num_classes
 
     def prepare_data(self) -> None:
         """Download data if needed 
@@ -255,6 +256,8 @@ class ImageDataModule(ImagePlotMixin, DataModule, LightningDataModule):
             data_dir = self.hparams.data_dir,
             train=True,
         )
+        # get num classes before setup method converst ImageDataset to Subset
+        self._num_classes = self.train_ds.num_classes
         # save class names before splitting test/valid and losing property
         self.int2str = self.train_ds.int2str
         # test set
