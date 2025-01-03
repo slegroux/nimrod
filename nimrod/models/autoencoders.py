@@ -8,12 +8,18 @@ __all__ = ['AutoEncoder', 'AutoEncoderPL']
 # %% ../../nbs/models.autoencoders.ipynb 3
 import torch.nn as nn
 import torch
-from lightning import LightningModule
-from ..image.datasets import ImageDataset
 from torch.utils.data import DataLoader
-from ..modules import Encoder, Decoder
+from lightning import LightningModule, Trainer
 
-# %% ../../nbs/models.autoencoders.ipynb 5
+from hydra.utils import instantiate
+from omegaconf import OmegaConf
+
+from ..image.datasets import ImageDataset
+from ..modules import Encoder, Decoder
+from .conv import ConvLayer, ConvNet
+from ..utils import time_it
+
+# %% ../../nbs/models.autoencoders.ipynb 8
 class AutoEncoder(nn.Module):
     """ A modular autoencoder with configurable encoder and decoder """
     def __init__(self,
@@ -38,7 +44,7 @@ class AutoEncoder(nn.Module):
         x_hat = self.decoder(z)
         return x_hat
 
-# %% ../../nbs/models.autoencoders.ipynb 9
+# %% ../../nbs/models.autoencoders.ipynb 13
 class AutoEncoderPL(LightningModule):
     """ LightningModule for AutoEncoder """
     def __init__(

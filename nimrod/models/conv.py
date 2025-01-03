@@ -19,6 +19,7 @@ from omegaconf import OmegaConf
 
 from matplotlib import pyplot as plt
 import pandas as pd
+from typing import List, Optional, Type
 
 from ..utils import get_device
 from .core import Classifier
@@ -28,112 +29,116 @@ logger = logging.getLogger(__name__)
 
 # %% ../../nbs/models.conv.ipynb 6
 class ConvLayer(nn.Module):
-    """
-    Convolutional layer for 2D images.
+    """A 2D convolutional layer with optional batch normalization and activation.
+
+    This layer performs 2D convolution with stride 2 for downsampling, optionally followed by
+    batch normalization and activation.
 
     Parameters
     ----------
-    in_channels : int, optional
-        Number of input channels. The default is 3.
-    out_channels : int, optional
-        Number of output channels. The default is 16.
-    kernel_size : int, optional
-        Size of the kernel (filter). The default is 3.
-    activation : bool, optional
-        Whether to apply ReLU activation after convolution. The default is True.
+    in_channels : int, default=3
+        Number of input channels
+    out_channels : int, default=16 
+        Number of output channels / number of features
+    kernel_size : int, default=3
+        Size of the convolving kernel
+    bias : bool, default=True
+        If True, adds a learnable bias to the convolution
+    normalization : nn.Module, default=nn.BatchNorm2d
+        Normalization layer to use after convolution
+    activation : nn.Module, default=nn.ReLU
+        Activation function to use after normalization
 
-    Returns
-    -------
-    torch.Tensor
-        Output image tensor of dimension (B, C, W/2, H/2)
+    Notes
+    -----
+    When using batch normalization, the convolution bias is automatically disabled
+    since it would be redundant.
 
+    The spatial dimensions are reduced by half due to stride=2 convolution:
+    output_size = input_size/2
     """
-
-    
+  
     def __init__(
         self,
         in_channels:int=3, # input channels
         out_channels:int=16, # output channels
         kernel_size:int=3, # kernel size
-        activation:bool=True
+        bias:bool=True,
+        normalization:Optional[Type[nn.Module]]=nn.BatchNorm2d,
+        activation:Optional[Type[nn.Module]]=nn.ReLU,
+        
     ):
 
         super().__init__()
-        self.activation = activation
+        
+        if bias and normalization and issubclass(normalization, (nn.BatchNorm1d,nn.BatchNorm2d,nn.BatchNorm3d)):
+            logger.warning('setting conv bias to False as Batchnorm is used')
+            # https://x.com/karpathy/status/1013245864570073090
+            bias = None
+
         # use stride 2 for downsampling to (W/2, H/2) instead of max or average pooling with stride 1
-        self.conv = nn.Conv2d(in_channels, out_channels, kernel_size, stride=2, padding=kernel_size//2)
-        self.relu = nn.ReLU()
+        conv = nn.Conv2d(in_channels, out_channels, kernel_size, stride=2, padding=kernel_size//2, bias=bias)
+        layers = [conv]
+        if normalization:
+            if issubclass(normalization,  (nn.BatchNorm1d,nn.BatchNorm2d,nn.BatchNorm3d)):
+                layers.append(normalization(out_channels))
+        if activation: layers.append(activation())
+        self.net = nn.Sequential(*layers)
 
     def forward(self, x:torch.Tensor # input image tensor of dimension (B, C, W, H)
                 ) -> torch.Tensor: # output image tensor of dimension (B, C, W/2, H/2)
-        x = self.conv(x)
-        if self.activation:
-            x = self.relu(x)
-        return x
+        return self.net(x)
 
-# %% ../../nbs/models.conv.ipynb 11
+
+# %% ../../nbs/models.conv.ipynb 13
 class ConvNet(nn.Module):
-    """
-    Convolutional neural network for 2D images.
 
-    Parameters
-    ----------
-    in_channels : int, optional
-        Number of input channels. The default is 1.
-    out_channels : int, optional
-        Number of output channels (number of classes in classification).
-        The default is 10.
-
-    Returns
-    -------
-    torch.Tensor
-        Output probability tensor of dimension (B, N_classes)
-
-    """
-    
-
-    
     def __init__(
             self,
-            in_channels:int=1, # input channels
-            out_channels:int=10 # num_classes
-            ):
-        super().__init__()
-        self.net = nn.Sequential(
-            ConvLayer(in_channels, 8, kernel_size=5), #14x14
-            nn.BatchNorm2d(8),
-            ConvLayer(8, 16), #7x7
-            nn.BatchNorm2d(16),
-            ConvLayer(16, 32), #4x4
-            nn.BatchNorm2d(32),
-            ConvLayer(32, 64), #2x2
-            nn.BatchNorm2d(64),
-            ConvLayer(64, 10, activation=False), #1x1
-            nn.BatchNorm2d(10),
-            nn.Flatten()
+            n_features:List[int]=[1, 8, 16, 32, 64], # channel/feature expansion
+            num_classes:int=10, # num_classes
+            kernel_size:int=3, # kernel size
+            bias:bool=False, # conv2d bias
+            normalization:nn.Module=nn.BatchNorm2d, # normalization (before activation)
+            activation:nn.Module=nn.ReLU, # activation function
+        ):
 
-        )
+        super().__init__()
+
+        net = nn.ModuleList()
+        for i in range(len(n_features) - 1):
+            conv = ConvLayer(
+                    in_channels=n_features[i],
+                    out_channels=n_features[i+1],
+                    kernel_size=kernel_size,
+                    bias=bias,
+                    normalization=normalization,
+                    activation=activation
+            )
+            net.append(conv)
+       
+        net.append(
+            ConvLayer(
+                in_channels=n_features[-1],
+                out_channels=num_classes,
+                kernel_size=kernel_size,
+                bias=True,
+                normalization=None,
+                activation=None
+                )
+            )
+        net.append(nn.Flatten(start_dim=1, end_dim=-1))
+
+        self.net = nn.Sequential(*net)
+
 
     def forward(
         self,
         x:torch.Tensor # input image tensor of dimension (B, C, W, H)
         ) -> torch.Tensor: # output probs (B, N_classes)
-
-        """
-        Parameters
-        ----------
-        x : torch.Tensor
-            Input image tensor of dimension (B, C, W, H)
-
-        Returns
-        -------
-        torch.Tensor
-            Output probs of dimension (B, N_classes)
-        """
-
         return self.net(x)
 
-# %% ../../nbs/models.conv.ipynb 30
+# %% ../../nbs/models.conv.ipynb 32
 class ConvNetX(Classifier, LightningModule):
     def __init__(
             self,
