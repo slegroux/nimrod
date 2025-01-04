@@ -10,9 +10,10 @@ import torch
 from lightning import LightningModule, Trainer
 from lightning.pytorch.loggers import CSVLogger, TensorBoardLogger
 from lightning.pytorch.tuner.tuning import Tuner
-from lightning.pytorch.callbacks import LearningRateMonitor
+from lightning.pytorch.callbacks import LearningRateMonitor, ModelCheckpoint
 
 from torch_lr_finder import LRFinder
+from torchinfo import summary
 
 from hydra.utils import instantiate
 from omegaconf import OmegaConf
@@ -24,6 +25,7 @@ from typing import List, Optional, Type
 from ..utils import get_device
 from .core import Classifier
 
+from pprint import pprint
 import logging
 logger = logging.getLogger(__name__)
 
@@ -138,7 +140,7 @@ class ConvNet(nn.Module):
         ) -> torch.Tensor: # output probs (B, N_classes)
         return self.net(x)
 
-# %% ../../nbs/models.conv.ipynb 32
+# %% ../../nbs/models.conv.ipynb 31
 class ConvNetX(Classifier, LightningModule):
     def __init__(
             self,

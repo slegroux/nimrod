@@ -62,7 +62,7 @@ class Classifier(ABC):
         """
         optimizer = self.hparams.optimizer(params=self.trainer.model.parameters())
         logger.info(f"Optimizer: {optimizer}")
-        if self.hparams.scheduler is not None:
+        if hasattr(self.hparams, 'scheduler'):
             scheduler = self.hparams.scheduler(optimizer=optimizer)
             self.scheduler = scheduler
             logger.info(f"Scheduler: {scheduler}")
@@ -76,6 +76,8 @@ class Classifier(ABC):
                     "strict": False,
                 },
             }
+        else:
+            logger.warning(f"no scheduler has been setup")
         return {"optimizer": optimizer}
     
     @abstractmethod
@@ -94,9 +96,10 @@ class Classifier(ABC):
         self.val_acc_best.reset()
 
     def training_step(self, batch, batch_idx):
-        if self.step >= self.scheduler.total_steps:
-            logger.warning("Max steps reached for 1-cycle LR scheduler")
-            return
+        if isinstance(self.scheduler, torch.optim.lr_scheduler.OneCycleLR):
+            if self.step >= self.scheduler.total_steps:
+                logger.warning("Max steps reached for 1-cycle LR scheduler")
+                return
         
         self.step += 1
 
@@ -106,17 +109,22 @@ class Classifier(ABC):
         loss, preds, y = self._step(batch, batch_idx)
         self.manual_backward(loss)
         opt.step()
-        sched.step()
+
+        if not isinstance(sched, torch.optim.lr_scheduler.ReduceLROnPlateau):
+            sched.step() #reduce plateau sched is updated at end of epoch only instead
 
         self.train_loss(loss)
         self.train_acc(preds, y)
         metrics = {"train/loss": self.train_loss, "train/acc": self.train_acc}
-        self.log_dict(metrics, on_epoch=True, on_step=True, prog_bar=True)
+        self.log_dict(metrics, on_epoch=True, on_step=True, prog_bar=True)# Pass the validation loss to the scheduler
+
         return loss
 
     def on_train_epoch_end(self):
-        # self.training_loss.clear()  # Clear memory after epoch        
-        pass
+        sch = self.lr_schedulers()
+        if isinstance(sch, torch.optim.lr_scheduler.ReduceLROnPlateau):
+            sch.step(self.trainer.callback_metrics["val/loss"])
+
     
     def validation_step(self, batch, batch_idx, prog_bar=True, on_step=False, on_epoch=True, sync_dist=True):
         loss, preds, y = self._step(batch, batch_idx)
