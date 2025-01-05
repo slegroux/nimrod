@@ -7,4 +7,7 @@ num_workers: 0
 pin_memory: False
 persistent_workers: False
 transforms: 
-  _target_: torchvision.transforms.ToTensor
+  - _target_: torchvision.transforms.ToTensor
+  - _target_: transforms.Normalize
+    mean: [0.1307,], 
+    std: [0.3081,]
