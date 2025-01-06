@@ -12,7 +12,7 @@ from torch import Tensor # type hint
 import torch.utils.data as data
 from torch.utils.data import ConcatDataset, DataLoader, Dataset, random_split
 # torchvision
-from torchvision.transforms import transforms
+from torchvision.transforms import transforms, Compose
 # lightning
 from lightning import LightningDataModule
 # hugging face
@@ -44,7 +44,7 @@ logger = logging.getLogger(__name__)
 plt.set_loglevel('INFO')
 warnings.filterwarnings("ignore", category=UserWarning, module="matplotlib")
 
-# %% ../../nbs/image.datasets.ipynb 7
+# %% ../../nbs/image.datasets.ipynb 6
 class ImagePlotMixin:
     " Mixin class for image datasets providing visualization of (image, label) samples"
 
@@ -52,7 +52,8 @@ class ImagePlotMixin:
     def plot(
         ds: Dataset,
         idx: int,
-        int2label: Dict[int, str] | Callable = None
+        int2label: Dict[int, str] | Callable = None,
+
         ):
         X, label = ds[idx]
         C, H, W = X.shape
@@ -113,7 +114,7 @@ class ImagePlotMixin:
                 cmap = None
             
             # Plot the image
-            axs[i].imshow(plot_img, cmap=cmap)
+            axs[i].imshow(plot_img, cmap=cmap) #.astype(np.uint8)
             
             # Convert label to string if possible
             try:
@@ -135,34 +136,41 @@ class ImagePlotMixin:
 
         
 
-# %% ../../nbs/image.datasets.ipynb 10
+# %% ../../nbs/image.datasets.ipynb 9
 class ImageDataset(ImagePlotMixin, Dataset):
     "Image dataset"
 
     def __init__(
         self,
         name:str = "mnist",
+        *args,
         data_dir:Optional[str]='../data/image', # path where data is saved if None default to hugging face cache
-        train = True, # train or test dataset
+        split = 'train', # train or test dataset
         transforms:Optional[transforms.Compose]=transforms.Compose([
-                transforms.ToTensor(),
-                transforms.Normalize((0.1307,), (0.3081,))]),
-        streaming:bool = False # TODO: support and test streaming datasest
+                transforms.ToTensor()]), #,transforms.Normalize((0.1307,), (0.3081,))]),
+        streaming:bool = False, # TODO: support and test streaming datasest
+        exclude_grey_scale = False,
+        verification_mode="no_checks"
+        
     ):
 
-        logger.info(f"{name} Dataset: init")
         if data_dir is not None:
             os.makedirs(data_dir, exist_ok=True)
         super().__init__()
-
-        split = 'train' if train else 'test'
+        self.exclude_grey_scale = exclude_grey_scale
+        self.info = load_dataset_builder(name, *args)
+        if split not in self.info.info.splits:
+            raise ValueError(f"The specified split '{split}' does not exist in the dataset '{name}'. Available splits: {list(info.info.splits.keys())}")
 
         self.hf_ds = load_dataset(
             name,
+            *args,
             split=split,
             cache_dir=data_dir,
             download_mode='reuse_dataset_if_exists',
-            streaming=streaming
+            streaming=streaming,
+            verification_mode=verification_mode
+            
         )
         if name == 'cifar10':
             self.images = self.hf_ds['img']
@@ -176,8 +184,16 @@ class ImageDataset(ImagePlotMixin, Dataset):
         return self.hf_ds.features['label'].num_classes
     
     @property
+    def label_names(self)->List[str]:
+        return self.hf_ds.features['label'].names
+    
+    @property
     def int2str(self):
         return self.hf_ds.features['label'].int2str
+    
+    @property
+    def splits(self)->List[int]:
+        return self.info.info.splits.keys()
 
     def __len__(self) -> int: # length of dataset
         return len(self.images)
@@ -189,9 +205,17 @@ class ImageDataset(ImagePlotMixin, Dataset):
       
         image = np.array(self.images[idx])
         label = self.labels[idx]
+
         if self.transform:
             image = self.transform(image)
+            if self.exclude_grey_scale and image.size(0) != 3:
+                logger.warning(f"Skipping sample at index {idx} because doesn't have 3 channels")
+                next_idx = (idx + 1) % len(self)
+                return self.__getitem__(next_idx)
+        
         return image, label
+
+
     
     def train_dev_split(
         self,
@@ -219,11 +243,12 @@ class ImageDataset(ImagePlotMixin, Dataset):
         self.plot_grid(self, n_rows, n_cols, self.hf_ds.features['label'].int2str)
     
 
-# %% ../../nbs/image.datasets.ipynb 20
+# %% ../../nbs/image.datasets.ipynb 18
 class ImageDataModule(ImagePlotMixin, DataModule, LightningDataModule):
     def __init__(
         self,
-        name: str = "mnist",
+        name: str,
+        *args,
         data_dir: Optional[str] = "~/Data/", # path to source data dir
         transforms: Union[transforms.Compose, Callable, None] = transforms.Compose([
             transforms.ToTensor(),
@@ -233,7 +258,8 @@ class ImageDataModule(ImagePlotMixin, DataModule, LightningDataModule):
         batch_size: int = 64, # size of compute batch
         num_workers: int = 0, # num_workers equal 0 means that it’s the main process that will do the data loading when needed, num_workers equal 1 is the same as any n, but you’ll only have a single worker, so it might be slow
         pin_memory: bool = False, # If you load your samples in the Dataset on CPU and would like to push it during training to the GPU, you can speed up the host to device transfer by enabling pin_memory. This lets your DataLoader allocate the samples in page-locked memory, which speeds-up the transfer
-        persistent_workers: bool = False
+        persistent_workers: bool = False,
+        **kwargs
         ):
 
         logger.info(f"Init ImageDataModule for {name}")
@@ -242,43 +268,88 @@ class ImageDataModule(ImagePlotMixin, DataModule, LightningDataModule):
         self.train_ds, self.test_ds, self.val_ds = None, None, None
         self.int2str = None
         self._num_classes = None
+        self.args = args
+        self.kwargs = kwargs
 
     @property
     def num_classes(self) -> int: # num of classes in dataset
-        return self._num_classes
+        if self._num_classes is not None:
+            return self._num_classes
+        raise RuntimeError("train_ds is not initialized. Call prepare_data() first.")
+    
+    @property
+    def label_names(self) -> List[str]:  # Add this property
+        if self.train_ds is not None:
+            return self._label_names
+        raise RuntimeError("train_ds is not initialized. Call prepare_data() first.")
 
     def prepare_data(self) -> None:
         """Download data if needed 
         """
         # train set
         self.train_ds = ImageDataset(
-            name = self.hparams.name,
+            self.hparams.name,
+            *self.args,
             data_dir = self.hparams.data_dir,
-            train=True,
+            split='train',
+            **self.kwargs
+
         )
         # get num classes before setup method converst ImageDataset to Subset
         self._num_classes = self.train_ds.num_classes
+        self._label_names = self.train_ds.label_names
         # save class names before splitting test/valid and losing property
         self.int2str = self.train_ds.int2str
         # test set
-        self.test_ds = ImageDataset(
-            name = self.hparams.name,
-            data_dir = self.hparams.data_dir,
-            train=False
-        )
+        splits = self.train_ds.splits
+        # test is test split from hugging face else use validation for test and split test into test/val
+        if 'test' in splits:
+            self.test_ds = ImageDataset(
+                self.hparams.name,
+                *self.args,
+                data_dir = self.hparams.data_dir,
+                split='test',
+                **self.kwargs
+            )
+        elif 'validation' in splits and 'test' not in splits:
+            self.test_ds = ImageDataset(
+                self.hparams.name,
+                *self.args,
+                data_dir = self.hparams.data_dir,
+                split='validation',
+                **self.kwargs
+            )
+            self.val_ds = None
+
+        elif 'validation' in splits and 'test in splits':
+            self.test_ds = ImageDataset(
+                self.hparams.name,
+                *self.args,
+                data_dir = self.hparams.data_dir,
+                split='test',
+                **self.kwargs
+            )
+            self.val_ds = ImageDataset(
+                self.hparams.name,
+                *self.args,
+                data_dir = self.hparams.data_dir,
+                split='validation',
+                **self.kwargs
+            )
 
     def setup(self, stage: Optional[str] = None) -> None:
         # called on every GPU when distrib
         # stage: {fit,validate,test,predict}\n",
         # concat train & test mnist dataset and randomly generate train, eval, test sets
+
         if not self.train_ds:
-            self.train_ds = ImageDataset(self.hparams.name, self.hparams.data_dir, train=True, transforms=self.transforms)
+            raise RuntimeError("prepare_data() must be called before accessing the train dataset.")
         if not self.test_ds:
-            self.test_ds = ImageDataset(self.hparams.name, self.hparams.data_dir, train=False, transforms=self.transforms)
+            raise RuntimeError("prepare_data() must be called before accessing the test dataset.")
         if not self.val_ds:
             # dataset = ConcatDataset(datasets=[trainset, testset])
             logger.info(f"split train into train/val {self.hparams.train_val_split}")
-            lengths = [int(split * len(self.train_ds)) for split in self.hparams.train_val_split]
+            lengths = [round(split * len(self.train_ds)) for split in self.hparams.train_val_split]
             self.train_ds, self.val_ds = random_split(dataset=self.train_ds, lengths=lengths)
             logger.info(f"train: {len(self.train_ds)} val: {len(self.val_ds)}, test: {len(self.test_ds)}")
     

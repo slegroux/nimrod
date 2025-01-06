@@ -29,7 +29,7 @@ from pprint import pprint
 import logging
 logger = logging.getLogger(__name__)
 
-# %% ../../nbs/models.conv.ipynb 6
+# %% ../../nbs/models.conv.ipynb 5
 class ConvLayer(nn.Module):
     """A 2D convolutional layer with optional batch normalization and activation.
 
@@ -92,7 +92,7 @@ class ConvLayer(nn.Module):
         return self.net(x)
 
 
-# %% ../../nbs/models.conv.ipynb 13
+# %% ../../nbs/models.conv.ipynb 12
 class ConvNet(nn.Module):
 
     def __init__(
@@ -140,7 +140,7 @@ class ConvNet(nn.Module):
         ) -> torch.Tensor: # output probs (B, N_classes)
         return self.net(x)
 
-# %% ../../nbs/models.conv.ipynb 31
+# %% ../../nbs/models.conv.ipynb 30
 class ConvNetX(Classifier, LightningModule):
     def __init__(
             self,

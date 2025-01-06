@@ -96,7 +96,9 @@ class Classifier(ABC):
         self.val_acc_best.reset()
 
     def training_step(self, batch, batch_idx):
+
         if isinstance(self.scheduler, torch.optim.lr_scheduler.OneCycleLR):
+            logger.info("scheduler is instance of OneCycleLR")
             if self.step >= self.scheduler.total_steps:
                 logger.warning("Max steps reached for 1-cycle LR scheduler")
                 return
@@ -123,6 +125,7 @@ class Classifier(ABC):
     def on_train_epoch_end(self):
         sch = self.lr_schedulers()
         if isinstance(sch, torch.optim.lr_scheduler.ReduceLROnPlateau):
+            logger.info("scheduler is an instance of Reduce plateau")
             sch.step(self.trainer.callback_metrics["val/loss"])
 
     
