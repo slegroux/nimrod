@@ -22,3 +22,14 @@ baseline:
     _target_: hydra.utils.get_class
     path: torch.nn.ReLU
 
+fashion_mnist:
+  _target_: nimrod.models.conv.ConvNet
+  n_features: [1, 4, 8, 16, 16]  # channel/feature expansion
+  num_classes: 10  # number of output classes
+  kernel_size: 3  # convolution kernel size
+  bias: true  # disable bias since using BatchNorm
+  normalization: null
+  activation:
+    _target_: hydra.utils.get_class
+    path: torch.nn.ReLU
+

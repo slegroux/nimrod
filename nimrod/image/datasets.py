@@ -272,6 +272,10 @@ class ImageDataModule(ImagePlotMixin, DataModule, LightningDataModule):
         self.kwargs = kwargs
 
     @property
+    def batch_size(self)->int:
+        return self.hparams.batch_size
+
+    @property
     def num_classes(self) -> int: # num of classes in dataset
         if self._num_classes is not None:
             return self._num_classes
