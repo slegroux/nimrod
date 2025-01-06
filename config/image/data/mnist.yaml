@@ -2,9 +2,16 @@ dataset:
   _target_: nimrod.image.datasets.ImageDataset
   name: "mnist"
   data_dir: "../data/image"
-  train: False
-  transforms: 
-    _target_: torchvision.transforms.ToTensor
+  split: 'test'
+  transforms:
+    _target_: torchvision.transforms.Compose
+    transforms:
+      - _target_: torchvision.transforms.ToTensor
+      - _target_: torchvision.transforms.Normalize
+        # mean: [0.1307,]
+        # std: [0.3081,]
+        mean: [0.0,]
+        std: [0.2,]
 
 datamodule:
   _target_: nimrod.image.datasets.ImageDataModule
