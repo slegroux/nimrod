@@ -36,7 +36,7 @@ logger = logging.getLogger(__name__)
 plt.set_loglevel('INFO')
 warnings.filterwarnings("ignore", category=UserWarning, module="matplotlib")
 
-# %% ../../nbs/models.autoencoders.ipynb 20
+# %% ../../nbs/models.autoencoders.ipynb 19
 class AutoEncoder(nn.Module):
     """ A modular autoencoder with configurable encoder and decoder """
     def __init__(self,
@@ -61,7 +61,7 @@ class AutoEncoder(nn.Module):
         x_hat = self.decoder(z)
         return x_hat
 
-# %% ../../nbs/models.autoencoders.ipynb 25
+# %% ../../nbs/models.autoencoders.ipynb 24
 class AutoEncoderPL(LightningModule):
     """ LightningModule for AutoEncoder """
     def __init__(
