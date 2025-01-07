@@ -2,14 +2,14 @@
 
 defaults:
   - _self_
-  # - data: mnist
-  # - model: mnist
-  # - callbacks: default
+  - data: image/mnist
+  - model: image/conv
+  - callbacks: default
   # - logger: null # set logger here or use command line (e.g. `python train.py logger=tensorboard`)
-  # - trainer: default
   - paths: default
   # - extras: default
   - hydra: default
+  - trainer: default
 
 
 # GLOBAL
@@ -20,8 +20,9 @@ defaults:
 
 # project: "TINY_SHAKESPEARE_NNLM"
 # ckpt_path: ${paths.log_dir}/${run_id}/checkpoints/last.ckpt # ckpt to resume training from
+ckpt_path: null
 task_name: "train"
-tags: ['dev']
+tags: ['mnist', 'conv', 'dev']
 seed: 42
 test: True
 train: True

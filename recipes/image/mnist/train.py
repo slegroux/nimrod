@@ -5,7 +5,6 @@ from omegaconf import DictConfig, OmegaConf
 import hydra
 from hydra.utils import instantiate
 from nimrod.utils import set_seed
-import json
 import logging
 log = logging.getLogger(__name__)
 
