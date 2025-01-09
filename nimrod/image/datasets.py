@@ -257,7 +257,7 @@ class ImageDataset(ImagePlotMixin, Dataset):
         self.plot_grid(self, n_rows, n_cols, self.hf_ds.features['label'].int2str)
     
 
-# %% ../../nbs/image.datasets.ipynb 19
+# %% ../../nbs/image.datasets.ipynb 23
 class ImageDataModule(ImagePlotMixin, DataModule, LightningDataModule):
     def __init__(
         self,
@@ -365,7 +365,7 @@ class ImageDataModule(ImagePlotMixin, DataModule, LightningDataModule):
         # concat train & test mnist dataset and randomly generate train, eval, test sets
         if stage == 'split_train_data':
             # TODO have separate test. here tes is a copy of val. fix later...
-            logger.warning(f"split train into train/val/test {self.hparams.train_val_split} ")
+            logger.warning(f"split train into train/val/test with val==test {self.hparams.train_val_split} ")
             lengths = [round(split * len(self.train_ds)) for split in self.hparams.train_val_split]
             self.train_ds, self.val_ds = random_split(dataset=self.train_ds, lengths=lengths)
             self.test_ds = self.val_ds
