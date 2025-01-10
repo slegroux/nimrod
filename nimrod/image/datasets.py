@@ -24,6 +24,7 @@ import datasets
 # math
 import pandas as pd
 from matplotlib import pyplot as plt
+import matplotlib
 import numpy as np
 from PIL import Image
 import PIL
@@ -50,7 +51,7 @@ set_seed(42)
 logger = logging.getLogger(__name__)
 # logger.setLevel(logging.DEBUG)
 plt.set_loglevel('INFO')
-warnings.filterwarnings("ignore", category=UserWarning, module="matplotlib")
+logging.getLogger('matplotlib.image').setLevel(logging.ERROR)
 
 # %% ../../nbs/image.datasets.ipynb 6
 def show_images(x:torch.Tensor, ncols:int=8):
@@ -82,12 +83,15 @@ class ImagePlotMixin:
         ):
         X, label = ds[idx]
         C, H, W = X.shape
+        
         if C == 1:
             # X (1, H, W)
-            plt.imshow(X[0].numpy(), cmap='gray') 
+            plt.imshow(X[0].numpy(), cmap='gray')
+            # warnings.filterwarnings("ignore")
         elif C == 3:
             # X (3, H, W)
             plt.imshow(X.numpy().transpose(1,2,0).reshape(H,W,C))
+            # warnings.filterwarnings("ignore")
         # Convert label to string if possible
         try:
             # label_str = ds.hf_ds.features['label'].int2str(label)
@@ -100,6 +104,7 @@ class ImagePlotMixin:
         except AttributeError:  
             logger.warning("Unable to convert label to string")
         plt.title(f"Label: {label_str}")
+        
         plt.show()
 
     @staticmethod
@@ -140,6 +145,7 @@ class ImagePlotMixin:
             
             # Plot the image
             axs[i].imshow(plot_img, cmap=cmap) #.astype(np.uint8)
+            # warnings.filterwarnings("ignore")
             
             # Convert label to string if possible
             try:
