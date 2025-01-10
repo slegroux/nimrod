@@ -18,7 +18,7 @@ from torch.utils.data import random_split, Dataset, DataLoader, Subset
 import logging
 logger = logging.getLogger(__name__)
 
-# %% ../../nbs/data.core.ipynb 5
+# %% ../../nbs/data.core.ipynb 4
 class DataModule(ABC):
     def __init__(
         self,
@@ -127,7 +127,7 @@ class DataModule(ABC):
             
         return subsets
 
-# %% ../../nbs/data.core.ipynb 6
+# %% ../../nbs/data.core.ipynb 5
 def split_train_valid_test(dataset:Dataset, splits:List[float]):
     lengths = [int(split * len(dataset)) for split in splits]
     # if rounding ends up getting rid of some datapoints and total length != length dataset
