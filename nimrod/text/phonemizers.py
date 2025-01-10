@@ -3,7 +3,7 @@
 # %% auto 0
 __all__ = ['Phonemizer']
 
-# %% ../../nbs/text.phonemizer.ipynb 3
+# %% ../../nbs/text.phonemizer.ipynb 4
 import platform
 import os
 if platform.system() == 'Darwin':
@@ -22,7 +22,7 @@ from phonemizer import phonemize
 from typing import List, Tuple, Iterable
 from plum import dispatch
 
-# %% ../../nbs/text.phonemizer.ipynb 4
+# %% ../../nbs/text.phonemizer.ipynb 5
 class Phonemizer():
     def __init__(self,
         separator=Separator(word=" ", syllable="|", phone=None), # separator

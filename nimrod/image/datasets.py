@@ -16,7 +16,7 @@ from torchvision.transforms import transforms, Compose
 # lightning
 from lightning import LightningDataModule
 # hugging face
-from datasets import load_dataset, load_dataset_builder
+from datasets import load_dataset, load_dataset_builder, ClassLabel
 import datasets
 # math
 import pandas as pd
@@ -172,12 +172,26 @@ class ImageDataset(ImagePlotMixin, Dataset):
             verification_mode=verification_mode
             
         )
+        self.image_column_name = 'image'
         if name == 'cifar10':
-            self.images = self.hf_ds['img']
-        else:
-            self.images = self.hf_ds['image']
+            self.image_column_name = 'img'
+                
+        self.images = self.hf_ds[self.image_column_name]
+
+        if name == "huggan/smithsonian_butterflies_subset":
+            # no default label col available using 'taxonomy' instead
+            unique_labels =list(set(self.hf_ds['taxonomy']))
+            cl = ClassLabel(names=unique_labels)
+            self.hf_ds = self.hf_ds.map(lambda example: {'label': cl.str2int(example['taxonomy'])})
+            self.hf_ds = self.hf_ds.cast_column('label', cl)
+
         self.labels = self.hf_ds['label']
+
         self.transform = transforms
+
+    def add_label_column(example):
+        example['label'] = cl.str2int(example['taxonomy'])
+        return example
 
     @property
     def num_classes(self):
@@ -243,7 +257,7 @@ class ImageDataset(ImagePlotMixin, Dataset):
         self.plot_grid(self, n_rows, n_cols, self.hf_ds.features['label'].int2str)
     
 
-# %% ../../nbs/image.datasets.ipynb 18
+# %% ../../nbs/image.datasets.ipynb 23
 class ImageDataModule(ImagePlotMixin, DataModule, LightningDataModule):
     def __init__(
         self,
@@ -296,6 +310,7 @@ class ImageDataModule(ImagePlotMixin, DataModule, LightningDataModule):
             *self.args,
             data_dir = self.hparams.data_dir,
             split='train',
+            transforms = self.hparams.transforms,
             **self.kwargs
 
         )
@@ -313,49 +328,61 @@ class ImageDataModule(ImagePlotMixin, DataModule, LightningDataModule):
                 *self.args,
                 data_dir = self.hparams.data_dir,
                 split='test',
+                transforms = self.hparams.transforms,
                 **self.kwargs
             )
-        elif 'validation' in splits and 'test' not in splits:
-            self.test_ds = ImageDataset(
-                self.hparams.name,
-                *self.args,
-                data_dir = self.hparams.data_dir,
-                split='validation',
-                **self.kwargs
-            )
-            self.val_ds = None
+            if 'validation' in splits:
+                self.val_ds = ImageDataset(
+                    self.hparams.name,
+                    *self.args,
+                    data_dir = self.hparams.data_dir,
+                    split='validation',
+                    transforms = self.hparams.transforms,
+                    **self.kwargs
+                )
+            else:
+                self._val_ds = None # self.setup() will create validation from train set
 
-        elif 'validation' in splits and 'test in splits':
-            self.test_ds = ImageDataset(
-                self.hparams.name,
-                *self.args,
-                data_dir = self.hparams.data_dir,
-                split='test',
-                **self.kwargs
-            )
-            self.val_ds = ImageDataset(
-                self.hparams.name,
-                *self.args,
-                data_dir = self.hparams.data_dir,
-                split='validation',
-                **self.kwargs
-            )
+        elif 'test' not in splits:
+            if 'validation' in splits:
+                # make existing val set the actual test set and split training into train/val
+                self.test_ds = ImageDataset(
+                    self.hparams.name,
+                    *self.args,
+                    data_dir = self.hparams.data_dir,
+                    split='validation',
+                    transforms = self.hparams.transforms,
+                    **self.kwargs
+                )
+                self.val_ds = None
+            else:
+                self.setup(stage='split_train_data')
+                logger.info(f"split train into train/val {self.hparams.train_val_split}")
 
     def setup(self, stage: Optional[str] = None) -> None:
         # called on every GPU when distrib
         # stage: {fit,validate,test,predict}\n",
         # concat train & test mnist dataset and randomly generate train, eval, test sets
+        if stage == 'split_train_data':
+            # TODO have separate test. here tes is a copy of val. fix later...
+            logger.warning(f"split train into train/val/test with val==test {self.hparams.train_val_split} ")
+            lengths = [round(split * len(self.train_ds)) for split in self.hparams.train_val_split]
+            self.train_ds, self.val_ds = random_split(dataset=self.train_ds, lengths=lengths)
+            self.test_ds = self.val_ds
+            logger.info(f"train: {len(self.train_ds)} val: {len(self.val_ds)}, test: {len(self.test_ds)}")
+
 
         if not self.train_ds:
             raise RuntimeError("prepare_data() must be called before accessing the train dataset.")
-        if not self.test_ds:
-            raise RuntimeError("prepare_data() must be called before accessing the test dataset.")
+        # if not self.test_ds:
+        #     raise RuntimeError("prepare_data() must be called before accessing the test dataset.")
         if not self.val_ds:
             # dataset = ConcatDataset(datasets=[trainset, testset])
             logger.info(f"split train into train/val {self.hparams.train_val_split}")
             lengths = [round(split * len(self.train_ds)) for split in self.hparams.train_val_split]
             self.train_ds, self.val_ds = random_split(dataset=self.train_ds, lengths=lengths)
             logger.info(f"train: {len(self.train_ds)} val: {len(self.val_ds)}, test: {len(self.test_ds)}")
+
     
     def show(self, idx):
       self.plot(self.train_ds, idx, self.int2str)
