@@ -1,0 +1,15 @@
+_target_: nimrod.image.datasets.ImageDataModule
+name: "fashion_mnist"
+data_dir: "../data/image"
+train_val_split: [0.8, 0.2]
+batch_size: 128
+num_workers: 0
+pin_memory: False
+persistent_workers: False
+transforms: 
+  _target_: torchvision.transforms.Compose
+  transforms:
+    - _target_: torchvision.transforms.ToTensor
+    - _target_: torchvision.transforms.Resize
+      size: 32
+
