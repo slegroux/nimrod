@@ -5,7 +5,7 @@
 # %% auto 0
 __all__ = ['STTDataset', 'LibriSpeechDataModule']
 
-# %% ../../../nbs/audio.datasets.stt.ipynb 3
+# %% ../../../nbs/audio.datasets.stt.ipynb 4
 import torch
 from torch.utils.data import DataLoader, Dataset
 from lightning import LightningDataModule, LightningModule
@@ -18,7 +18,7 @@ from lhotse import CutSet, RecordingSet, SupervisionSet, Fbank, FbankConfig
 from pathlib import Path
 from pprint import pprint
 
-# %% ../../../nbs/audio.datasets.stt.ipynb 5
+# %% ../../../nbs/audio.datasets.stt.ipynb 6
 class STTDataset(Dataset):
     def __init__(self,
         tokenizer:TokenCollater, # text tokenizer
@@ -35,7 +35,7 @@ class STTDataset(Dataset):
 
 
 
-# %% ../../../nbs/audio.datasets.stt.ipynb 7
+# %% ../../../nbs/audio.datasets.stt.ipynb 8
 class LibriSpeechDataModule(LightningDataModule):
     def __init__(self,
         target_dir="../data/en", # where data will be saved / retrieved
