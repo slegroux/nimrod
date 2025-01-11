@@ -422,7 +422,7 @@ class ImageDataModule(ImagePlotMixin, DataModule, LightningDataModule):
     def show_batch(
         batch:torch.Tensor,
         n_cols:int=8,
-        )->List[PIL.Image]:
+        )->Image.Image:
 
         # show_images(batch, n_cols)
         x = batch
