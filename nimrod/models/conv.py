@@ -22,14 +22,18 @@ from matplotlib import pyplot as plt
 import pandas as pd
 from typing import List, Optional, Type
 
-from ..utils import get_device
+from ..utils import get_device, set_seed
 from .core import Classifier
 
 from pprint import pprint
 import logging
-logger = logging.getLogger(__name__)
 
-# %% ../../nbs/models.conv.ipynb 5
+
+# %% ../../nbs/models.conv.ipynb 4
+logger = logging.getLogger(__name__)
+set_seed()
+
+# %% ../../nbs/models.conv.ipynb 6
 class ConvLayer(nn.Module):
     """A 2D convolutional layer with optional batch normalization and activation.
 
@@ -98,7 +102,7 @@ class ConvLayer(nn.Module):
         return self.net(x)
 
 
-# %% ../../nbs/models.conv.ipynb 13
+# %% ../../nbs/models.conv.ipynb 14
 class DeconvLayer(nn.Module):
     def __init__(
         self,
@@ -129,7 +133,7 @@ class DeconvLayer(nn.Module):
                 ) -> torch.Tensor: # output image tensor of dimension (B, C, W*2, H*2)
         return self._net(x) 
 
-# %% ../../nbs/models.conv.ipynb 18
+# %% ../../nbs/models.conv.ipynb 19
 class ConvNet(nn.Module):
 
     def __init__(
@@ -189,7 +193,7 @@ class ConvNet(nn.Module):
         ) -> torch.Tensor: # output probs (B, N_classes)
         return self.net(x)
 
-# %% ../../nbs/models.conv.ipynb 33
+# %% ../../nbs/models.conv.ipynb 34
 class ConvNetX(Classifier, LightningModule):
     def __init__(
             self,
