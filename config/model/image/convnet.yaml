@@ -1,6 +1,6 @@
 batchnorm:
   _target_: nimrod.models.conv.ConvNet
-  n_features: [1, 8, 16, 32, 64]  # channel/feature expansion
+  n_features: [1, 8, 16, 32, 64, 128]  # channel/feature expansion
   num_classes: 10  # number of output classes
   kernel_size: 3  # convolution kernel size
   bias: false  # disable bias since using BatchNorm

@@ -22,14 +22,18 @@ from matplotlib import pyplot as plt
 import pandas as pd
 from typing import List, Optional, Type
 
-from ..utils import get_device
+from ..utils import get_device, set_seed
 from .core import Classifier
 
 from pprint import pprint
 import logging
-logger = logging.getLogger(__name__)
 
-# %% ../../nbs/models.conv.ipynb 5
+
+# %% ../../nbs/models.conv.ipynb 4
+logger = logging.getLogger(__name__)
+set_seed()
+
+# %% ../../nbs/models.conv.ipynb 6
 class ConvLayer(nn.Module):
     """A 2D convolutional layer with optional batch normalization and activation.
 
@@ -65,6 +69,7 @@ class ConvLayer(nn.Module):
         in_channels:int=3, # input channels
         out_channels:int=16, # output channels
         kernel_size:int=3, # kernel size
+        stride:int=2, # stride
         bias:bool=True,
         normalization:Optional[Type[nn.Module]]=nn.BatchNorm2d,
         activation:Optional[Type[nn.Module]]=nn.ReLU,
@@ -79,7 +84,7 @@ class ConvLayer(nn.Module):
             bias = None
 
         # use stride 2 for downsampling to (W/2, H/2) instead of max or average pooling with stride 1
-        conv = nn.Conv2d(in_channels, out_channels, kernel_size, stride=2, padding=kernel_size//2, bias=bias)
+        conv = nn.Conv2d(in_channels, out_channels, kernel_size, stride=stride, padding=kernel_size//2, bias=bias)
         layers = [conv]
         if normalization:
             if issubclass(normalization,  (nn.BatchNorm1d,nn.BatchNorm2d,nn.BatchNorm3d)):
@@ -88,12 +93,16 @@ class ConvLayer(nn.Module):
             layers.append(activation())
         self.net = nn.Sequential(*layers)
 
-    def forward(self, x:torch.Tensor # input image tensor of dimension (B, C, W, H)
-                ) -> torch.Tensor: # output image tensor of dimension (B, C, W/2, H/2)
+    def forward(
+            self,
+            x:torch.Tensor # input image tensor of dimension (B, C, W, H)
+            ) -> torch.Tensor: # output image tensor of dimension (B, C, W/2, H/2)
+        
+        """forward method of the ConvLayer"""
         return self.net(x)
 
 
-# %% ../../nbs/models.conv.ipynb 12
+# %% ../../nbs/models.conv.ipynb 14
 class DeconvLayer(nn.Module):
     def __init__(
         self,
@@ -124,7 +133,7 @@ class DeconvLayer(nn.Module):
                 ) -> torch.Tensor: # output image tensor of dimension (B, C, W*2, H*2)
         return self._net(x) 
 
-# %% ../../nbs/models.conv.ipynb 16
+# %% ../../nbs/models.conv.ipynb 19
 class ConvNet(nn.Module):
 
     def __init__(
@@ -140,7 +149,19 @@ class ConvNet(nn.Module):
         super().__init__()
 
         net = nn.ModuleList()
-        for i in range(len(n_features) - 1):
+
+        conv_stride_1 = ConvLayer(
+            in_channels=n_features[0],
+            out_channels=n_features[1],
+            stride=1,
+            kernel_size=kernel_size,
+            bias=bias,
+            normalization=normalization,
+            activation=activation
+        )
+        net.append(conv_stride_1)
+
+        for i in range(1, len(n_features) - 1):
             conv = ConvLayer(
                     in_channels=n_features[i],
                     out_channels=n_features[i+1],
@@ -172,7 +193,7 @@ class ConvNet(nn.Module):
         ) -> torch.Tensor: # output probs (B, N_classes)
         return self.net(x)
 
-# %% ../../nbs/models.conv.ipynb 31
+# %% ../../nbs/models.conv.ipynb 34
 class ConvNetX(Classifier, LightningModule):
     def __init__(
             self,
