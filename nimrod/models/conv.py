@@ -84,7 +84,14 @@ class ConvLayer(nn.Module):
             bias = None
 
         # use stride 2 for downsampling to (W/2, H/2) instead of max or average pooling with stride 1
-        conv = nn.Conv2d(in_channels, out_channels, kernel_size, stride=stride, padding=kernel_size//2, bias=bias)
+        conv = nn.Conv2d(
+            in_channels,
+            out_channels,
+            kernel_size,
+            stride=stride,
+            padding=kernel_size//2,
+            bias=bias
+            )
         layers = [conv]
         if normalization:
             if issubclass(normalization,  (nn.BatchNorm1d,nn.BatchNorm2d,nn.BatchNorm3d)):
