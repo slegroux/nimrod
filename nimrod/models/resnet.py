@@ -12,6 +12,7 @@ import torch
 from torch_lr_finder import LRFinder
 from torchinfo import summary
 from torchviz import make_dot
+from torchvision.transforms import transforms
 
 
 from omegaconf import OmegaConf
@@ -22,6 +23,7 @@ import math
 
 from .conv import ConvLayer
 from ..utils import get_device, set_seed
+from ..image.datasets import ImageDataModule
 
 from typing import List
 import logging
@@ -42,7 +44,7 @@ class ResBlock(nn.Module):
         super().__init__()
 
         layers = []
-        conv = partial(ConvLayer, n_channels, n_channels, stride=1, normalization=None)
+        conv = partial(ConvLayer, n_channels, n_channels, stride=1, normalization=nn.BatchNorm2d)
         layers += [conv(activation=nn.ReLU), conv(activation=None)]
         self.layers = nn.Sequential(*layers)
 
