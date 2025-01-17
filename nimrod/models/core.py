@@ -33,7 +33,7 @@ class Classifier(ABC):
         logger.info("Classifier: init")
 
         super().__init__()
-        self.save_hyperparameters()
+        # self.save_hyperparameters()
         self.automatic_optimization = False
 
         self.loss = nn.CrossEntropyLoss()
@@ -62,23 +62,48 @@ class Classifier(ABC):
         """
         optimizer = self.hparams.optimizer(params=self.trainer.model.parameters())
         logger.info(f"Optimizer: {optimizer}")
-        if hasattr(self.hparams, 'scheduler'):
-            scheduler = self.hparams.scheduler(optimizer=optimizer)
-            self.scheduler = scheduler
-            logger.info(f"Scheduler: {scheduler}")
-            return {
-                "optimizer": optimizer,
-                "lr_scheduler": {
-                    "scheduler": scheduler,
-                    "monitor": "val/loss",
-                    "interval": "step",
-                    "frequency": 1,
-                    "strict": False,
-                },
-            }
+
+        if self.hparams.scheduler is None:
+            logger.warning("no scheduler has been setup")
+            return {"optimizer": optimizer}
+        
+        scheduler = self.hparams.scheduler(optimizer=optimizer)
+
+        # self.scheduler = scheduler
+        # logger.info(f"Scheduler: {scheduler}")
+        # return {
+        #     "optimizer": optimizer,
+        #     "lr_scheduler": {
+        #         "scheduler": scheduler,
+        #         "monitor": "val/loss",
+        #         "interval": "step",
+        #         "frequency": 1,
+        #         "strict": False,
+        #     },
+        # }
+        scheduler_config = {"scheduler": scheduler}
+        
+        # Special handling for different scheduler types
+        if isinstance(scheduler, torch.optim.lr_scheduler.ReduceLROnPlateau):
+            scheduler_config.update({
+                "monitor": "val/loss",
+                "interval": "epoch",
+                "frequency": 1,
+            })
+        elif isinstance(scheduler, torch.optim.lr_scheduler.OneCycleLR):
+            scheduler_config.update({
+                "interval": "step",
+            })
         else:
-            logger.warning(f"no scheduler has been setup")
-        return {"optimizer": optimizer}
+            # Default configuration for other scheduler types
+            scheduler_config.update({
+                "interval": "epoch",
+            })
+        
+        return {
+            "optimizer": optimizer,
+            "lr_scheduler": scheduler_config,
+        }
     
     @abstractmethod
     def _step(self, batch, batch_idx):

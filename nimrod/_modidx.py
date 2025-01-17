@@ -729,6 +729,7 @@ d = { 'settings': { 'branch': 'main',
                                                                                                   'nimrod/text/tokenizers.py'),
                                         'nimrod.text.tokenizers.Tokenizer.inverse': ( 'text.tokenizers.html#tokenizer.inverse',
                                                                                       'nimrod/text/tokenizers.py')},
+            'nimrod.tutorials.stablediffusion': {},
             'nimrod.utils': { 'nimrod.utils.get_device': ('utils.html#get_device', 'nimrod/utils.py'),
                               'nimrod.utils.set_seed': ('utils.html#set_seed', 'nimrod/utils.py'),
                               'nimrod.utils.time_it': ('utils.html#time_it', 'nimrod/utils.py')}}}

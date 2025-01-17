@@ -33,7 +33,7 @@ import logging
 logger = logging.getLogger(__name__)
 set_seed()
 
-# %% ../../nbs/models.conv.ipynb 6
+# %% ../../nbs/models.conv.ipynb 11
 class ConvLayer(nn.Module):
     """A 2D convolutional layer with optional batch normalization and activation.
 
@@ -94,7 +94,7 @@ class ConvLayer(nn.Module):
             )
         layers = [conv]
         if normalization:
-            if issubclass(normalization,  (nn.BatchNorm1d,nn.BatchNorm2d,nn.BatchNorm3d)):
+            if issubclass(normalization,  (nn.BatchNorm1d, nn.BatchNorm2d, nn.BatchNorm3d)):
                 layers.append(normalization(out_channels))
         if activation:
             layers.append(activation())
@@ -109,7 +109,7 @@ class ConvLayer(nn.Module):
         return self.net(x)
 
 
-# %% ../../nbs/models.conv.ipynb 14
+# %% ../../nbs/models.conv.ipynb 19
 class DeconvLayer(nn.Module):
     def __init__(
         self,
@@ -119,17 +119,20 @@ class DeconvLayer(nn.Module):
         bias:bool=True,
         normalization:Optional[Type[nn.Module]]=None,
         activation:Optional[Type[nn.Module]]=nn.ReLU,
+        stride:int = 1,
+        scale_factor:int = 2
     ):
         super().__init__()
-        layers = nn.ModuleList()
+        layers = []
         if normalization:
             if issubclass(normalization,  (nn.BatchNorm1d,nn.BatchNorm2d,nn.BatchNorm3d)):
                 logger.warning('setting conv bias to False as Batchnorm is used')
                 # https://x.com/karpathy/status/1013245864570073090
                 bias = None
 
-        layers.append(nn.UpsamplingNearest2d(scale_factor=2))
-        layers.append(nn.Conv2d(in_channels, out_channels, kernel_size, stride=1, padding=kernel_size//2, bias=bias))
+        layers.append(nn.UpsamplingNearest2d(scale_factor=scale_factor))
+
+        layers.append(nn.Conv2d(in_channels, out_channels, kernel_size, stride=stride, padding=kernel_size//2, bias=bias))
         if normalization:
             layers.append(normalization(out_channels))
         if activation:
@@ -140,7 +143,7 @@ class DeconvLayer(nn.Module):
                 ) -> torch.Tensor: # output image tensor of dimension (B, C, W*2, H*2)
         return self._net(x) 
 
-# %% ../../nbs/models.conv.ipynb 19
+# %% ../../nbs/models.conv.ipynb 26
 class ConvNet(nn.Module):
 
     def __init__(
@@ -155,7 +158,7 @@ class ConvNet(nn.Module):
 
         super().__init__()
 
-        net = nn.ModuleList()
+        net = []
 
         conv_stride_1 = ConvLayer(
             in_channels=n_features[0],
@@ -200,7 +203,7 @@ class ConvNet(nn.Module):
         ) -> torch.Tensor: # output probs (B, N_classes)
         return self.net(x)
 
-# %% ../../nbs/models.conv.ipynb 34
+# %% ../../nbs/models.conv.ipynb 41
 class ConvNetX(Classifier, LightningModule):
     def __init__(
             self,
@@ -212,7 +215,7 @@ class ConvNetX(Classifier, LightningModule):
         logger.info("ConvNetX: init")
         super().__init__(num_classes, optimizer, scheduler)
         self.register_module('nnet', nnet)
-        self.save_hyperparameters(logger=False, ignore=['nnet'])
+        self.save_hyperparameters(logger=False, ignore=['nnet']) # by default saved since input of __init__
         self.lr = optimizer.keywords['lr'] # for lr finder
         self.nnet = nnet
 
