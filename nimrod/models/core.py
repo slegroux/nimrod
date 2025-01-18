@@ -14,7 +14,7 @@ from torch_lr_finder import LRFinder
 from abc import ABC, abstractmethod
 import logging
 import os
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Callable
 
 import pandas as pd
 from matplotlib import pyplot as plt
@@ -26,8 +26,8 @@ class Classifier(ABC):
     def __init__(
             self,
             num_classes:int,
-            optimizer: torch.optim.Optimizer,
-            scheduler: torch.optim.lr_scheduler,
+            optimizer: Callable[...,torch.optim.Optimizer], # partial of optimizer
+            scheduler: Callable[...,torch.optim.lr_scheduler], # partial of scheduler
             ):
 
         logger.info("Classifier: init")
@@ -50,8 +50,36 @@ class Classifier(ABC):
         self.step = 0
 
     
-
     def configure_optimizers(self) -> Dict[str, Any]:
+        """Choose what optimizers and learning-rate schedulers to use in your optimization.
+        Normally you'd need one. But in the case of GANs or similar you might have multiple.
+
+        Examples:
+            https://lightning.ai/docs/pytorch/latest/common/lightning_module.html#configure-optimizers
+
+        :return: A dict containing the configured optimizers and learning-rate schedulers to be used for training.
+        """
+        optimizer = self.hparams.optimizer(params=self.trainer.model.parameters())
+        logger.info(f"Optimizer: {optimizer}")
+        if hasattr(self.hparams, 'scheduler'):
+            scheduler = self.hparams.scheduler(optimizer=optimizer)
+            self.scheduler = scheduler
+            logger.info(f"Scheduler: {scheduler}")
+            return {
+                "optimizer": optimizer,
+                "lr_scheduler": {
+                    "scheduler": scheduler,
+                    "monitor": "val/loss",
+                    "interval": "step",
+                    "frequency": 1,
+                    "strict": False,
+                },
+            }
+        else:
+            logger.warning("no scheduler has been setup")
+        return {"optimizer": optimizer}
+
+    def configure_optimizers2(self) -> Dict[str, Any]:
         """Choose what optimizers and learning-rate schedulers to use in your optimization.
         Normally you'd need one. But in the case of GANs or similar you might have multiple.
 
@@ -132,6 +160,7 @@ class Classifier(ABC):
 
         opt = self.optimizers()
         sched = self.lr_schedulers()
+         
         opt.zero_grad()
         loss, preds, y = self._step(batch, batch_idx)
         self.manual_backward(loss)
