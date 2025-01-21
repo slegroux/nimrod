@@ -22,7 +22,7 @@ from matplotlib import pyplot as plt
 import pandas as pd
 
 from ..image.datasets import ImageDataset
-from .conv import ConvLayer, DeconvLayer, ConvNet, ConvNetX
+from .conv import ConvLayer, DeconvLayer
 from ..utils import time_it, set_seed, get_device
 
 import logging

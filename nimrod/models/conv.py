@@ -215,7 +215,8 @@ class ConvNetX(Classifier, LightningModule):
         logger.info("ConvNetX: init")
         super().__init__(num_classes, optimizer, scheduler)
         self.register_module('nnet', nnet)
-        self.save_hyperparameters(logger=False, ignore=['nnet']) # by default saved since input of __init__
+        # self.save_hyperparameters(logger=False, ignore=['nnet']) # by default saved since input of __init__
+        self.save_hyperparameters(logger=False)
         self.lr = optimizer.keywords['lr'] # for lr finder
         self.nnet = nnet
 

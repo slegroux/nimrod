@@ -26,8 +26,10 @@ class Classifier(ABC):
     def __init__(
             self,
             num_classes:int,
-            optimizer: Callable[...,torch.optim.Optimizer], # partial of optimizer
-            scheduler: Callable[...,torch.optim.lr_scheduler], # partial of scheduler
+            # optimizer: Callable[...,torch.optim.Optimizer], # partial of optimizer
+            # scheduler: Callable[...,torch.optim.lr_scheduler], # partial of scheduler
+            optimizer: torch.optim.Optimizer,
+            scheduler: torch.optim.lr_scheduler
             ):
 
         logger.info("Classifier: init")
@@ -50,7 +52,7 @@ class Classifier(ABC):
         self.step = 0
 
     
-    def configure_optimizers(self) -> Dict[str, Any]:
+    def configure_optimizers2(self) -> Dict[str, Any]:
         """Choose what optimizers and learning-rate schedulers to use in your optimization.
         Normally you'd need one. But in the case of GANs or similar you might have multiple.
 
@@ -79,7 +81,7 @@ class Classifier(ABC):
             logger.warning("no scheduler has been setup")
         return {"optimizer": optimizer}
 
-    def configure_optimizers2(self) -> Dict[str, Any]:
+    def configure_optimizers(self) -> Dict[str, Any]:
         """Choose what optimizers and learning-rate schedulers to use in your optimization.
         Normally you'd need one. But in the case of GANs or similar you might have multiple.
 
@@ -89,6 +91,7 @@ class Classifier(ABC):
         :return: A dict containing the configured optimizers and learning-rate schedulers to be used for training.
         """
         optimizer = self.hparams.optimizer(params=self.trainer.model.parameters())
+        self.optimizer = optimizer
         logger.info(f"Optimizer: {optimizer}")
 
         if self.hparams.scheduler is None:
@@ -96,6 +99,8 @@ class Classifier(ABC):
             return {"optimizer": optimizer}
         
         scheduler = self.hparams.scheduler(optimizer=optimizer)
+        self.scheduler = scheduler
+        logger.info(f"Scheduler: {scheduler}")
 
         # self.scheduler = scheduler
         # logger.info(f"Scheduler: {scheduler}")
@@ -150,16 +155,16 @@ class Classifier(ABC):
 
     def training_step(self, batch, batch_idx):
 
-        if isinstance(self.scheduler, torch.optim.lr_scheduler.OneCycleLR):
-            logger.info("scheduler is instance of OneCycleLR")
-            if self.step >= self.scheduler.total_steps:
-                logger.warning("Max steps reached for 1-cycle LR scheduler")
-                return
+        # if isinstance(self.scheduler, torch.optim.lr_scheduler.OneCycleLR):
+        #     logger.info("scheduler is instance of OneCycleLR")
+        #     if self.step >= self.scheduler.total_steps:
+        #         logger.warning("Max steps reached for 1-cycle LR scheduler")
+        #         return
         
         self.step += 1
 
-        opt = self.optimizers()
-        sched = self.lr_schedulers()
+        opt = self.optimizers() # optimizer defined in configure_optimizers
+        sched = self.lr_schedulers() # access scheduler defined in configure_optimizers
          
         opt.zero_grad()
         loss, preds, y = self._step(batch, batch_idx)
@@ -167,7 +172,7 @@ class Classifier(ABC):
         opt.step()
 
         if not isinstance(sched, torch.optim.lr_scheduler.ReduceLROnPlateau):
-            sched.step() #reduce plateau sched is updated at end of epoch only instead
+            sched.step() #reduce plateau sched is updated at end of epoch only instead TODO: should it be applied to val loop by default?
 
         self.train_loss(loss)
         self.train_acc(preds, y)
