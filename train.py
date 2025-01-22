@@ -1,13 +1,20 @@
 #!/usr/bin/env python
 import lightning as L
 from lightning.pytorch.tuner import Tuner
+from nimrod.utils import set_seed
+
 from omegaconf import DictConfig, OmegaConf
 import hydra
 from hydra.utils import instantiate
+
 import wandb
 from IPython import embed
-from nimrod.utils import set_seed
 from pprint import pprint
+from matplotlib import pyplot as plt
+import multiprocessing
+
+import logging
+log = logging.getLogger(__name__)
 
 # config_path = ["config", "config/image/model", "config/image/data"]
 
@@ -15,71 +22,99 @@ from pprint import pprint
 def main(cfg: DictConfig) -> dict:
 
     # HPARAMS
-    # print(OmegaConf.to_yaml(cfg))
+    # pprint(OmegaConf.to_yaml(cfg))
     # convert hp to dict for logging & saving
-
     hp = OmegaConf.to_container(cfg, resolve=True, throw_on_missing=True)
-    
-    # pprint(hp)
+
     # SEED
-    set_seed(cfg.seed)
+    if cfg.get("seed"):
+        set_seed(cfg.seed)
+    else:
+        set_seed()
 
     # DATA
-    dm = instantiate(cfg.data)
-    dm.prepare_data()
-    dm.setup()
+    log.info("Setup datamodule")
+    datamodule = instantiate(cfg.data) #, num_workers=multiprocessing.cpu_count())
+    datamodule.prepare_data()
+    datamodule.setup()
 
     # MODEL
-    mdl = instantiate(cfg.model, num_classes=dm.num_classes)
+    log.info("Setup model")
+    model = instantiate(cfg.model, num_classes=datamodule.num_classes)
 
     # CALLBACKS
+    log.info("Setup callbacks")
     callbacks = []
     for _, cb_conf in cfg.callbacks.items():
         callbacks.append(instantiate(cb_conf))
 
-    # # LOGGERS
+    # LOGGERS
+    log.info("Setup loggers")
     loggers = []
-    # for log_conf in cfg.loggers:
-    #     logger = instantiate(cfg[log_conf])
-    #     # wandb logger special setup
-    #     if isinstance(logger, L.pytorch.loggers.wandb.WandbLogger):
-    #         # deal with hangs when hp optim multirun training 
-    #         # wandb.init(settings=wandb.Settings(start_method="thread"))
-    #         # wandb requires dict not DictConfig
-    #         # logger.experiment.config.update(hp)
-    #         logger.experiment.config.update(hp["data"], allow_val_change=True)
-    #         logger.experiment.config.update(hp["model"], allow_val_change=True)
 
-    #     loggers.append(logger)
+    if cfg.get("logger"):
+        for log_ in cfg.logger:
+            logger = instantiate(cfg['logger'][log_])
+            # wandb logger special setup
+            if isinstance(logger, L.pytorch.loggers.wandb.WandbLogger):
+                # deal with hangs when hp optim multirun training 
+                # wandb.init(settings=wandb.Settings(start_method="thread"))
+                # wandb requires dict not DictConfig
+                # logger.experiment.config.update(hp)
+                # logger.experiment.config.update(hp["data"], allow_val_change=True)
+                # logger.experiment.config.update(hp["model"], allow_val_change=True)
+                logger.config = hp
+
+            loggers.append(logger)
         
-    # # TRAINER
-    # profiler = instantiate(cfg.profiler)
-    # trainer = instantiate(cfg.trainer, callbacks=callbacks, profiler=profiler, logger=loggers)
-    trainer = instantiate(cfg.trainer, callbacks=callbacks, logger=loggers)
+    # TRAINER
+    log.info("Setup profiler")
+    profiler = None
+    if cfg.get("profiler"):
+        profiler = instantiate(cfg.profiler)
+
+    log.info("Setup trainer")
+    trainer = instantiate(cfg.trainer, callbacks=callbacks, profiler=profiler, logger=loggers)
+
     # trainer.logger.log_hyperparams(hp)
     
-    # # TUNER
-    # tuner = Tuner(trainer)
-    # if cfg.get("tune_batch_size"):
-    #     # lr finder
-    #     tuner.scale_batch_size(model, datamodule=datamodule, mode="power")
+    # TUNER
+    tuner = Tuner(trainer)
+    if cfg.get("tune_batch_size"):
+        tuner.scale_batch_size(model, datamodule=datamodule, mode="power")
 
-    # if cfg.get("tune_lr"):
-    #     lr_finder = tuner.lr_find(model, datamodule=datamodule)
-    #     # Plot with
-    #     fig = lr_finder.plot(suggest=True)
-    #     fig.savefig('lr_finder.png')
+    if cfg.get("tune_lr"):
+        log.info("Tuning learning rate")
+        lr_finder = tuner.lr_find(
+            model,
+            datamodule=datamodule,
+            min_lr=1e-6,
+            max_lr=1.0,
+            num_training=100,  # number of iterations to test
+            )
+
+        fig = lr_finder.plot(suggest=True)
+        plt.show()
+        fig.savefig('lr_finder.png')
+        log.info(f"Suggested learning rate: {lr_finder.suggestion()}")
 
     # # new_lr = lr_finder.suggestion()
     # # model.hparams.lr = new_lr
 
     # TRAIN
     if cfg.get("train"):
-        trainer.fit(mdl, datamodule=dm, ckpt_path=cfg.get("ckpt_path"))
+        log.info("Training model")
+        if cfg.model.scheduler.get("total_steps"): #for 1-cycle
+            cfg.model.scheduler.total_steps = len(datamodule.train_dataloader()) * cfg.trainer.max_epochs
+            log.info(f"Total steps: {cfg.model.scheduler.total_steps}")
+            model = instantiate(cfg.model)
+
+        trainer.fit(model, datamodule=datamodule) #, ckpt_path=cfg.get("ckpt_path"))
 
     # TEST
     if cfg.get("test"):
-        trainer.test(datamodule=dm, ckpt_path="best")
+        log.info("Testing model")
+        trainer.test(datamodule=datamodule, ckpt_path="best")
 
     # wandb.finish()
 
