@@ -10,12 +10,14 @@ import torch.nn as nn
 import torch
 
 from lightning import LightningModule, Trainer
+from lightning.pytorch.tuner.tuning import Tuner
 from lightning.pytorch.loggers import CSVLogger
 
 from hydra.utils import instantiate
 from omegaconf import OmegaConf
 from matplotlib import pyplot as plt
 import pandas as pd
+from typing import Callable
 
 from ..utils import get_device
 from .core import Classifier
@@ -51,14 +53,14 @@ class MLP(nn.Module):
 class MLP_X(Classifier, LightningModule):
     def __init__(
             self,
-            nnet:MLP,
-            num_classes:int,
-            optimizer:torch.optim.Optimizer,
-            scheduler:torch.optim.lr_scheduler
+            nnet:MLP=None,
+            num_classes:int=10,
+            optimizer:Callable[...,torch.optim.Optimizer]=None,
+            scheduler:Callable[...,torch.optim.lr_scheduler]=None,
         ):
         
         logger.info("MLP_X init")
-        super().__init__(num_classes, optimizer, scheduler)
+        super().__init__(num_classes=num_classes, optimizer=optimizer, scheduler=scheduler)
         self.nnet = nnet
         self.save_hyperparameters(logger=False,ignore=['nnet'])
         self.lr = optimizer.keywords['lr'] # for lr finder
