@@ -1,0 +1,5 @@
+_target_: lightning.pytorch.tuner.tuning.Tuner
+_partial_: true
+min_lr: 1e-6
+max_lr: 1.0
+num_training: 100
