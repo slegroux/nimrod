@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 import lightning as L
+import torch
 from lightning.pytorch.tuner import Tuner
 from nimrod.utils import set_seed
 
 from omegaconf import DictConfig, OmegaConf
 import hydra
-from hydra.utils import instantiate
+from hydra.utils import instantiate, get_class
 
 import wandb
 from IPython import embed
@@ -56,15 +57,16 @@ def main(cfg: DictConfig) -> dict:
         for log_ in cfg.logger:
             logger = instantiate(cfg['logger'][log_])
             # wandb logger special setup
-            if isinstance(logger, L.pytorch.loggers.wandb.WandbLogger):
+            # if isinstance(logger, L.pytorch.loggers.wandb.WandbLogger):
                 # deal with hangs when hp optim multirun training 
                 # wandb.init(settings=wandb.Settings(start_method="thread"))
                 # wandb requires dict not DictConfig
                 # logger.experiment.config.update(hp)
                 # logger.experiment.config.update(hp["data"], allow_val_change=True)
                 # logger.experiment.config.update(hp["model"], allow_val_change=True)
-                logger.config = hp
-
+                # logger.config = hp
+            if hasattr(logger, 'log_hyperparams'):
+                logger.log_hyperparams(hp)
             loggers.append(logger)
         
     # TRAINER
@@ -104,19 +106,22 @@ def main(cfg: DictConfig) -> dict:
     # TRAIN
     if cfg.get("train"):
         log.info("Training model")
-        if cfg.model.scheduler.get("total_steps"): #for 1-cycle
+        scheduler_class = get_class(cfg.model.scheduler._target_)
+        if scheduler_class == torch.optim.lr_scheduler.OneCycleLR:
+            log.info("OneCycleLR scheduler")
             cfg.model.scheduler.total_steps = len(datamodule.train_dataloader()) * cfg.trainer.max_epochs
+            if cfg.get("tune_lr"):
+                cfg.model.scheduler.max_lr = lr_finder.suggestion()
             log.info(f"Total steps: {cfg.model.scheduler.total_steps}")
             model = instantiate(cfg.model)
 
-        trainer.fit(model, datamodule=datamodule) #, ckpt_path=cfg.get("ckpt_path"))
+        trainer.fit(model, datamodule.train_dataloader(), datamodule.val_dataloader(), ckpt_path=cfg.get("ckpt_path"))
 
     # TEST
     if cfg.get("test"):
         log.info("Testing model")
         trainer.test(datamodule=datamodule, ckpt_path="best")
-
-    # wandb.finish()
+        log.info(f"Best ckpt path: {trainer.checkpoint_callback.best_model_path}")
 
 
     # # return trainer.callback_metrics[cfg.get("optimized_metric")].item()

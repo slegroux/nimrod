@@ -35,7 +35,6 @@ class Classifier(ABC):
         logger.info("Classifier: init")
 
         super().__init__()
-        # self.save_hyperparameters()
         self.automatic_optimization = False
 
         self.loss = nn.CrossEntropyLoss()
@@ -62,7 +61,7 @@ class Classifier(ABC):
         :return: A dict containing the configured optimizers and learning-rate schedulers to be used for training.
         """
         optimizer = self.hparams.optimizer(params=self.trainer.model.parameters())
-        logger.info(f"Optimizer: {optimizer}")
+        logger.info(f"Optimizer: {optimizer.__class__}")
         if hasattr(self.hparams, 'scheduler'):
             scheduler = self.hparams.scheduler(optimizer=optimizer)
             self.scheduler = scheduler
@@ -182,10 +181,7 @@ class Classifier(ABC):
         return loss
 
     def on_train_epoch_end(self):
-        sch = self.lr_schedulers()
-        if isinstance(sch, torch.optim.lr_scheduler.ReduceLROnPlateau):
-            logger.info("scheduler is an instance of Reduce plateau")
-            sch.step(self.trainer.callback_metrics["val/loss"])
+        pass
 
     
     def validation_step(self, batch, batch_idx, prog_bar=True, on_step=False, on_epoch=True, sync_dist=True):
@@ -203,6 +199,11 @@ class Classifier(ABC):
         # log `val_acc_best` as a value through `.compute()` method, instead of as a metric object
         # otherwise metric would be reset by lightning after each epoch
         self.log("val/acc_best", self.val_acc_best.compute(), sync_dist=True, prog_bar=True)
+        
+        sch = self.lr_schedulers()
+        if isinstance(sch, torch.optim.lr_scheduler.ReduceLROnPlateau):
+            logger.info("scheduler is an instance of Reduce plateau")
+            sch.step(self.trainer.callback_metrics["val/loss"])
 
     
     def test_step(self, batch, batch_idx, prog_bar=True, on_step=False, on_epoch=True, sync_dist=True):

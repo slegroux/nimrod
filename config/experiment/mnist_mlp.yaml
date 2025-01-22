@@ -13,22 +13,22 @@ defaults:
 tags: ["mnist", "mlp", "dev"]
 project: "mnist-mlp"
 seed: 42
-tune_lr: false
-test: false
+tune_lr: true
+test: true
 
 data:
-  batch_size: 512
+  batch_size: 1024
   num_workers: 0
   pin_memory: true
 
 trainer:
-  max_epochs: 2
-  log_every_n_steps: 10
+  max_epochs: 5
   check_val_every_n_epoch: 1
+  log_every_n_steps: 1
   
 logger:
   wandb:
     tags: ${tags}
     group: "mnist"
     project: ${project}
-    name: bs:${data.batch_size}-lr:${model.optimizer.lr}
+    name: tune_lr_one_cycle #bs:${data.batch_size}-lr:${model.optimizer.lr}
