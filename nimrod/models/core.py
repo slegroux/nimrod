@@ -33,6 +33,7 @@ class Classifier(ABC):
         logger.info("Classifier: init")
 
         super().__init__()
+        self.lr = optimizer.keywords['lr'] # for lr finder
         self.automatic_optimization = False
 
         self.loss = nn.CrossEntropyLoss()
