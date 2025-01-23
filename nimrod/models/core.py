@@ -10,6 +10,7 @@ import torch.nn as nn
 import torch
 from torchmetrics import Accuracy, MaxMetric, MeanMetric
 from torch_lr_finder import LRFinder
+import lightning as L
 
 from abc import ABC, abstractmethod
 import logging
@@ -22,17 +23,20 @@ from matplotlib import pyplot as plt
 logger = logging.getLogger(__name__)
 
 # %% ../../nbs/models.core.ipynb 5
-class Classifier(ABC):
+class Classifier(ABC, L.LightningModule):
     def __init__(
             self,
+            nnet: nn.Module,
             num_classes:int,
             optimizer: Callable[...,torch.optim.Optimizer], # partial of optimizer
             scheduler: Callable[...,torch.optim.lr_scheduler], # partial of scheduler
             ):
 
         logger.info("Classifier: init")
-
         super().__init__()
+        self.save_hyperparameters(logger=False)
+        self.nnet = nnet
+        self.register_module('nnet', self.nnet)
         self.lr = optimizer.keywords['lr'] # for lr finder
         self.automatic_optimization = False
 
@@ -49,48 +53,13 @@ class Classifier(ABC):
         self.val_acc_best = MaxMetric()
         self.step = 0
 
-    
-    def configure_optimizers2(self) -> Dict[str, Any]:
-        """Choose what optimizers and learning-rate schedulers to use in your optimization.
-        Normally you'd need one. But in the case of GANs or similar you might have multiple.
-
-        Examples:
-            https://lightning.ai/docs/pytorch/latest/common/lightning_module.html#configure-optimizers
-
-        :return: A dict containing the configured optimizers and learning-rate schedulers to be used for training.
-        """
-        optimizer = self.hparams.optimizer(params=self.trainer.model.parameters())
-        logger.info(f"Optimizer: {optimizer.__class__}")
-        if hasattr(self.hparams, 'scheduler'):
-            scheduler = self.hparams.scheduler(optimizer=optimizer)
-            self.scheduler = scheduler
-            logger.info(f"Scheduler: {scheduler}")
-            return {
-                "optimizer": optimizer,
-                "lr_scheduler": {
-                    "scheduler": scheduler,
-                    "monitor": "val/loss",
-                    "interval": "step",
-                    "frequency": 1,
-                    "strict": False,
-                },
-            }
-        else:
-            logger.warning("no scheduler has been setup")
-        return {"optimizer": optimizer}
+    def forward(self, x:torch.Tensor)->torch.Tensor:
+        return self.nnet(x)
 
     def configure_optimizers(self) -> Dict[str, Any]:
-        """Choose what optimizers and learning-rate schedulers to use in your optimization.
-        Normally you'd need one. But in the case of GANs or similar you might have multiple.
-
-        Examples:
-            https://lightning.ai/docs/pytorch/latest/common/lightning_module.html#configure-optimizers
-
-        :return: A dict containing the configured optimizers and learning-rate schedulers to be used for training.
-        """
         optimizer = self.hparams.optimizer(params=self.trainer.model.parameters())
         self.optimizer = optimizer
-        logger.info(f"Optimizer: {optimizer}")
+        logger.info(f"Optimizer: {optimizer.__class__}")
 
         if self.hparams.scheduler is None:
             logger.warning("no scheduler has been setup")
@@ -98,20 +67,8 @@ class Classifier(ABC):
         
         scheduler = self.hparams.scheduler(optimizer=optimizer)
         self.scheduler = scheduler
-        logger.info(f"Scheduler: {scheduler}")
+        logger.info(f"Scheduler: {scheduler.__class__}")
 
-        # self.scheduler = scheduler
-        # logger.info(f"Scheduler: {scheduler}")
-        # return {
-        #     "optimizer": optimizer,
-        #     "lr_scheduler": {
-        #         "scheduler": scheduler,
-        #         "monitor": "val/loss",
-        #         "interval": "step",
-        #         "frequency": 1,
-        #         "strict": False,
-        #     },
-        # }
         scheduler_config = {"scheduler": scheduler}
         
         # Special handling for different scheduler types
@@ -182,7 +139,6 @@ class Classifier(ABC):
     def on_train_epoch_end(self):
         pass
 
-    
     def validation_step(self, batch, batch_idx, prog_bar=True, on_step=False, on_epoch=True, sync_dist=True):
         loss, preds, y = self._step(batch, batch_idx)
         self.val_loss(loss)
@@ -204,7 +160,6 @@ class Classifier(ABC):
             logger.info("scheduler is an instance of Reduce plateau")
             sch.step(self.trainer.callback_metrics["val/loss"])
 
-    
     def test_step(self, batch, batch_idx, prog_bar=True, on_step=False, on_epoch=True, sync_dist=True):
         loss, preds, y = self._step(batch, batch_idx)
         self.test_loss(loss)

@@ -60,13 +60,13 @@ class MLP_X(Classifier, LightningModule):
         ):
         
         logger.info("MLP_X init")
-        super().__init__(num_classes=num_classes, optimizer=optimizer, scheduler=scheduler)
-        self.nnet = nnet
-        self.save_hyperparameters(logger=False,ignore=['nnet'])
+        super().__init__(nnet=nnet, num_classes=num_classes, optimizer=optimizer, scheduler=scheduler)
+        # self.nnet = nnet
+        # self.save_hyperparameters(logger=False,ignore=['nnet'])
         # self.lr = optimizer.keywords['lr'] # for lr finder
     
-    def forward(self, x:torch.Tensor)->torch.Tensor:
-        return self.nnet(x)
+    # def forward(self, x:torch.Tensor)->torch.Tensor:
+    #     return self.nnet(x)
     
     def _step(self, batch, batch_idx):
         x, y = batch

@@ -1,5 +1,7 @@
 _target_: nimrod.models.conv.ConvNetX
+_partial_: true
 num_classes: 10 #default value overridden by hydra at instantiation if necessary
+
 nnet:
   _target_: nimrod.models.conv.ConvNet
   n_features: [1, 8, 16, 32, 64, 128]  # channel/feature expansion
@@ -13,18 +15,18 @@ nnet:
     _target_: hydra.utils.get_class
     path: torch.nn.ReLU
 
-optimizer:
-  _target_: torch.optim.AdamW
-  _partial_: true
-  lr: 1e-4
-  weight_decay: 1e-5 # mild regularization
+# optimizer:
+#   _target_: torch.optim.AdamW
+#   _partial_: true
+#   lr: 1e-4
+#   weight_decay: 1e-5 # mild regularization
 
-scheduler:
-  _target_: torch.optim.lr_scheduler.OneCycleLR
-  _partial_: true
-  max_lr: 0.01
-  total_steps: null
-  pct_start: 0.3
-  anneal_strategy: 'cos'
-  div_factor: 10
-  three_phase: False
+# scheduler:
+#   _target_: torch.optim.lr_scheduler.OneCycleLR
+#   _partial_: true
+#   max_lr: 0.01
+#   total_steps: null
+#   pct_start: 0.3
+#   anneal_strategy: 'cos'
+#   div_factor: 10
+#   three_phase: False

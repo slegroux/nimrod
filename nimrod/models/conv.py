@@ -20,7 +20,7 @@ from omegaconf import OmegaConf
 
 from matplotlib import pyplot as plt
 import pandas as pd
-from typing import List, Optional, Type
+from typing import List, Optional, Type, Callable
 
 from ..utils import get_device, set_seed
 from .core import Classifier
@@ -204,24 +204,30 @@ class ConvNet(nn.Module):
         return self.net(x)
 
 # %% ../../nbs/models.conv.ipynb 41
-class ConvNetX(Classifier, LightningModule):
+class ConvNetX(Classifier):
     def __init__(
             self,
             nnet:ConvNet,
             num_classes:int,
-            optimizer:torch.optim.Optimizer,
-            scheduler:torch.optim.lr_scheduler,
+            optimizer:Callable[...,torch.optim.Optimizer],
+            scheduler:Callable[...,torch.optim.lr_scheduler],
             ):
-        logger.info("ConvNetX: init")
-        super().__init__(num_classes, optimizer, scheduler)
-        self.register_module('nnet', nnet)
-        # self.save_hyperparameters(logger=False, ignore=['nnet']) # by default saved since input of __init__
-        self.save_hyperparameters(logger=False)
-        self.lr = optimizer.keywords['lr'] # for lr finder
-        self.nnet = nnet
 
-    def forward(self, x:torch.Tensor)->torch.Tensor:
-        return self.nnet(x)
+        logger.info("ConvNetX: init")
+        super().__init__(
+            nnet=nnet,
+            num_classes=num_classes,
+            optimizer=optimizer,
+            scheduler=scheduler
+            )
+        # self.register_module('nnet', nnet)
+        # self.save_hyperparameters(logger=False, ignore=['nnet']) # by default saved since input of __init__
+        # self.save_hyperparameters(logger=False)
+        # self.lr = optimizer.keywords['lr'] # for lr finder
+        # self.nnet = nnet
+
+    # def forward(self, x:torch.Tensor)->torch.Tensor:
+    #     return self.nnet(x)
     
     def _step(self, batch, batch_idx):
         x, y = batch
