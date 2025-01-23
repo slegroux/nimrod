@@ -13,7 +13,6 @@ dm.prepare_data()
 dm.setup()
 total_train_steps = len(dm.train_dataloader()) * N_EPOCHS # number of batches in training data * epochs
 
-
 cfg = OmegaConf.load('../../../config/optimizer/adam_w.yaml')
 optimizer = instantiate(cfg)
 

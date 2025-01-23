@@ -9,9 +9,11 @@ defaults:
   - paths: default
   - extras: default
   - hydra: default
-  - trainer: default
+  - trainer: debug
   - experiment: null
   - profiler: default
+  - optimizer: adam_w
+  - scheduler: default
 
 project: "Template"
 # ckpt_path: ${paths.log_dir}/${run_id}/checkpoints/last.ckpt # ckpt to resume training from
@@ -22,8 +24,7 @@ seed: 42
 tune_batch_size: False
 tune_lr: False
 train: True
-test: True
-
+test: False
 
 
 # # HYPERPARAMETER OPTIMIZATION

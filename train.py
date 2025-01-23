@@ -9,6 +9,7 @@ import hydra
 from hydra.utils import instantiate, get_class
 
 import wandb
+import os
 from IPython import embed
 from pprint import pprint
 from matplotlib import pyplot as plt
@@ -38,10 +39,21 @@ def main(cfg: DictConfig) -> dict:
     datamodule = instantiate(cfg.data) #, num_workers=multiprocessing.cpu_count())
     datamodule.prepare_data()
     datamodule.setup()
+    total_steps = len(datamodule.train_dataloader()) * cfg.trainer.max_epochs
+
+    # OPTIMIZER
+    log.info("Setup optimizer")
+    optimizer = instantiate(cfg.optimizer)
+
+    # SCHEDULER
+    log.info("Setup scheduler")
+    if get_class(cfg.scheduler._target_) == torch.optim.lr_scheduler.OneCycleLR:
+        cfg.scheduler.total_steps = total_steps
+    scheduler = instantiate(cfg.scheduler)
 
     # MODEL
     log.info("Setup model")
-    model = instantiate(cfg.model, num_classes=datamodule.num_classes)
+    model = instantiate(cfg.model, num_classes=datamodule.num_classes)(optimizer=optimizer, scheduler=scheduler)
 
     # CALLBACKS
     log.info("Setup callbacks")
@@ -96,9 +108,13 @@ def main(cfg: DictConfig) -> dict:
             )
 
         fig = lr_finder.plot(suggest=True)
-        plt.show()
-        fig.savefig('lr_finder.png')
+        # plt.show()
+        fig_name= os.path.join(cfg.paths.output_dir, 'lr_finder.png')
+        fig.savefig(fig_name)
+        log.info(f"lr_finder plot saved to {fig_name}")
         log.info(f"Suggested learning rate: {lr_finder.suggestion()}")
+        if get_class(cfg.scheduler._target_) == torch.optim.lr_scheduler.OneCycleLR:
+            cfg.scheduler.max_lr = lr_finder.suggestion()
 
     # # new_lr = lr_finder.suggestion()
     # # model.hparams.lr = new_lr
@@ -106,15 +122,6 @@ def main(cfg: DictConfig) -> dict:
     # TRAIN
     if cfg.get("train"):
         log.info("Training model")
-        scheduler_class = get_class(cfg.model.scheduler._target_)
-        if scheduler_class == torch.optim.lr_scheduler.OneCycleLR:
-            log.info("OneCycleLR scheduler")
-            cfg.model.scheduler.total_steps = len(datamodule.train_dataloader()) * cfg.trainer.max_epochs
-            if cfg.get("tune_lr"):
-                cfg.model.scheduler.max_lr = lr_finder.suggestion()
-            log.info(f"Total steps: {cfg.model.scheduler.total_steps}")
-            model = instantiate(cfg.model)
-
         trainer.fit(model, datamodule.train_dataloader(), datamodule.val_dataloader(), ckpt_path=cfg.get("ckpt_path"))
 
     # TEST

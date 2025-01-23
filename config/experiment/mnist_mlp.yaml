@@ -5,16 +5,18 @@
 defaults:
   - override /data: image/mnist
   - override /model: image/mlp
-  # - override /callbacks: default
-  # - override /trainer: default
+  - override /trainer: default
   - override /logger: wandb
-
+  - _self_
 
 tags: ["mnist", "mlp", "dev"]
 project: "mnist-mlp"
+name: "test" # name of run
 seed: 42
-tune_lr: true
-test: true
+train: True
+tune_lr: False
+test: False
+
 
 data:
   batch_size: 1024
@@ -22,7 +24,7 @@ data:
   pin_memory: true
 
 trainer:
-  max_epochs: 5
+  max_epochs: 2
   check_val_every_n_epoch: 1
   log_every_n_steps: 1
   
@@ -31,4 +33,4 @@ logger:
     tags: ${tags}
     group: "mnist"
     project: ${project}
-    name: tune_lr_one_cycle #bs:${data.batch_size}-lr:${model.optimizer.lr}
+    name: test #bs:${data.batch_size}-lr:${model.optimizer.lr}

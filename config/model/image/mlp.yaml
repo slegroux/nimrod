@@ -8,3 +8,6 @@ nnet:
   n_h: 64
   n_out: 10
   dropout: 0.2
+
+# optimizer
+# scheduler

@@ -5,4 +5,4 @@ total_steps: null
 pct_start: 0.3
 anneal_strategy: 'cos'
 div_factor: 10
-three_phase: False%  
+three_phase: False
