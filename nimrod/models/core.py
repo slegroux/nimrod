@@ -25,9 +25,9 @@ logger = logging.getLogger(__name__)
 class Classifier(ABC):
     def __init__(
             self,
-            num_classes:int=10,
-            optimizer: Callable[...,torch.optim.Optimizer]=None, # partial of optimizer
-            scheduler: Callable[...,torch.optim.lr_scheduler]=None, # partial of scheduler
+            num_classes:int,
+            optimizer: Callable[...,torch.optim.Optimizer], # partial of optimizer
+            scheduler: Callable[...,torch.optim.lr_scheduler], # partial of scheduler
             ):
 
         logger.info("Classifier: init")
