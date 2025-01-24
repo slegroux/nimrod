@@ -323,6 +323,9 @@ class ImageDataModule(ImagePlotMixin, DataModule, LightningDataModule):
             return list(self.train_ds[0][0].shape[-2:])
         raise RuntimeError("train_ds is not initialized. Call prepare_data() first.")
 
+    @property
+    def name(self)->str:
+        return self.hparams.name
 
     @property
     def num_classes(self) -> int: # num of classes in dataset

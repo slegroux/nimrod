@@ -20,7 +20,7 @@ from omegaconf import OmegaConf
 
 from matplotlib import pyplot as plt
 import pandas as pd
-from typing import List, Optional, Type, Callable
+from typing import List, Optional, Type, Callable, Any
 
 from ..utils import get_device, set_seed
 from .core import Classifier
@@ -260,7 +260,7 @@ class ConvNetX(Classifier):
             nnet:ConvNet, # model
             num_classes:int, # number of classes
             optimizer:Callable[...,torch.optim.Optimizer], # optimizer
-            scheduler:Callable[...,torch.optim.lr_scheduler], # scheduler
+            scheduler: Optional[Callable[...,Any]]=None, # scheduler
             ):
 
         logger.info("ConvNetX: init")
