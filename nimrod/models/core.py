@@ -15,7 +15,7 @@ import lightning as L
 from abc import ABC, abstractmethod
 import logging
 import os
-from typing import Any, Dict, List, Callable
+from typing import Any, Dict, List, Callable, Optional
 
 import pandas as pd
 from matplotlib import pyplot as plt
@@ -29,7 +29,7 @@ class Classifier(ABC, L.LightningModule):
             nnet: nn.Module,
             num_classes:int,
             optimizer: Callable[...,torch.optim.Optimizer], # partial of optimizer
-            scheduler: Callable[...,torch.optim.lr_scheduler], # partial of scheduler
+            scheduler: Optional[Callable[...,Any]]=None, # partial of scheduler
             ):
 
         logger.info("Classifier: init")
@@ -37,7 +37,8 @@ class Classifier(ABC, L.LightningModule):
         self.save_hyperparameters(logger=False)
         self.nnet = nnet
         self.register_module('nnet', self.nnet)
-        self.lr = optimizer.keywords['lr'] # for lr finder
+        self.lr = optimizer.keywords.get('lr') if optimizer else None # for lr finder
+
         self.automatic_optimization = False
 
         self.loss = nn.CrossEntropyLoss()

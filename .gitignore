@@ -152,6 +152,7 @@ _docs/
 /data/codeparrot
 /data/en/Libri*
 /data/
+recipes
 token
 env-file
 Dockerfile.base
@@ -160,7 +161,7 @@ Dockerfile.paperspace
 # wandb stuff
 wandb
 artifacts
-
+Miniforge*
 .vscode
 *.swp
 

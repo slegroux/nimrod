@@ -109,7 +109,7 @@ class ConvLayer(nn.Module):
         return self.net(x)
 
 
-# %% ../../nbs/models.conv.ipynb 19
+# %% ../../nbs/models.conv.ipynb 20
 class DeconvLayer(nn.Module):
     def __init__(
         self,
@@ -143,8 +143,44 @@ class DeconvLayer(nn.Module):
                 ) -> torch.Tensor: # output image tensor of dimension (B, C, W*2, H*2)
         return self._net(x) 
 
-# %% ../../nbs/models.conv.ipynb 26
+# %% ../../nbs/models.conv.ipynb 27
 class ConvNet(nn.Module):
+    """
+    ConvNet: a simple convolutional neural network
+
+    Parameters
+    ----------
+    n_features : List[int]
+        channel/feature expansion. The length of the list will determine the
+        number of convolutional layers. The first element is the number of
+        channels in the input image, and the last element is the number of
+        output channels (i.e. the number of classes).
+    num_classes : int
+        number of classes
+    kernel_size : int
+        kernel size
+    bias : bool
+        conv2d bias
+    normalization : nn.Module
+        normalization (before activation)
+    activation : nn.Module
+        activation function
+
+    Notes
+    -----
+    The number of convolutional layers is determined by the length of the list
+    `n_features`.
+
+    Examples
+    --------
+    >>> model = ConvNet(n_features=[1, 8, 16, 32, 64])
+    >>> model = ConvNet(n_features=[1, 8, 16, 32, 64], num_classes=10)
+    >>> model = ConvNet(n_features=[1, 8, 16, 32, 64], kernel_size=5)
+    >>> model = ConvNet(n_features=[1, 8, 16, 32, 64], bias=True)
+    >>> model = ConvNet(n_features=[1, 8, 16, 32, 64], normalization=None)
+    >>> model = ConvNet(n_features=[1, 8, 16, 32, 64], activation=None)
+    """
+
 
     def __init__(
             self,
@@ -159,11 +195,11 @@ class ConvNet(nn.Module):
         super().__init__()
 
         net = []
-
+        # TODO:first layer stride 1 ?
         conv_stride_1 = ConvLayer(
             in_channels=n_features[0],
             out_channels=n_features[1],
-            stride=1,
+            stride=2,
             kernel_size=kernel_size,
             bias=bias,
             normalization=normalization,
@@ -181,7 +217,8 @@ class ConvNet(nn.Module):
                     activation=activation
             )
             net.append(conv)
-       
+        
+        # last layer -> flatten
         net.append(
             ConvLayer(
                 in_channels=n_features[-1],
@@ -203,14 +240,27 @@ class ConvNet(nn.Module):
         ) -> torch.Tensor: # output probs (B, N_classes)
         return self.net(x)
 
-# %% ../../nbs/models.conv.ipynb 41
+# %% ../../nbs/models.conv.ipynb 42
 class ConvNetX(Classifier):
+    """
+    Parameters
+    ----------
+    nnet : ConvNet
+        The neural network model.
+    num_classes : int
+        The number of classes.
+    optimizer : callable
+        The optimizer.
+    scheduler : callable
+        The learning rate scheduler.
+    """
+
     def __init__(
             self,
-            nnet:ConvNet,
-            num_classes:int,
-            optimizer:Callable[...,torch.optim.Optimizer],
-            scheduler:Callable[...,torch.optim.lr_scheduler],
+            nnet:ConvNet, # model
+            num_classes:int, # number of classes
+            optimizer:Callable[...,torch.optim.Optimizer], # optimizer
+            scheduler:Callable[...,torch.optim.lr_scheduler], # scheduler
             ):
 
         logger.info("ConvNetX: init")

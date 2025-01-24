@@ -287,20 +287,19 @@ class ImageDataset(ImagePlotMixin, Dataset):
 
 # %% ../../nbs/image.datasets.ipynb 28
 class ImageDataModule(ImagePlotMixin, DataModule, LightningDataModule):
+
+
     def __init__(
         self,
-        name: str,
-        *args,
-        data_dir: Optional[str] = "~/Data/", # path to source data dir
-        transforms: Union[transforms.Compose, Callable, None] = transforms.Compose([
-            transforms.ToTensor(),
-            transforms.Normalize((0.1307,), (0.3081,))
-        ]),
-        train_val_split:List[float] = [0.8, 0.2], # train val test %
+        name: str, # name of dataset from hugging face
+        *args, # arguments to pass to hugging face dataset
+        data_dir: Optional[str] = "~/Data/", # path to source data dir where data is stored
+        transforms: Union[transforms.Compose, Callable, None] = transforms.Compose([transforms.ToTensor(),transforms.Normalize((0.1307,), (0.3081,))]), # transform to apply to each sample
+        train_val_split:List[float] = [0.8, 0.2], # train val test percentage
         batch_size: int = 64, # size of compute batch
         num_workers: int = 0, # num_workers equal 0 means that it’s the main process that will do the data loading when needed, num_workers equal 1 is the same as any n, but you’ll only have a single worker, so it might be slow
         pin_memory: bool = False, # If you load your samples in the Dataset on CPU and would like to push it during training to the GPU, you can speed up the host to device transfer by enabling pin_memory. This lets your DataLoader allocate the samples in page-locked memory, which speeds-up the transfer
-        persistent_workers: bool = False,
+        persistent_workers: bool = False, # persist
         **kwargs
         ):
 
@@ -316,6 +315,13 @@ class ImageDataModule(ImagePlotMixin, DataModule, LightningDataModule):
     @property
     def batch_size(self)->int:
         return self.hparams.batch_size
+
+    @property
+    def dim(self)->List[int]:
+        if self.train_ds:
+            return list(self.train_ds[0][0].shape[-2:])
+        raise RuntimeError("train_ds is not initialized. Call prepare_data() first.")
+
 
     @property
     def num_classes(self) -> int: # num of classes in dataset
