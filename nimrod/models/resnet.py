@@ -22,6 +22,7 @@ from matplotlib import pyplot as plt
 import math
 
 from .conv import ConvLayer
+from .core import Classifier
 from ..utils import get_device, set_seed
 from ..image.datasets import ImageDataModule
 
@@ -63,9 +64,12 @@ class ResNet(nn.Module):
 
         layers = []
         conv = partial(ConvLayer, stride=2, normalization=nn.BatchNorm2d, activation=nn.ReLU)
+        # convnet with resblock between
         for i in range(len(n_channels)-1):
             layers += [conv(n_channels[i], n_channels[i+1])]
             layers += [ResBlock(n_channels[i+1])]
+
+        # last layer back to n_classes and flatten
         layers.append(conv(n_channels[-1], n_classes))
         layers.append(nn.Flatten())
         self.layers = nn.Sequential(*layers)
@@ -73,7 +77,7 @@ class ResNet(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.layers(x)
 
-# %% ../../nbs/models.resnet.ipynb 13
+# %% ../../nbs/models.resnet.ipynb 18
 class ResBlock2(nn.Module):
     """ResNet basic block with optional downsampling.
     This block implements the basic building block of ResNet architecture,
@@ -136,7 +140,7 @@ class ResBlock2(nn.Module):
     def forward(self, x):
         return self.act(self.conv(x) + self.id(self.pool(x)))
 
-# %% ../../nbs/models.resnet.ipynb 18
+# %% ../../nbs/models.resnet.ipynb 23
 class ResNet2(nn.Module):
     """A simple implementation of a ResNet-like neural network.
 
@@ -173,7 +177,7 @@ class ResNet2(nn.Module):
         return self.nnet(x)
 
 
-# %% ../../nbs/models.resnet.ipynb 27
+# %% ../../nbs/models.resnet.ipynb 32
 class UpSample(nn.Module):
     def __init__(
             self,
@@ -193,7 +197,7 @@ class UpSample(nn.Module):
     def forward(self, x:torch.Tensor)->torch.Tensor:
         return self.layers(x)
 
-# %% ../../nbs/models.resnet.ipynb 32
+# %% ../../nbs/models.resnet.ipynb 37
 class SuperResNet(nn.Module):
     def __init__(
             self,

@@ -191,6 +191,7 @@ class ImageDataset(ImagePlotMixin, Dataset):
         if split not in self.info.info.splits:
             raise ValueError(f"The specified split '{split}' does not exist in the dataset '{name}'. Available splits: {list(info.info.splits.keys())}")
 
+        logger.info(f"loading dataset {name} with args {args} from split {split}")
         self.hf_ds = load_dataset(
             name,
             *args,
