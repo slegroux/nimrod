@@ -208,7 +208,7 @@ class Classifier(ABC, L.LightningModule):
         pass
 
 
-# %% ../../nbs/models.core.ipynb 8
+# %% ../../nbs/models.core.ipynb 6
 def plot_classifier_metrics_from_csv(metrics_csv_path:str | os.PathLike):
     metrics = pd.read_csv(metrics_csv_path)
     # Create figure with secondary y-axis
@@ -236,7 +236,7 @@ def plot_classifier_metrics_from_csv(metrics_csv_path:str | os.PathLike):
     plt.title('Training Metrics')
     plt.show()
 
-# %% ../../nbs/models.core.ipynb 10
+# %% ../../nbs/models.core.ipynb 8
 class SequentialModelX(Classifier):
     def __init__(self, modules: List[nn.Module], *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -245,7 +245,7 @@ class SequentialModelX(Classifier):
     def forward(self, x):
         return self._model(x)
 
-# %% ../../nbs/models.core.ipynb 13
+# %% ../../nbs/models.core.ipynb 11
 def lr_finder(
     model: Callable[...,torch.nn.Module], # partial model (missing optim & sched)
     datamodule: ImageDataModule, # data module
@@ -271,7 +271,7 @@ def lr_finder(
         plt.show()
     return lr_finder.suggestion()
 
-# %% ../../nbs/models.core.ipynb 14
+# %% ../../nbs/models.core.ipynb 13
 def one_cycle_train(
     model: Callable[...,torch.nn.Module], #partial model (missing optim & sched)
     datamodule: ImageDataModule,
