@@ -109,7 +109,7 @@ class ConvLayer(nn.Module):
         return self.net(x)
 
 
-# %% ../../nbs/models.conv.ipynb 20
+# %% ../../nbs/models.conv.ipynb 21
 class DeconvLayer(nn.Module):
     def __init__(
         self,
@@ -143,7 +143,7 @@ class DeconvLayer(nn.Module):
                 ) -> torch.Tensor: # output image tensor of dimension (B, C, W*2, H*2)
         return self._net(x) 
 
-# %% ../../nbs/models.conv.ipynb 27
+# %% ../../nbs/models.conv.ipynb 28
 class ConvNet(nn.Module):
     """
     ConvNet: a simple convolutional neural network
@@ -240,7 +240,7 @@ class ConvNet(nn.Module):
         ) -> torch.Tensor: # output probs (B, N_classes)
         return self.net(x)
 
-# %% ../../nbs/models.conv.ipynb 42
+# %% ../../nbs/models.conv.ipynb 43
 class ConvNetX(Classifier):
     """
     Parameters
