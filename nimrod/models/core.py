@@ -34,13 +34,13 @@ class Classifier(ABC, L.LightningModule):
 
         logger.info("Classifier: init")
         super().__init__()
-        self.save_hyperparameters(logger=False)
+        self.save_hyperparameters()
+
         self.nnet = nnet
         self.register_module('nnet', self.nnet)
         self.lr = optimizer.keywords.get('lr') if optimizer else None # for lr finder
 
         self.automatic_optimization = False
-
         self.loss = nn.CrossEntropyLoss()
         
         self.train_acc = Accuracy(task="multiclass", num_classes=num_classes)
@@ -53,6 +53,11 @@ class Classifier(ABC, L.LightningModule):
 
         self.val_acc_best = MaxMetric()
         self.step = 0
+
+        self.optimizer_config = None
+        self.scheduler_config = None
+        self.nnet_config = None
+        
 
     def forward(self, x:torch.Tensor)->torch.Tensor:
         return self.nnet(x)
@@ -88,7 +93,28 @@ class Classifier(ABC, L.LightningModule):
             scheduler_config.update({
                 "interval": "epoch",
             })
-        
+        # setup config to be able to save in wandb
+        self.optimizer_config = {
+            'type': optimizer.__class__.__name__,
+            'params': optimizer.defaults
+        }
+        self.scheduler_config = {
+            'type': scheduler.__class__.__name__,
+            'params': scheduler.__dict__
+        }
+        self.nnet_config = {
+            'type': self.nnet.__class__.__name__,
+            'params': self.nnet.__dict__,
+            'architecture': str(self.nnet),
+            'summary': repr(self.nnet)
+        }
+        if self.logger and hasattr(self.logger, 'experiment'):
+            self.logger.experiment.config.update({
+                'optimizer_config': self.optimizer_config,
+                'scheduler_config': self.scheduler_config,
+                'nnet_config': self.nnet_config
+            })
+
         return {
             "optimizer": optimizer,
             "lr_scheduler": scheduler_config,
@@ -173,7 +199,7 @@ class Classifier(ABC, L.LightningModule):
         pass
 
 
-# %% ../../nbs/models.core.ipynb 6
+# %% ../../nbs/models.core.ipynb 8
 def plot_classifier_metrics_from_csv(metrics_csv_path:str | os.PathLike):
     metrics = pd.read_csv(metrics_csv_path)
     # Create figure with secondary y-axis
@@ -201,7 +227,7 @@ def plot_classifier_metrics_from_csv(metrics_csv_path:str | os.PathLike):
     plt.title('Training Metrics')
     plt.show()
 
-# %% ../../nbs/models.core.ipynb 8
+# %% ../../nbs/models.core.ipynb 10
 class SequentialModelX(Classifier):
     def __init__(self, modules: List[nn.Module], *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -210,7 +236,7 @@ class SequentialModelX(Classifier):
     def forward(self, x):
         return self._model(x)
 
-# %% ../../nbs/models.core.ipynb 10
+# %% ../../nbs/models.core.ipynb 12
 def find_optimal_lr(model, train_loader, criterion=None, optimizer=None, device='cuda'):
     # If no criterion provided, use default CrossEntropyLoss
     if criterion is None:

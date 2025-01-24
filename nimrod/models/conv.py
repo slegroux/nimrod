@@ -270,14 +270,7 @@ class ConvNetX(Classifier):
             optimizer=optimizer,
             scheduler=scheduler
             )
-        # self.register_module('nnet', nnet)
-        # self.save_hyperparameters(logger=False, ignore=['nnet']) # by default saved since input of __init__
-        # self.save_hyperparameters(logger=False)
-        # self.lr = optimizer.keywords['lr'] # for lr finder
-        # self.nnet = nnet
-
-    # def forward(self, x:torch.Tensor)->torch.Tensor:
-    #     return self.nnet(x)
+        
     
     def _step(self, batch, batch_idx):
         x, y = batch
