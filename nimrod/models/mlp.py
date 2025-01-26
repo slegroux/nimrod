@@ -17,7 +17,7 @@ from hydra.utils import instantiate
 from omegaconf import OmegaConf
 from matplotlib import pyplot as plt
 import pandas as pd
-from typing import Callable
+from typing import Callable, Optional
 
 from ..utils import get_device
 from .core import Classifier
@@ -54,10 +54,10 @@ class MLP(nn.Module):
 class MLP_X(Classifier, LightningModule):
     def __init__(
             self,
-            nnet:MLP=None,
-            num_classes:int=10,
-            optimizer:Callable[...,torch.optim.Optimizer]=None,
-            scheduler:Callable[...,torch.optim.lr_scheduler]=None,
+            nnet:MLP, # mlp neural net
+            num_classes:int, # number of classes
+            optimizer:Callable[...,torch.optim.Optimizer], # optimizer
+            scheduler:Optional[Callable[...,torch.optim.lr_scheduler]]=None, # scheduler
         ):
         
         logger.info("MLP_X init")
