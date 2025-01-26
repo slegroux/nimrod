@@ -3,19 +3,19 @@
 defaults:
   - _self_
   - data: image/mnist
-  - model: image/mlp
+  - model: image/mlpx
   - callbacks: default
   - logger: default # set logger here or use command line (e.g. `python train.py logger=tensorboard`)
   - paths: default
   - extras: default
   - hydra: default
-  - trainer: debug
+  - trainer: default
   - experiment: null
   - profiler: default
   - optimizer: adam_w
-  - scheduler: default
+  - scheduler: one_cycle_lr
 
-project: "Template"
+project: "Nimrod"
 # ckpt_path: ${paths.log_dir}/${run_id}/checkpoints/last.ckpt # ckpt to resume training from
 ckpt_path: null
 tags: ['mnist', 'mlp', 'dev']
@@ -23,7 +23,8 @@ task_name: 'mnist-mlp'
 seed: 42
 tune_batch_size: False
 tune_lr: False
-train: True
+plot_lr_tuning: False
+train: False
 test: False
 
 

@@ -105,25 +105,25 @@ class Classifier(ABC, L.LightningModule):
                 "interval": "epoch",
             })
         # setup config to be able to save in wandb
-        self.optimizer_config = {
-            'type': optimizer.__class__.__name__,
-            'params': optimizer.defaults
-        }
+        # self.optimizer_config = {
+        #     'type': optimizer.__class__.__name__,
+        #     'params': optimizer.defaults
+        # }
         self.scheduler_config = {
             'type': scheduler.__class__.__name__,
             'params': scheduler.__dict__
         }
-        self.nnet_config = {
-            'type': self.nnet.__class__.__name__,
-            'architecture': str(self.nnet),
+        # self.nnet_config = {
+        #     'type': self.nnet.__class__.__name__,
+        #     'architecture': str(self.nnet),
 
-        }
-        if self.logger and hasattr(self.logger, 'experiment'):
-            self.logger.experiment.config.update({
-                'optimizer_config': self.optimizer_config,
-                'scheduler_config': self.scheduler_config,
-                'nnet_config': self.nnet_config
-            })
+        # }
+        # if self.logger and hasattr(self.logger, 'experiment'):
+        #     self.logger.experiment.config.update({
+        #         'optimizer_config': self.optimizer_config,
+        #         'scheduler_config': self.scheduler_config,
+        #         'nnet_config': self.nnet_config
+        #     }, allow_val_change=True)
 
         return {
             "optimizer": optimizer,

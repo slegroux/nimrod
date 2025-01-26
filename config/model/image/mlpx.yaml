@@ -1,0 +1,13 @@
+_target_: nimrod.models.mlp.MLP_X
+_partial_: true
+num_classes: 10
+
+nnet:
+  _target_: nimrod.models.mlp.MLP
+  n_in: 784
+  n_h: 64
+  n_out: ${..num_classes}
+  dropout: 0.2
+
+# optimizer
+# scheduler
