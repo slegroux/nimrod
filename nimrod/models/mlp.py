@@ -21,6 +21,7 @@ from typing import Callable
 
 from ..utils import get_device
 from .core import Classifier
+
 # torch.set_num_interop_threads(1)
 # from IPython.core.debugger import set_trace
 
