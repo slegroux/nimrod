@@ -65,9 +65,9 @@ class Classifier(ABC, L.LightningModule):
         self.val_acc_best = MaxMetric()
         self.step = 0
 
-        self.optimizer_config = None
-        self.scheduler_config = None
-        self.nnet_config = None
+        # self.optimizer_config = None
+        # self.scheduler_config = None
+        # self.nnet_config = None
         
 
     def forward(self, x:torch.Tensor)->torch.Tensor:
@@ -109,10 +109,10 @@ class Classifier(ABC, L.LightningModule):
         #     'type': optimizer.__class__.__name__,
         #     'params': optimizer.defaults
         # }
-        self.scheduler_config = {
-            'type': scheduler.__class__.__name__,
-            'params': scheduler.__dict__
-        }
+        # self.scheduler_config = {
+        #     'type': scheduler.__class__.__name__,
+        #     'params': scheduler.__dict__
+        # }
         # self.nnet_config = {
         #     'type': self.nnet.__class__.__name__,
         #     'architecture': str(self.nnet),

@@ -120,11 +120,12 @@ def main(cfg: DictConfig) -> dict:
     if cfg.get("train"):
         log.info("Training model")
         if cfg.get("ckpt_path"):
+            log.info("Resuming training from ckpt")
             trainer.fit(model, datamodule.train_dataloader(), datamodule.val_dataloader(), ckpt_path=cfg.get("ckpt_path"))
         else:
             trainer.fit(model, datamodule.train_dataloader(), datamodule.val_dataloader())
         
-    log.info(f"Best ckpt path: {trainer.checkpoint_callback.best_model_path} score: {trainer.checkpoint_callback.best_score}")
+    log.info(f"Best ckpt path: {trainer.checkpoint_callback.best_model_path}")
     
     # TEST
     if cfg.get("test"):
