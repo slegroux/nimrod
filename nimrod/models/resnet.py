@@ -11,6 +11,7 @@ import torch.nn as nn
 import torch
 from torchinfo import summary
 from torchvision.transforms import transforms
+import torch.nn.functional as F
 
 
 from omegaconf import OmegaConf
@@ -37,42 +38,59 @@ set_seed()
 class ResBlock(nn.Module):
     def __init__(
             self,
-            n_channels:int # Number of input & output channels
+            in_channels:int, # Number of input channels
+            out_channels:int, # Number of output channels
+            stride:int=1
         ):
 
         super().__init__()
 
-        layers = []
-        conv_ = partial(ConvLayer, stride=1)
-        layers += [conv_(n_channels, n_channels), conv_(n_channels, n_channels)]
-        self.nnet = nn.Sequential(*layers)
+        conv_block = []
+        conv_ = partial(ConvLayer, stride=1, activation=nn.ReLU, normalization=nn.BatchNorm2d)
+        c1 = conv_(in_channels, out_channels, stride=stride)
+        c2 = conv_(out_channels, out_channels, activation=None) #adding activation to the whole layer at the end c.f. forward
+        conv_block += [c1,c2]
+        self.conv_layer = nn.Sequential(*conv_block)
+
+        if in_channels == out_channels:
+            self.id = nn.Identity()
+        else:
+            # resize x to match channels
+            self.id = conv_(in_channels, out_channels, kernel_size=1, stride=1, activation=None)
+        
+        if stride == 1:
+            self.pooling = nn.Identity()
+        else:
+            # resize x to match the stride
+            self.pooling = nn.AvgPool2d(stride, ceil_mode=True)
+
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        return x + self.nnet(x)
+        return F.relu(self.conv_layer(x) + self.id(self.pooling(x)))
 
 # %% ../../nbs/models.resnet.ipynb 10
 class ResNet(nn.Module):
     def __init__(
             self,
-            n_features: List[int]=[1, 8, 16, 32, 16], # Number of input & output channels
+            n_features: List[int]=[1, 8, 16, 32, 64, 32], # Number of input & output channels
             num_classes: int=10, # Number of classes
         ):
 
         super().__init__()
         logger.info("ResNet: init")
         layers = []
-        conv_ = partial(ConvLayer, stride=2, normalization=nn.BatchNorm2d, activation=nn.ReLU)
+        res_ = partial(ResBlock, stride=2)
 
-        # c.f. convnet with resblock between
-        layers.append(conv_(in_channels=n_features[0], out_channels=n_features[1], stride=1))
-        # layers.append(ResBlock(n_features[1]))
+        layers.append(res_(in_channels=n_features[0], out_channels=n_features[1], stride=1))
+
         for i in range(1, len(n_features)-1):
-            layers += [conv_(in_channels=n_features[i], out_channels=n_features[i+1])]
-            layers += [ResBlock(n_features[i+1])]
+            layers += [res_(in_channels=n_features[i], out_channels=n_features[i+1])]
 
         # last layer back to n_classes and flatten
-        layers.append(conv_(in_channels=n_features[-1], out_channels=num_classes))
+        layers.append(res_(in_channels=n_features[-1], out_channels=num_classes))
         layers.append(nn.Flatten())
+
+        # layers += [nn.Flatten(), nn.Linear(n_features[-1], num_classes, bias=False), nn.BatchNorm1d(num_classes)]
         self.layers = nn.Sequential(*layers)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:

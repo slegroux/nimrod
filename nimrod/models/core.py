@@ -333,7 +333,7 @@ def train_one_cycle(
 
     if model_summary:
         xb, yb = next(iter(datamodule.train_dataloader()))
-        print(summary(model.nnet, input_size=xb.shape, depth=-1, device='cpu'))
+        print(summary(model.nnet, input_size=xb.shape, depth=5, device='cpu'))
     
     trainer.fit(model, datamodule.train_dataloader(), datamodule.val_dataloader())
     if test:
