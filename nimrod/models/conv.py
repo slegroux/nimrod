@@ -21,6 +21,7 @@ from omegaconf import OmegaConf
 from matplotlib import pyplot as plt
 import pandas as pd
 from typing import List, Optional, Type, Callable, Any
+from functools import partial
 
 from ..utils import get_device, set_seed
 from .core import Classifier
@@ -35,34 +36,6 @@ set_seed()
 
 # %% ../../nbs/models.conv.ipynb 11
 class ConvLayer(nn.Module):
-    """A 2D convolutional layer with optional batch normalization and activation.
-
-    This layer performs 2D convolution with stride 2 for downsampling, optionally followed by
-    batch normalization and activation.
-
-    Parameters
-    ----------
-    in_channels : int, default=3
-        Number of input channels
-    out_channels : int, default=16 
-        Number of output channels / number of features
-    kernel_size : int, default=3
-        Size of the convolving kernel
-    bias : bool, default=True
-        If True, adds a learnable bias to the convolution
-    normalization : nn.Module, default=nn.BatchNorm2d
-        Normalization layer to use after convolution
-    activation : nn.Module, default=nn.ReLU
-        Activation function to use after normalization
-
-    Notes
-    -----
-    When using batch normalization, the convolution bias is automatically disabled
-    since it would be redundant.
-
-    The spatial dimensions are reduced by half due to stride=2 convolution:
-    output_size = input_size/2
-    """
   
     def __init__(
         self,
@@ -70,18 +43,19 @@ class ConvLayer(nn.Module):
         out_channels:int=16, # output channels
         kernel_size:int=3, # kernel size
         stride:int=2, # stride
-        bias:bool=True,
+        bias:bool=False,
         normalization:Optional[Type[nn.Module]]=nn.BatchNorm2d,
         activation:Optional[Type[nn.Module]]=nn.ReLU,
+        # padding=kernel_size//2
         
     ):
 
         super().__init__()
         
         if bias and normalization and issubclass(normalization, (nn.BatchNorm1d,nn.BatchNorm2d,nn.BatchNorm3d)):
-            logger.warning('setting conv bias to False as Batchnorm is used')
+            logger.warning('setting conv bias back to False as Batchnorm is used')
             # https://x.com/karpathy/status/1013245864570073090
-            bias = None
+            bias = False
 
         # use stride 2 for downsampling to (W/2, H/2) instead of max or average pooling with stride 1
         conv = nn.Conv2d(
@@ -109,7 +83,7 @@ class ConvLayer(nn.Module):
         return self.net(x)
 
 
-# %% ../../nbs/models.conv.ipynb 21
+# %% ../../nbs/models.conv.ipynb 20
 class DeconvLayer(nn.Module):
     def __init__(
         self,
@@ -143,48 +117,12 @@ class DeconvLayer(nn.Module):
                 ) -> torch.Tensor: # output image tensor of dimension (B, C, W*2, H*2)
         return self._net(x) 
 
-# %% ../../nbs/models.conv.ipynb 28
+# %% ../../nbs/models.conv.ipynb 27
 class ConvNet(nn.Module):
-    """
-    ConvNet: a simple convolutional neural network
-
-    Parameters
-    ----------
-    n_features : List[int]
-        channel/feature expansion. The length of the list will determine the
-        number of convolutional layers. The first element is the number of
-        channels in the input image, and the last element is the number of
-        output channels (i.e. the number of classes).
-    num_classes : int
-        number of classes
-    kernel_size : int
-        kernel size
-    bias : bool
-        conv2d bias
-    normalization : nn.Module
-        normalization (before activation)
-    activation : nn.Module
-        activation function
-
-    Notes
-    -----
-    The number of convolutional layers is determined by the length of the list
-    `n_features`.
-
-    Examples
-    --------
-    >>> model = ConvNet(n_features=[1, 8, 16, 32, 64])
-    >>> model = ConvNet(n_features=[1, 8, 16, 32, 64], num_classes=10)
-    >>> model = ConvNet(n_features=[1, 8, 16, 32, 64], kernel_size=5)
-    >>> model = ConvNet(n_features=[1, 8, 16, 32, 64], bias=True)
-    >>> model = ConvNet(n_features=[1, 8, 16, 32, 64], normalization=None)
-    >>> model = ConvNet(n_features=[1, 8, 16, 32, 64], activation=None)
-    """
-
 
     def __init__(
             self,
-            n_features:List[int]=[1, 8, 16, 32, 64], # channel/feature expansion
+            n_features:List[int]=[1, 8, 16, 32, 64, 128], # channel/feature expansion
             num_classes:int=10, # num_classes
             kernel_size:int=3, # kernel size
             bias:bool=False, # conv2d bias
@@ -195,39 +133,43 @@ class ConvNet(nn.Module):
         super().__init__()
 
         net = []
-        # TODO:first layer stride 1 ?
-        conv_stride_1 = ConvLayer(
-            in_channels=n_features[0],
-            out_channels=n_features[1],
-            stride=2,
-            kernel_size=kernel_size,
-            bias=bias,
-            normalization=normalization,
-            activation=activation
-        )
-        net.append(conv_stride_1)
+        conv_ = partial(ConvLayer, kernel_size=kernel_size, bias=bias, normalization=normalization, activation=activation)
+        # first layer stride 1 to be able to go deeper while keeping the same spatial resolution
+        conv_1 = conv_(in_channels=n_features[0], out_channels=n_features[1], stride=1)
+        # conv_1 = ConvLayer(
+        #     in_channels=n_features[0],
+        #     out_channels=n_features[1],
+        #     stride=1,
+        #     kernel_size=kernel_size,
+        #     bias=bias,
+        #     normalization=normalization,
+        #     activation=activation
+        # )
+        net.append(conv_1)
 
         for i in range(1, len(n_features) - 1):
-            conv = ConvLayer(
-                    in_channels=n_features[i],
-                    out_channels=n_features[i+1],
-                    kernel_size=kernel_size,
-                    bias=bias,
-                    normalization=normalization,
-                    activation=activation
-            )
-            net.append(conv)
+
+            # conv = ConvLayer(
+            #         in_channels=n_features[i],
+            #         out_channels=n_features[i+1],
+            #         kernel_size=kernel_size,
+            #         bias=bias,
+            #         normalization=normalization,
+            #         activation=activation
+            # )
+            net.append(conv_(in_channels=n_features[i], out_channels=n_features[i+1], stride=2))
         
         # last layer -> flatten
         net.append(
-            ConvLayer(
-                in_channels=n_features[-1],
-                out_channels=num_classes,
-                kernel_size=kernel_size,
-                bias=True,
-                normalization=None,
-                activation=None
-                )
+            conv_(in_channels=n_features[-1], out_channels=num_classes, stride=2)
+            # ConvLayer(
+            #     in_channels=n_features[-1],
+            #     out_channels=num_classes,
+            #     kernel_size=kernel_size,
+            #     bias=True,
+            #     normalization=None,
+            #     activation=None
+            #     )
             )
         net.append(nn.Flatten(start_dim=1, end_dim=-1))
 
@@ -240,7 +182,7 @@ class ConvNet(nn.Module):
         ) -> torch.Tensor: # output probs (B, N_classes)
         return self.net(x)
 
-# %% ../../nbs/models.conv.ipynb 43
+# %% ../../nbs/models.conv.ipynb 41
 class ConvNetX(Classifier):
     """
     Parameters

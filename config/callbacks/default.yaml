@@ -1,7 +1,7 @@
 defaults:
   - model_checkpoint
   - early_stopping
-  # - model_summary
+  - model_summary
   - rich_progress_bar
   - learning_rate_monitor
   - _self_

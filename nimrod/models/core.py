@@ -10,11 +10,12 @@ import torch.nn as nn
 import torch
 from torchmetrics import Accuracy, MaxMetric, MeanMetric
 from torch_lr_finder import LRFinder
+from torchinfo import summary
 
 import lightning as L
 from lightning.pytorch.tuner import Tuner
 from lightning import Trainer
-from lightning.pytorch.loggers import WandbLogger
+from lightning.pytorch.loggers import WandbLogger, TensorBoardLogger
 import wandb
 from lightning.pytorch.callbacks import LearningRateMonitor
 
@@ -27,6 +28,7 @@ import logging
 import os
 from typing import Any, Dict, List, Callable, Optional
 from functools import partial
+from rich import print
 
 import pandas as pd
 from matplotlib import pyplot as plt
@@ -278,11 +280,13 @@ def train_one_cycle(
     datamodule: ImageDataModule,
     max_lr:float=0.1,
     weight_decay=1e-5,
-    n_epochs: int=5,
+    n_epochs:int=5,
     project_name:str='MNIST-Classifier',
     tags = ['arch', 'dev'],
     test:bool=True,
-    run_name:str=None
+    run_name:str=None,
+    model_summary:bool=True,
+    logger:str='wandb'
     ):
 
     """train one cycle, adamW optim with wandb logging & learning rate monitor by default"""
@@ -290,25 +294,33 @@ def train_one_cycle(
     model_name = model.func.__name__ 
     if run_name is None:
         run_name = f"{model_name}-bs:{datamodule.batch_size}-epochs:{n_epochs}"
+    
+    if logger=='wandb':
 
-    wandb_logger = WandbLogger(
-        project=project_name,
-        name=run_name,
-        save_dir='wandb',
-        entity='slegroux',
-        tags=tags,
-        group=model_name,
-        log_model=True, # log artefacts at the end of run
-        # monitor_gym=False,
-        mode='online'
-        )
+        exp_logger = WandbLogger(
+            project=project_name,
+            name=run_name,
+            save_dir='wandb',
+            entity='slegroux',
+            tags=tags,
+            group=model_name,
+            log_model=False, # log artefacts at the end of run
+            # monitor_gym=False,
+            mode='online',
+            )
+    else:
+        exp_logger = TensorBoardLogger(
+            save_dir='./tensorboard',
+            log_graph=True,
+            default_hp_metric=True
+            )
 
     lr_monitor = LearningRateMonitor(logging_interval="step")
 
     trainer = Trainer(
         accelerator="auto",
         max_epochs=n_epochs,
-        logger=wandb_logger,
+        logger=exp_logger,
         callbacks = [lr_monitor],
         check_val_every_n_epoch=1,
         log_every_n_steps=1
@@ -318,9 +330,14 @@ def train_one_cycle(
     optimizer = partial(torch.optim.AdamW, lr=1e-4, weight_decay=weight_decay)
     scheduler = partial(torch.optim.lr_scheduler.OneCycleLR, total_steps=total_steps, max_lr=max_lr) 
     model = model(optimizer=optimizer, scheduler=scheduler)
+
+    if model_summary:
+        xb, yb = next(iter(datamodule.train_dataloader()))
+        print(summary(model.nnet, input_size=xb.shape, depth=-1, device='cpu'))
     
     trainer.fit(model, datamodule.train_dataloader(), datamodule.val_dataloader())
     if test:
         trainer.test(model, datamodule.test_dataloader())
+
     wandb.finish()
 

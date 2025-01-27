@@ -37,18 +37,18 @@ set_seed()
 class ResBlock(nn.Module):
     def __init__(
             self,
-            n_channels: int=3 # Number of input & output channels
+            n_channels:int # Number of input & output channels
         ):
 
         super().__init__()
 
         layers = []
-        conv = partial(ConvLayer, n_channels, n_channels, stride=1, normalization=nn.BatchNorm2d)
-        layers += [conv(activation=nn.ReLU), conv(activation=None)]
-        self.layers = nn.Sequential(*layers)
+        conv_ = partial(ConvLayer, stride=1)
+        layers += [conv_(n_channels, n_channels), conv_(n_channels, n_channels)]
+        self.nnet = nn.Sequential(*layers)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        return x + self.layers(x)
+        return x + self.nnet(x)
 
 # %% ../../nbs/models.resnet.ipynb 10
 class ResNet(nn.Module):
@@ -61,14 +61,17 @@ class ResNet(nn.Module):
         super().__init__()
         logger.info("ResNet: init")
         layers = []
-        conv = partial(ConvLayer, stride=2, normalization=nn.BatchNorm2d, activation=nn.ReLU)
-        # convnet with resblock between
-        for i in range(len(n_features)-1):
-            layers += [conv(n_features[i], n_features[i+1])]
+        conv_ = partial(ConvLayer, stride=2, normalization=nn.BatchNorm2d, activation=nn.ReLU)
+
+        # c.f. convnet with resblock between
+        layers.append(conv_(in_channels=n_features[0], out_channels=n_features[1], stride=1))
+        # layers.append(ResBlock(n_features[1]))
+        for i in range(1, len(n_features)-1):
+            layers += [conv_(in_channels=n_features[i], out_channels=n_features[i+1])]
             layers += [ResBlock(n_features[i+1])]
 
         # last layer back to n_classes and flatten
-        layers.append(conv(n_features[-1], num_classes))
+        layers.append(conv_(in_channels=n_features[-1], out_channels=num_classes))
         layers.append(nn.Flatten())
         self.layers = nn.Sequential(*layers)
 
