@@ -1,15 +1,19 @@
 _target_: nimrod.image.datasets.ImageDataModule
 name: 'zh-plus/tiny-imagenet'
 data_dir: "../data/image"
+exclude_grey_scale: true
 train_val_split: [0.8, 0.2]
 batch_size: 64
 num_workers: 0
-pin_memory: False
+pin_memory: True
 persistent_workers: False
 transforms: 
   _target_: torchvision.transforms.Compose
   transforms:
     - _target_: torchvision.transforms.ToTensor
-    - _target_: torchvision.transforms.Resize
-      size: [32,32]
+    - _target_: torchvision.transforms.Normalize
+      mean: [0.4822, 0.4495, 0.3985]
+      std: [0.2771, 0.2690, 0.2826]
+    # - _target_: torchvision.transforms.Resize
+    #   size: [32,32]
 

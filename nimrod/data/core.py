@@ -14,24 +14,26 @@ from abc import ABC, abstractmethod
 import torch
 from torchvision.transforms import transforms
 from torch.utils.data import random_split, Dataset, DataLoader, Subset
+import lightning as L
 
 import logging
 logger = logging.getLogger(__name__)
 
 # %% ../../nbs/data.core.ipynb 4
-class DataModule(ABC):
+class DataModule(ABC, L.LightningDataModule):
     def __init__(
         self,
         # data_dir: str = "~/Data/", # path to source data dir
-        # train_val_split:Tuple[float, float] = [0.8, 0.2], # train val test %
+        train_val_split:Tuple[float, float] = [0.8, 0.2], # train val test %
         batch_size: int = 64, # size of compute batch
         num_workers: int = 0, # num_workers equal 0 means that it’s the main process that will do the data loading when needed, num_workers equal 1 is the same as any n, but you’ll only have a single worker, so it might be slow
         pin_memory: bool = False, # If you load your samples in the Dataset on CPU and would like to push it during training to the GPU, you can speed up the host to device transfer by enabling pin_memory. This lets your DataLoader allocate the samples in page-locked memory, which speeds-up the transfer
         persistent_workers: bool = False,
-        shuffle: bool = True # shuffle training data
     ) -> None:
+
         super().__init__()
-        self.save_hyperparameters() # can access inputs with self.hparams
+
+        # self.save_hyperparameters() # can access inputs with self.hparams
         self.transforms = transforms.Compose([transforms.ToTensor()])
         self.train_ds: Optional[Dataset] = None
         self.val_ds: Optional[Dataset] = None
@@ -49,6 +51,14 @@ class DataModule(ABC):
     def setup(self, stage: Optional[str]=None)->None:
         """Split data into train, val, test."""
         pass
+
+    @property
+    def batch_size(self) -> int:
+        return self.hparams.batch_size
+
+    @batch_size.setter
+    def batch_size(self, value: int) -> None:
+        self.hparams.batch_size = value
 
     def train_dataloader(self) -> torch.utils.data.DataLoader:
         return DataLoader(

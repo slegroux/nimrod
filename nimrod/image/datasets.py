@@ -8,11 +8,12 @@ __all__ = ['logger', 'show_images', 'make_grid', 'ImagePlotMixin', 'ImageDataset
 # %% ../../nbs/image.datasets.ipynb 3
 # torch
 import torch
+import torch.nn as nn
 from torch import Tensor # type hint
 import torch.utils.data as data
 from torch.utils.data import ConcatDataset, DataLoader, Dataset, random_split
 # torchvision
-from torchvision.transforms import transforms, Compose
+from torchvision.transforms import v2 as transforms, Compose
 import torchvision
 # lightning
 from lightning import LightningDataModule
@@ -175,8 +176,7 @@ class ImageDataset(ImagePlotMixin, Dataset):
         *args,
         data_dir:Optional[str]='../data/image', # path where data is saved if None default to hugging face cache
         split = 'train', # train or test dataset
-        transforms:Optional[transforms.Compose]=transforms.Compose([
-                transforms.ToTensor()]), #,transforms.Normalize((0.1307,), (0.3081,))]),
+        transforms:Optional[transforms.Compose]=transforms.Compose([transforms.ToTensor()]),
         streaming:bool = False, # TODO: support and test streaming datasest
         exclude_grey_scale = False,
         verification_mode="no_checks"
@@ -228,6 +228,10 @@ class ImageDataset(ImagePlotMixin, Dataset):
         return self.hf_ds.features['label'].num_classes
     
     @property
+    def dim(self)->List[int]:
+        return list(self[0][0].shape)
+
+    @property
     def label_names(self)->List[str]:
         return self.hf_ds.features['label'].names
     
@@ -247,20 +251,30 @@ class ImageDataset(ImagePlotMixin, Dataset):
         idx:int # index into the dataset
     ) -> tuple[torch.FloatTensor, int]: # Y image data, x digit number
       
-        image = np.array(self.images[idx])
+        image = self.images[idx] # PIL image
         label = self.labels[idx]
 
+        # Check the number of channels in the PIL image
+        mode = image.mode
+        if mode == 'L':
+            channels = 1  # Grayscale
+        elif mode == 'RGB':
+            channels = 3  # RGB
+        elif mode == 'RGBA':
+            channels = 4  # RGBA
+        else:
+            raise ValueError(f"Unsupported image mode: {mode}")
+    
+        if self.exclude_grey_scale and channels != 3:
+            logger.warning(f"Skipping sample at index {idx} because doesn't have 3 channels")
+            next_idx = (idx + 1) % len(self)
+            return self.__getitem__(next_idx)
+        
         if self.transform:
             image = self.transform(image)
-            if self.exclude_grey_scale and image.size(0) != 3:
-                logger.warning(f"Skipping sample at index {idx} because doesn't have 3 channels")
-                next_idx = (idx + 1) % len(self)
-                return self.__getitem__(next_idx)
         
         return image, label
 
-
-    
     def train_dev_split(
         self,
         ratio:float, # percentage of train/dev split,
@@ -286,7 +300,7 @@ class ImageDataset(ImagePlotMixin, Dataset):
         ):
         self.plot_grid(self, n_rows, n_cols, self.hf_ds.features['label'].int2str)
 
-# %% ../../nbs/image.datasets.ipynb 28
+# %% ../../nbs/image.datasets.ipynb 31
 class ImageDataModule(ImagePlotMixin, DataModule, LightningDataModule):
 
 

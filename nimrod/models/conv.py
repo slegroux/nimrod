@@ -182,7 +182,7 @@ class ConvNet(nn.Module):
         ) -> torch.Tensor: # output probs (B, N_classes)
         return self.net(x)
 
-# %% ../../nbs/models.conv.ipynb 41
+# %% ../../nbs/models.conv.ipynb 42
 class ConvNetX(Classifier):
     """
     Parameters
