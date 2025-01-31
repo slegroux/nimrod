@@ -19,8 +19,10 @@ import torchvision
 from lightning import LightningDataModule
 
 # hugging face
-from datasets import load_dataset, load_dataset_builder, ClassLabel
-import datasets
+from datasets import load_dataset, load_dataset_builder, load_from_disk
+from datasets import GeneratorBasedBuilder, DatasetInfo, Features, ClassLabel, Image, Value, SplitInfo
+from datasets.info import DatasetInfo
+from datasets.splits import NamedSplit, SplitDict
 
 # math
 import pandas as pd
@@ -36,6 +38,7 @@ import logging
 import warnings
 from pprint import pprint
 from plum import dispatch
+from rich import print
 
 # configs
 from omegaconf import OmegaConf
@@ -179,29 +182,57 @@ class ImageDataset(ImagePlotMixin, Dataset):
         transforms:Optional[transforms.Compose]=transforms.Compose([transforms.ToTensor()]),
         streaming:bool = False, # TODO: support and test streaming datasest
         exclude_grey_scale = False,
-        verification_mode="no_checks"
+        verification_mode="no_checks",
+        from_image_folder=False,
+        from_disk=False
         
     ):
-
+        logging.getLogger('datasets')
         if data_dir is not None:
             os.makedirs(data_dir, exist_ok=True)
         super().__init__()
         self.exclude_grey_scale = exclude_grey_scale
-        self.info = load_dataset_builder(name, *args)
-        if split not in self.info.info.splits:
-            raise ValueError(f"The specified split '{split}' does not exist in the dataset '{name}'. Available splits: {list(info.info.splits.keys())}")
+        if not from_image_folder:
+            self.info = load_dataset_builder(name, *args)
+            if split not in self.info.info.splits:
+                raise ValueError(f"The specified split '{split}' does not exist in the dataset '{name}'. Available splits: {list(self.info.info.splits.keys())}")
+        else:
+            self.info = split
 
         logger.info(f"loading dataset {name} with args {args} from split {split}")
-        self.hf_ds = load_dataset(
-            name,
-            *args,
-            split=split,
-            cache_dir=data_dir,
-            download_mode='reuse_dataset_if_exists',
-            streaming=streaming,
-            verification_mode=verification_mode
-            
-        )
+
+        # If loading from datadir/{train,test,val}/{name}/*.jpg formatted directory
+        if from_image_folder:
+            self.hf_ds = load_dataset(
+                'imagefolder',
+                data_dir=name,
+                *args,
+                split=split,
+                cache_dir=data_dir,
+                download_mode='reuse_dataset_if_exists',
+                streaming=streaming,
+                verification_mode=verification_mode
+            )
+        elif from_disk:
+            self.hf_ds = load_from_disk(name)
+        else:
+            logger.info(f"loading dataset {name} from split {split}")
+            self.hf_ds = load_dataset(
+                name,
+                *args,
+                split=split,
+                cache_dir=data_dir,
+                download_mode='reuse_dataset_if_exists',
+                streaming=streaming,
+                verification_mode=verification_mode
+                
+            )
+
+        # filter out grey scale images
+        if self.exclude_grey_scale:
+            logger.warning("filtering out grey scale images")
+            self.hf_ds = self.hf_ds.filter(lambda row: row['image'].mode == 'RGB')
+
         self.image_column_name = 'image'
         if name == 'cifar10':
             self.image_column_name = 'img'
@@ -215,7 +246,11 @@ class ImageDataset(ImagePlotMixin, Dataset):
             self.hf_ds = self.hf_ds.map(lambda example: {'label': cl.str2int(example['taxonomy'])})
             self.hf_ds = self.hf_ds.cast_column('label', cl)
 
-        self.labels = self.hf_ds['label']
+        if name == 'jeremyf/tiny-imagent-200':
+            self.labels = self.hf_ds['word']
+        else:
+            self.labels = self.hf_ds['label']
+
 
         self.transform = transforms
 
@@ -241,7 +276,11 @@ class ImageDataset(ImagePlotMixin, Dataset):
     
     @property
     def splits(self)->List[int]:
-        return self.info.info.splits.keys()
+        if self.info is not None:
+            return self.info.info.splits.keys()
+        else:
+            logger.warning("info from_image_folder=True at init")
+            return self.info
 
     def __len__(self) -> int: # length of dataset
         return len(self.images)
@@ -300,9 +339,8 @@ class ImageDataset(ImagePlotMixin, Dataset):
         ):
         self.plot_grid(self, n_rows, n_cols, self.hf_ds.features['label'].int2str)
 
-# %% ../../nbs/image.datasets.ipynb 31
-class ImageDataModule(ImagePlotMixin, DataModule, LightningDataModule):
-
+# %% ../../nbs/image.datasets.ipynb 26
+class ImageDataModule(ImagePlotMixin, DataModule):
 
     def __init__(
         self,
@@ -319,17 +357,26 @@ class ImageDataModule(ImagePlotMixin, DataModule, LightningDataModule):
         ):
 
         logger.info(f"Init ImageDataModule for {name}")
-        super().__init__(train_val_split, batch_size, num_workers, pin_memory, persistent_workers)
+
         self.save_hyperparameters()
+
+        super().__init__(
+            train_val_split=train_val_split,
+            batch_size=batch_size,
+            num_workers=num_workers,
+            pin_memory=pin_memory,
+            persistent_workers=persistent_workers
+            )
+
         self.train_ds, self.test_ds, self.val_ds = None, None, None
         self.int2str = None
         self._num_classes = None
         self.args = args
         self.kwargs = kwargs
 
-    @property
-    def batch_size(self)->int:
-        return self.hparams.batch_size
+    # @property
+    # def batch_size(self)->int:
+    #     return self.hparams.batch_size
 
     @property
     def dim(self)->List[int]:
@@ -364,7 +411,6 @@ class ImageDataModule(ImagePlotMixin, DataModule, LightningDataModule):
             split='train',
             transforms = self.hparams.transforms,
             **self.kwargs
-
         )
         # get num classes before setup method converst ImageDataset to Subset
         self._num_classes = self.train_ds.num_classes
@@ -435,7 +481,6 @@ class ImageDataModule(ImagePlotMixin, DataModule, LightningDataModule):
             self.train_ds, self.val_ds = random_split(dataset=self.train_ds, lengths=lengths)
             logger.info(f"train: {len(self.train_ds)} val: {len(self.val_ds)}, test: {len(self.test_ds)}")
 
-    
     def show(self, idx):
       self.plot(self.train_ds, idx, self.int2str)
     
@@ -456,4 +501,3 @@ class ImageDataModule(ImagePlotMixin, DataModule, LightningDataModule):
         grid_im = Image.fromarray(np.array(grid_im).astype(np.uint8))
         return grid_im
 
-        
