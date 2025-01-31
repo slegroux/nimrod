@@ -187,7 +187,8 @@ class ImageDataset(ImagePlotMixin, Dataset):
         from_disk=False
         
     ):
-        logging.getLogger('datasets')
+        logging.getLogger('datasets').setLevel(logging.INFO)
+        
         if data_dir is not None:
             os.makedirs(data_dir, exist_ok=True)
         super().__init__()
@@ -339,7 +340,7 @@ class ImageDataset(ImagePlotMixin, Dataset):
         ):
         self.plot_grid(self, n_rows, n_cols, self.hf_ds.features['label'].int2str)
 
-# %% ../../nbs/image.datasets.ipynb 26
+# %% ../../nbs/image.datasets.ipynb 25
 class ImageDataModule(ImagePlotMixin, DataModule):
 
     def __init__(
