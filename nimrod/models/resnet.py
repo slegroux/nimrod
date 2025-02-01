@@ -25,7 +25,7 @@ from .core import Classifier
 from ..utils import get_device, set_seed
 from ..image.datasets import ImageDataModule
 
-from typing import List, Optional, Callable, Any
+from typing import List, Optional, Callable, Any, Type
 import logging
 from functools import partial
 
@@ -40,15 +40,17 @@ class ResBlock(nn.Module):
             self,
             in_channels:int, # Number of input channels
             out_channels:int, # Number of output channels
-            stride:int=1
+            stride:int=1,
+            kernel_size:int=3,
+            activation:Optional[Type[nn.Module]]=nn.ReLU
         ):
 
         super().__init__()
-
+        self.activation = activation()
         conv_block = []
-        conv_ = partial(ConvLayer, stride=1, activation=nn.ReLU, normalization=nn.BatchNorm2d)
-        c1 = conv_(in_channels, out_channels, stride=stride)
-        c2 = conv_(out_channels, out_channels, activation=None) #adding activation to the whole layer at the end c.f. forward
+        conv_ = partial(ConvLayer, stride=1, activation=activation, normalization=nn.BatchNorm2d)
+        c1 = conv_(in_channels, out_channels, stride=1, kernel_size=kernel_size)
+        c2 = conv_(out_channels, out_channels, stride=stride, activation=None, kernel_size=kernel_size) #adding activation to the whole layer at the end c.f. forward
         conv_block += [c1,c2]
         self.conv_layer = nn.Sequential(*conv_block)
 
@@ -66,7 +68,7 @@ class ResBlock(nn.Module):
 
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        return F.relu(self.conv_layer(x) + self.id(self.pooling(x)))
+        return self.activation(self.conv_layer(x) + self.id(self.pooling(x)))
 
 # %% ../../nbs/models.resnet.ipynb 10
 class ResNet(nn.Module):
