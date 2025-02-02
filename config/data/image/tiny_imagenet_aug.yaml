@@ -4,7 +4,6 @@ data_dir: '../data/image'
 train_val_split: [0.8, 0.2]
 batch_size: 512
 num_workers: 0
-size: 64
 pin_memory: True
 persistent_workers: False
 transforms: 
@@ -15,11 +14,10 @@ transforms:
       mean: [0.4822, 0.4495, 0.3985]
       std: [0.2771, 0.2690, 0.2826]
     - _target_: torchvision.transforms.Resize
-      size: [${..size},${..size}]
+      size: 64
     - _target_: torchvision.transforms.RandomCrop
-      size: [${..size},${..size}]
+      size: 64
     - _target_: torchvision.transforms.RandomHorizontalFlip
     - _target_: torchvision.transforms.RandomVerticalFlip
-    - _target_: torchvision.transforms.RandomRotation
 
 
