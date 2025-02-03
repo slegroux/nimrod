@@ -513,10 +513,10 @@ class ImageDataModule(ImagePlotMixin, DataModule):
 # %% ../../nbs/image.datasets.ipynb 23
 TFM_LOW_RES = transforms.Compose(
     [
-        transforms.Resize((32, 32)), 
+        transforms.Resize((32, 32), antialias=True), 
         # lambda x: F.interpolate(x.unsqueeze(0), scale_factor=(2,2), mode='bilinear').squeeze(0)
         # nn.Upsample(scale_factor=(2,2), mode='bilinear')
-        transforms.Resize((64, 64)),
+        transforms.Resize((64, 64), antialias=True),
     ]
 )
 

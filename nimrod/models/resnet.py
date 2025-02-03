@@ -49,7 +49,10 @@ class ResBlock(nn.Module):
         self.activation = activation()
         conv_block = []
         conv_ = partial(ConvLayer, stride=1, activation=activation, normalization=nn.BatchNorm2d)
+        # conv stride 1 to be able to go deeper while keeping the same spatial resolution
         c1 = conv_(in_channels, out_channels, stride=1, kernel_size=kernel_size)
+        # conv stride to be able to go wider in number of channels
+        # activation will be added at very end
         c2 = conv_(out_channels, out_channels, stride=stride, activation=None, kernel_size=kernel_size) #adding activation to the whole layer at the end c.f. forward
         conv_block += [c1,c2]
         self.conv_layer = nn.Sequential(*conv_block)
