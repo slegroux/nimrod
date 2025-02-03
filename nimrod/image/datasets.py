@@ -4,7 +4,7 @@
 
 # %% auto 0
 __all__ = ['logger', 'TFM_LOW_RES', 'show_images', 'make_grid', 'ImagePlotMixin', 'ImageDataset', 'ImageDataModule',
-           'ImageSuperResDataset']
+           'ImageSuperResDataset', 'ImageSuperResDataModule']
 
 # %% ../../nbs/image.datasets.ipynb 3
 # torch
@@ -42,6 +42,7 @@ import warnings
 from pprint import pprint
 from plum import dispatch
 from rich import print
+from functools import partial
 
 # configs
 from omegaconf import OmegaConf
@@ -53,14 +54,14 @@ from typing import Optional, Tuple, List, Callable, Union, Dict
 from ..data.core import DataModule
 from ..utils import set_seed
 
-# %% ../../nbs/image.datasets.ipynb 4
+
 set_seed(42)
 logger = logging.getLogger(__name__)
 # logger.setLevel(logging.DEBUG)
 plt.set_loglevel('INFO')
 logging.getLogger('matplotlib.image').setLevel(logging.ERROR)
 
-# %% ../../nbs/image.datasets.ipynb 6
+# %% ../../nbs/image.datasets.ipynb 5
 def show_images(x:torch.Tensor, ncols:int=8):
     """Given a batch of images x, make a grid and convert to PIL"""
     # x = x * 0.5 + 0.5  # Map from (-1, 1) back to (0, 1)
@@ -77,7 +78,7 @@ def make_grid(images, size=64):
         output_im.paste(im.resize((size, size)), (i * size, 0))
     return output_im
 
-# %% ../../nbs/image.datasets.ipynb 8
+# %% ../../nbs/image.datasets.ipynb 7
 class ImagePlotMixin:
     " Mixin class for image datasets providing visualization of (image, label) samples"
 
@@ -90,6 +91,8 @@ class ImagePlotMixin:
         ):
         X, label = ds[idx]
         C, H, W = X.shape
+
+        fig, axs = plt.subplots(figsize=(2, 2))
         
         if C == 1:
             # X (1, H, W)
@@ -157,22 +160,23 @@ class ImagePlotMixin:
             # Convert label to string if possible
             try:
                 # label_str = ds.hf_ds.features['label'].int2str(label)
+                max_length_label = 20 # max length of the label string
                 if isinstance(int2label, dict):
-                    label_str = int2label[label]
+                    label_str = int2label[label][0:max_length_label]
                 elif isinstance(int2label, Callable):
-                    label_str = int2label(label)
+                    label_str = int2label(label)[0:max_length_label]
                 else:
-                    label_str = str(label)
+                    label_str = str(label)[0:max_length_label]
             except AttributeError:
                 logger.warning("Unable to convert label to string")
             
-            axs[i].set_title(f"Label: {label_str}")
+            axs[i].set_title(f"{label_str}")
             axs[i].axis('off')
     
         plt.tight_layout()
         plt.show()
 
-# %% ../../nbs/image.datasets.ipynb 11
+# %% ../../nbs/image.datasets.ipynb 10
 class ImageDataset(ImagePlotMixin, Dataset):
     "Image dataset"
 
@@ -232,16 +236,16 @@ class ImageDataset(ImagePlotMixin, Dataset):
                 
             )
 
-        # filter out grey scale images
-        if self.exclude_grey_scale:
-            logger.warning("filtering out grey scale images")
-            self.hf_ds = self.hf_ds.filter(lambda row: row['image'].mode == 'RGB')
-
-        # IMAGES
-
+        # CHANGE IMAGE COLUMN NAME IF NEEDED
         self.image_column_name = 'image'
         if name == 'cifar10':
             self.image_column_name = 'img'
+
+        # filter out grey scale images
+        if self.exclude_grey_scale:
+            logger.warning("filtering out grey scale images")
+            self.hf_ds = self.hf_ds.filter(lambda row: row[self.image_column_name].mode == 'RGB')
+
                 
         self.images = self.hf_ds[self.image_column_name]
 
@@ -343,7 +347,7 @@ class ImageDataset(ImagePlotMixin, Dataset):
         ):
         self.plot_grid(self, n_rows, n_cols, self.hf_ds.features['label'].int2str)
 
-# %% ../../nbs/image.datasets.ipynb 25
+# %% ../../nbs/image.datasets.ipynb 12
 class ImageDataModule(ImagePlotMixin, DataModule):
 
     def __init__(
@@ -506,11 +510,13 @@ class ImageDataModule(ImagePlotMixin, DataModule):
         return grid_im
 
 
-# %% ../../nbs/image.datasets.ipynb 36
+# %% ../../nbs/image.datasets.ipynb 23
 TFM_LOW_RES = transforms.Compose(
     [
         transforms.Resize((32, 32)), 
-        lambda x: F.interpolate(x.unsqueeze(0), scale_factor=(2,2), mode='bilinear').squeeze(0)
+        # lambda x: F.interpolate(x.unsqueeze(0), scale_factor=(2,2), mode='bilinear').squeeze(0)
+        # nn.Upsample(scale_factor=(2,2), mode='bilinear')
+        transforms.Resize((64, 64)),
     ]
 )
 
@@ -542,3 +548,57 @@ class ImageSuperResDataset(ImageDataset):
         
         return image_x, image_y
         
+
+# %% ../../nbs/image.datasets.ipynb 27
+class ImageSuperResDataModule(ImageDataModule):
+    def __init__(
+        self,
+        name:str = 'slegroux/tiny-imagenet-200-clean',
+        data_dir:str = '../data/image',
+        transform_x:Optional[transforms.Compose]=transforms.Compose([transforms.ToTensor(), TFM_LOW_RES]),
+        transform_y:Optional[transforms.Compose]=transforms.Compose([transforms.ToTensor()]),
+        train_val_split:Optional[List[float]] = [0.8, 0.2],
+        batch_size:int = 64,
+        num_workers:int = 0,
+        pin_memory:bool = False,
+        persistent_workers:bool = False
+    ):
+        logger.info(f"Init ImageSuperResDataModule for {name}")
+        self.save_hyperparameters()
+
+        super().__init__(
+            name=name,
+            data_dir=data_dir,
+            train_val_split=train_val_split,
+            batch_size=batch_size,
+            num_workers=num_workers,
+            pin_memory=pin_memory,
+            persistent_workers=persistent_workers
+            )
+
+        self.train_ds, self.test_ds, self.val_ds = None, None, None
+        self._num_classes = None
+        self.int2str = None
+
+    def prepare_data(self) -> None:
+        ds = partial(
+            ImageSuperResDataset,
+            name=self.hparams.name,
+            data_dir=self.hparams.data_dir,
+            transform_x=self.hparams.transform_x,
+            transform_y=self.hparams.transform_y
+            )
+        self.train_ds = ds(split='train')
+        self.test_ds = ds(split='test')
+        self.val_ds = ds(split='validation')
+    
+    def show(self, idx:int):
+        x, y = self.train_ds[idx]
+        fig, ax = plt.subplots(1,2, figsize=(10,5))
+        fig.tight_layout()
+        ax[0].imshow(x.permute(1,2,0).squeeze())
+        ax[0].set_title('low res')
+        ax[1].imshow(y.permute(1,2,0).squeeze())
+        ax[1].set_title('high res')
+
+
