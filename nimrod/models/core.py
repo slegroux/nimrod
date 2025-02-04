@@ -23,6 +23,7 @@ import wandb
 from lightning.pytorch.callbacks import LearningRateMonitor
 
 from ..image.datasets import ImageDataModule
+
 from omegaconf import OmegaConf
 from hydra.utils import instantiate
 
@@ -247,13 +248,17 @@ class Regressor(ABC, L.LightningModule):
     def __init__(
         self,
         nnet: L.LightningModule,
-        optimizer: torch.optim.Optimizer,
-        scheduler: torch.optim.lr_scheduler.LRScheduler
+        optimizer: Callable[...,torch.optim.Optimizer], # partial of optimizer
+        scheduler: Optional[Callable[...,Any]]=None, # partial of scheduler
+
     ):
         logger.info("Regressor: init")
         super().__init__()
         self.save_hyperparameters()
         self.lr = optimizer.keywords.get('lr') if optimizer else None # for lr finder
+        self.nnet = nnet
+        # explicitely register nnet as a  module to track its parameters
+        self.register_module('nnet', self.nnet)
 
         # loss
         self.criterion = nn.MSELoss()
@@ -270,11 +275,11 @@ class Regressor(ABC, L.LightningModule):
         self.test_loss = MeanSquaredError()
 
     def forward(self, x:torch.Tensor)->torch.Tensor:
-        return self.hparams.nnet(x)
+        return self.nnet(x)
 
     def configure_optimizers(self):
         logger.info("Regressor: configure_optimizers")
-        self.optimizer = self.hparams.optimizer(params=self.trainer.model.parameters())
+        self.optimizer = self.hparams.optimizer(params=self.parameters())
         logger.info(f"Optimizer: {self.optimizer.__class__}")
         if self.hparams.scheduler is None:
             logger.warning("no scheduler has been setup")
@@ -332,7 +337,7 @@ class Regressor(ABC, L.LightningModule):
 
 
 
-# %% ../../nbs/models.core.ipynb 10
+# %% ../../nbs/models.core.ipynb 12
 class SequentialModelX(Classifier):
     def __init__(self, modules: List[nn.Module], *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -341,7 +346,7 @@ class SequentialModelX(Classifier):
     def forward(self, x):
         return self._model(x)
 
-# %% ../../nbs/models.core.ipynb 13
+# %% ../../nbs/models.core.ipynb 15
 def lr_finder(
     model: Callable[...,torch.nn.Module], # partial model (missing optim & sched)
     datamodule: ImageDataModule, # data module
@@ -367,7 +372,7 @@ def lr_finder(
         plt.show()
     return lr_finder.suggestion()
 
-# %% ../../nbs/models.core.ipynb 15
+# %% ../../nbs/models.core.ipynb 17
 def train_one_cycle(
     model: Callable[...,torch.nn.Module], #partial model (missing optim & sched)
     datamodule: ImageDataModule,

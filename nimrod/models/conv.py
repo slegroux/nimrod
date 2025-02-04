@@ -7,7 +7,7 @@ __all__ = ['logger', 'ConvLayer', 'DeconvLayer', 'ConvNet', 'ConvNetX']
 import torch.nn as nn
 import torch
 
-from lightning import LightningModule, Trainer
+from lightning import Trainer
 from lightning.pytorch.loggers import CSVLogger, TensorBoardLogger
 from lightning.pytorch.tuner.tuning import Tuner
 from lightning.pytorch.callbacks import LearningRateMonitor, ModelCheckpoint

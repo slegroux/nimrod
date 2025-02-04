@@ -10,20 +10,15 @@ import torch.nn as nn
 
 import torch
 from torchinfo import summary
-from torchvision.transforms import transforms
-import torch.nn.functional as F
 
 
 from omegaconf import OmegaConf
 from hydra.utils import instantiate
 
-from matplotlib import pyplot as plt
-import math
 
 from .conv import ConvLayer
 from .core import Classifier
 from ..utils import get_device, set_seed
-from ..image.datasets import ImageDataModule
 
 from typing import List, Optional, Callable, Any, Type
 import logging

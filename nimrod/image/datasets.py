@@ -550,13 +550,18 @@ class ImageSuperResDataset(ImageDataset):
         
 
 # %% ../../nbs/image.datasets.ipynb 27
+TFM_LOW_RES = nn.Sequential(
+    transforms.Resize((32, 32), antialias=True),
+    transforms.Resize((64, 64), antialias=True)
+    )
+
 class ImageSuperResDataModule(ImageDataModule):
     def __init__(
         self,
         name:str = 'slegroux/tiny-imagenet-200-clean',
         data_dir:str = '../data/image',
-        transform_x:Optional[transforms.Compose]=transforms.Compose([transforms.ToTensor(), TFM_LOW_RES]),
-        transform_y:Optional[transforms.Compose]=transforms.Compose([transforms.ToTensor()]),
+        transform_x:Optional[transforms.Compose]=nn.Sequential(transforms.ToTensor(), TFM_LOW_RES),
+        transform_y:Optional[transforms.Compose]=nn.Sequential(transforms.ToTensor()),
         train_val_split:Optional[List[float]] = [0.8, 0.2],
         batch_size:int = 64,
         num_workers:int = 0,
