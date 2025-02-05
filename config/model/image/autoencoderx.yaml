@@ -1,0 +1,10 @@
+_target_: nimrod.models.superres.SuperResAutoencoderX
+_partial_: true
+
+nnet:
+  _target_: nimrod.models.superres.SuperResAutoencoder
+  n_features: [3, 32, 64, 128, 256, 512, 1024]  # channel/feature expansion
+
+
+# optimizer
+# schedule

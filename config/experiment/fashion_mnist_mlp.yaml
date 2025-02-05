@@ -1,0 +1,44 @@
+# @package _global_
+
+# python train.py experiment=mnist_mlp
+
+defaults:
+  - override /data: image/fashion_mnist
+  - override /model: image/mlpx
+  - override /trainer: default
+  - override /logger: wandb
+  # - override /scheduler: one_cycle_lr
+  - _self_
+
+
+
+
+project: "FASHION-MNIST-Classifier"
+tags: ["n_h:${model.nnet.n_h}", "dropout:${model.nnet.dropout}", "dev"]
+train: True
+tune_batch_size: False
+tune_lr: True
+plot_lr_tuning: False
+test: True
+ckpt_path: null
+
+data:
+  batch_size: 2048
+  num_workers: 0
+  pin_memory: true
+
+model:
+  nnet:
+    n_in: 1024
+    n_h: 512
+    dropout: 0.1
+
+trainer:
+  max_epochs: 5
+  check_val_every_n_epoch: 1
+  log_every_n_steps: 1
+  
+logger:
+  wandb:
+    tags: ${tags}
+    project: ${project}

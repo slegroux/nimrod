@@ -1,0 +1,40 @@
+# @package _global_
+
+# python train.py experiment=mnist_conv
+
+defaults:
+  - override /data: image/fashion_mnist
+  - override /model: image/convnetx
+  - override /trainer: default
+  - override /logger: wandb
+  - _self_
+
+
+project: "FASHION-MNIST-Classifier"
+tags: ["n_features:${model.nnet.n_features}", "bs:${data.batch_size}", "dev"]
+train: True
+tune_batch_size: False
+tune_lr: True
+plot_lr_tuning: False
+test: True
+ckpt_path: null
+
+
+data:
+  batch_size: 1024
+  num_workers: 0
+  pin_memory: true
+
+model:
+  nnet:
+    n_features: [1, 8, 16, 32, 64, 32]
+
+trainer:
+  max_epochs: 5
+  check_val_every_n_epoch: 1
+  log_every_n_steps: 1
+  
+logger:
+  wandb:
+    tags: ${tags}
+    project: ${project}
