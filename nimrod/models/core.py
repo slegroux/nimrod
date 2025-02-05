@@ -19,6 +19,7 @@ import lightning as L
 from lightning.pytorch.tuner import Tuner
 from lightning import Trainer
 from lightning.pytorch.loggers import WandbLogger, TensorBoardLogger
+from lightning.pytorch.callbacks import ModelCheckpoint
 import wandb
 from lightning.pytorch.callbacks import LearningRateMonitor
 
@@ -402,7 +403,8 @@ def train_one_cycle(
     test:bool=True,
     run_name:str=None,
     model_summary:bool=True,
-    logger:str='wandb'
+    logger:str='wandb',
+    precision="32-true", # 16-mixed, 32-true
     ):
 
     """train one cycle, adamW optim with wandb logging & learning rate monitor by default"""
@@ -411,6 +413,7 @@ def train_one_cycle(
     if run_name is None:
         run_name = f"{model_name}-bs:{datamodule.batch_size}-epochs:{n_epochs}"
     
+    # logger
     if logger=='wandb':
 
         exp_logger = WandbLogger(
@@ -430,16 +433,28 @@ def train_one_cycle(
             log_graph=True,
             default_hp_metric=True
             )
-
+    # lr monitor
     lr_monitor = LearningRateMonitor(logging_interval="step")
+
+    # checkpoint callback
+    ckpt_cb = ModelCheckpoint(
+        dirpath=f"checkpoints/{project_name}/{run_name}",
+        filename="{epoch}-{val_loss:.2f}",
+        monitor="val_loss",
+        mode="min",
+        save_top_k=1,
+        save_last=True,
+    )
+
 
     trainer = Trainer(
         accelerator="auto",
         max_epochs=n_epochs,
         logger=exp_logger,
-        callbacks = [lr_monitor],
+        callbacks = [lr_monitor, ckpt_cb],
         check_val_every_n_epoch=1,
-        log_every_n_steps=1
+        log_every_n_steps=1,
+        precision=precision
         )
 
     total_steps = len(datamodule.train_dataloader()) * n_epochs
@@ -449,7 +464,7 @@ def train_one_cycle(
 
     if model_summary:
         xb, yb = next(iter(datamodule.train_dataloader()))
-        print(summary(model.nnet, input_size=xb.shape, depth=5, device='cpu'))
+        print(summary(model.nnet, input_size=xb.shape, depth=3, device='cpu'))
     
     trainer.fit(model, datamodule.train_dataloader(), datamodule.val_dataloader())
     if test:
