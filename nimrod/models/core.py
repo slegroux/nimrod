@@ -420,7 +420,7 @@ def train_one_cycle(
             entity='slegroux',
             tags=tags,
             group=model_name,
-            log_model=False, # log artefacts at the end of run
+            log_model=True, # log artefacts at the end of run
             # monitor_gym=False,
             mode='online',
             )
