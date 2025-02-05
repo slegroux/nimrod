@@ -439,8 +439,8 @@ def train_one_cycle(
     # checkpoint callback
     ckpt_cb = ModelCheckpoint(
         dirpath=f"checkpoints/{project_name}/{run_name}",
-        filename="{epoch}-{val_loss:.2f}",
-        monitor="val_loss",
+        filename="{epoch}-{val/loss:.2f}",
+        monitor="val/loss",
         mode="min",
         save_top_k=1,
         save_last=True,
