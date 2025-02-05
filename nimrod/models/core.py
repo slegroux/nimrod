@@ -439,13 +439,13 @@ def train_one_cycle(
     # checkpoint callback
     ckpt_cb = ModelCheckpoint(
         dirpath=f"checkpoints/{project_name}/{run_name}",
-        filename="{epoch}-{val/loss:.2f}",
+        filename='{epoch}-{val/loss:.2f}',
+        auto_insert_metric_name=False,
         monitor="val/loss",
         mode="min",
         save_top_k=1,
         save_last=True,
     )
-
 
     trainer = Trainer(
         accelerator="auto",
@@ -469,6 +469,6 @@ def train_one_cycle(
     trainer.fit(model, datamodule.train_dataloader(), datamodule.val_dataloader())
     if test:
         trainer.test(model, datamodule.test_dataloader())
-
+    logger.info(f"Best ckpt path: {ckpt_cb.best_model_path}")
     wandb.finish()
-
+    return ckpt_cb.best_model_path
