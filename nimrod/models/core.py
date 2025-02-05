@@ -270,9 +270,9 @@ class Regressor(ABC, L.LightningModule):
         self.val_mse_best = MinMetric()
 
         # average accross batches
-        self.train_loss = MeanSquaredError()
-        self.val_loss = MeanSquaredError()
-        self.test_loss = MeanSquaredError()
+        self.train_loss = MeanMetric()
+        self.val_loss = MeanMetric()
+        self.test_loss = MeanMetric()
 
     def forward(self, x:torch.Tensor)->torch.Tensor:
         return self.nnet(x)
@@ -285,13 +285,25 @@ class Regressor(ABC, L.LightningModule):
             logger.warning("no scheduler has been setup")
             return {"optimizer": self.optimizer}
         self.scheduler = self.hparams.scheduler(optimizer=self.optimizer)
+        if isinstance(self.scheduler, torch.optim.lr_scheduler.OneCycleLR):
+            lr_scheduler = {
+                "scheduler": self.scheduler,
+                "interval": "step",
+                "frequency": 1,
+            }
+        else:
+            lr_scheduler = {
+                "scheduler": self.scheduler,
+                "interval": "epoch",
+                "frequency": 1,
+            }
         logger.info(f"Scheduler: {self.scheduler.__class__}")
-        return {"optimizer": self.optimizer, "lr_scheduler": self.scheduler}
+        return {"optimizer": self.optimizer, "lr_scheduler": lr_scheduler}
 
     def on_train_start(self) -> None:
         self.val_loss.reset()
         self.val_mse.reset()
-        self.val_best.reset()
+        self.val_mse_best.reset()
     
     def predict_step(self, batch, batch_idx, dataloader_idx=0):
         x, y = batch
@@ -308,7 +320,7 @@ class Regressor(ABC, L.LightningModule):
         loss, y_hat, y = self._step(batch, batch_idx)
         self.train_loss(loss)
         self.train_mse(y_hat, y)
-        self.log("train/mse", self.train_mse, on_epoch=True, on_step=True, prog_bar=True)
+        # self.log("train/mse", self.train_mse, on_epoch=True, on_step=True, prog_bar=True)
         self.log("train/loss", self.train_loss, on_epoch=True, on_step=True, prog_bar=True)
         return loss
 
@@ -319,25 +331,31 @@ class Regressor(ABC, L.LightningModule):
         loss, y_hat, y = self._step(batch, batch_idx)
         self.val_loss(loss)
         self.val_mse(y_hat, y)
-        self.log("val/mse", self.val_mse, on_epoch=True, on_step=True, prog_bar=True)
-        self.log("val/loss", self.val_loss, on_epoch=True, on_step=True, prog_bar=True)
+        # self.log("val/mse", self.val_mse, on_epoch=True, on_step=True, prog_bar=True)
+        self.log("val/loss", self.val_loss, on_epoch=True, on_step=False, prog_bar=True, sync_dist=True)
     
     def on_validation_epoch_end(self) -> None:
-        pass
+        mse = self.val_mse.compute()  # get current val acc
+        self.val_mse_best(mse)  # update best so far val acc
+        # log `val_acc_best` as a value through `.compute()` method, instead of as a metric object
+        # otherwise metric would be reset by lightning after each epoch
+        self.log("val/mse_best", self.val_mse_best.compute(), sync_dist=True, prog_bar=True)
+        
 
     def test_step(self, batch, batch_idx):
         loss, y_hat, y = self._step(batch, batch_idx)
         self.test_loss(loss)
         self.test_mse(y_hat, y)
-        self.log("test/mse", self.test_mse, on_epoch=True, on_step=True, prog_bar=True)
-        self.log("test/loss", self.test_loss, on_epoch=True, on_step=True, prog_bar=True)
+    
+        # self.log("test/mse", self.test_mse, on_epoch=True, on_step=True, prog_bar=True)
+        self.log("test/loss", self.test_loss, on_epoch=True, on_step=False, prog_bar=True, sync_dist=True)
 
     def on_test_epoch_end(self) -> None:
         pass
 
 
 
-# %% ../../nbs/models.core.ipynb 12
+# %% ../../nbs/models.core.ipynb 11
 class SequentialModelX(Classifier):
     def __init__(self, modules: List[nn.Module], *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -346,7 +364,7 @@ class SequentialModelX(Classifier):
     def forward(self, x):
         return self._model(x)
 
-# %% ../../nbs/models.core.ipynb 15
+# %% ../../nbs/models.core.ipynb 14
 def lr_finder(
     model: Callable[...,torch.nn.Module], # partial model (missing optim & sched)
     datamodule: ImageDataModule, # data module
@@ -372,7 +390,7 @@ def lr_finder(
         plt.show()
     return lr_finder.suggestion()
 
-# %% ../../nbs/models.core.ipynb 17
+# %% ../../nbs/models.core.ipynb 16
 def train_one_cycle(
     model: Callable[...,torch.nn.Module], #partial model (missing optim & sched)
     datamodule: ImageDataModule,

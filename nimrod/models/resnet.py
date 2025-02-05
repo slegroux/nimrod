@@ -37,12 +37,21 @@ class ResBlock(nn.Module):
             out_channels:int, # Number of output channels
             stride:int=1,
             kernel_size:int=3,
-            activation:Optional[Type[nn.Module]]=nn.ReLU
+            activation:Optional[Type[nn.Module]]=nn.ReLU,
+            normalization:Optional[Type[nn.Module]]=None
         ):
 
         super().__init__()
         self.activation = activation()
         conv_block = []
+        # ConvLayer parameters:
+        # in_channels:int=3, # input channels
+        # out_channels:int=16, # output channels
+        # kernel_size:int=3, # kernel size
+        # stride:int=2, # stride
+        # bias:bool=False,
+        # normalization:Optional[Type[nn.Module]]=nn.BatchNorm2d,
+        # activation:Optional[Type[nn.Module]]=nn.ReLU,
         conv_ = partial(ConvLayer, stride=1, activation=activation, normalization=nn.BatchNorm2d)
         # conv stride 1 to be able to go deeper while keeping the same spatial resolution
         c1 = conv_(in_channels, out_channels, stride=1, kernel_size=kernel_size)
