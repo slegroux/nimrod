@@ -35,29 +35,28 @@ class ResBlock(nn.Module):
             self,
             in_channels:int, # Number of input channels
             out_channels:int, # Number of output channels
-            stride:int=1,
             kernel_size:int=3,
-            activation:Optional[Type[nn.Module]]=nn.ReLU,
-            normalization:Optional[Type[nn.Module]]=None
+            stride:int=1,
+            activation:Optional[Type[nn.Module]]=nn.ReLU, # use nn.Identity for no activation
+            normalization:Optional[Type[nn.Module]]=nn.BatchNorm2d
         ):
 
         super().__init__()
         self.activation = activation()
         conv_block = []
-        # ConvLayer parameters:
-        # in_channels:int=3, # input channels
-        # out_channels:int=16, # output channels
-        # kernel_size:int=3, # kernel size
-        # stride:int=2, # stride
-        # bias:bool=False,
-        # normalization:Optional[Type[nn.Module]]=nn.BatchNorm2d,
-        # activation:Optional[Type[nn.Module]]=nn.ReLU,
-        conv_ = partial(ConvLayer, stride=1, activation=activation, normalization=nn.BatchNorm2d)
+
+        conv_ = partial(
+            ConvLayer, 
+            kernel_size=kernel_size,
+            stride=stride,
+            activation=activation,
+            normalization=normalization,
+            )
         # conv stride 1 to be able to go deeper while keeping the same spatial resolution
-        c1 = conv_(in_channels, out_channels, stride=1, kernel_size=kernel_size)
+        c1 = conv_(in_channels, out_channels, stride=1)
         # conv stride to be able to go wider in number of channels
         # activation will be added at very end
-        c2 = conv_(out_channels, out_channels, stride=stride, activation=None, kernel_size=kernel_size) #adding activation to the whole layer at the end c.f. forward
+        c2 = conv_(out_channels, out_channels, activation=None) #adding activation to the whole layer at the end c.f. forward
         conv_block += [c1,c2]
         self.conv_layer = nn.Sequential(*conv_block)
 
@@ -65,7 +64,7 @@ class ResBlock(nn.Module):
             self.id = nn.Identity()
         else:
             # resize x to match channels
-            self.id = conv_(in_channels, out_channels, kernel_size=1, stride=1, activation=None)
+            self.id = conv_(in_channels, out_channels, kernel_size=1, stride=1, activation=None) #, normalization=None)
         
         if stride == 1:
             self.pooling = nn.Identity()
@@ -83,12 +82,13 @@ class ResNet(nn.Module):
             self,
             n_features: List[int]=[1, 8, 16, 32, 64, 32], # Number of input & output channels
             num_classes: int=10, # Number of classes
-        ):
+            activation: Optional[Type[nn.Module]]=partial(nn.LeakyReLU, negative_slope=0.1)
+            ):
 
         super().__init__()
         logger.info("ResNet: init")
         layers = []
-        res_ = partial(ResBlock, stride=2)
+        res_ = partial(ResBlock, stride=2, normalization=nn.Identity, activation=activation)
 
         layers.append(res_(in_channels=n_features[0], out_channels=n_features[1], stride=1))
 

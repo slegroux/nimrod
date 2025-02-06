@@ -43,7 +43,7 @@ class ConvLayer(nn.Module):
         out_channels:int=16, # output channels
         kernel_size:int=3, # kernel size
         stride:int=2, # stride
-        bias:bool=False,
+        bias:bool=True,
         normalization:Optional[Type[nn.Module]]=nn.BatchNorm2d,
         activation:Optional[Type[nn.Module]]=nn.ReLU,
         # padding=kernel_size//2
