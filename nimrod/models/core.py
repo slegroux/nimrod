@@ -480,4 +480,4 @@ def train_one_cycle(
         trainer.test(model, datamodule.test_dataloader())
     logger.info(f"Best ckpt path: {ckpt_cb.best_model_path}")
     wandb.finish()
-    return ckpt_cb.best_model_path
+    return model, ckpt_cb.best_model_path

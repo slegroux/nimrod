@@ -16,7 +16,7 @@ from omegaconf import OmegaConf
 from hydra.utils import instantiate
 
 
-from .conv import ConvLayer
+from .conv import ConvLayer, PreActivationConvLayer
 from .core import Classifier
 from ..utils import get_device, set_seed
 
@@ -46,7 +46,7 @@ class ResBlock(nn.Module):
         conv_block = []
 
         conv_ = partial(
-            ConvLayer, 
+            PreActivationConvLayer, 
             kernel_size=kernel_size,
             stride=stride,
             activation=activation,

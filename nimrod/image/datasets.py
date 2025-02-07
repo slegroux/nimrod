@@ -593,9 +593,25 @@ class ImageSuperResDataModule(ImageDataModule):
             transform_x=self.hparams.transform_x,
             transform_y=self.hparams.transform_y
             )
-        self.train_ds = ds(split='train')
-        self.test_ds = ds(split='test')
-        self.val_ds = ds(split='validation')
+        try:
+            self.train_ds = ds(split='train')
+        except:
+            logger.warning("No training split. abort")
+
+        splits = self.train_ds.splits 
+        #TODO: figure out all cases and split training set when necessary
+        if 'test' in splits and 'validation' in splits:
+            self.test_ds = ds(split='test')
+            self.val_ds = ds(split='validation')
+        if 'test' in splits and 'validation' not in splits:
+            self.test_ds = ds(split='test')
+            self.val_ds = ds(split='test')
+            logging.warning("same dataset for validation and test")
+        if 'test' not in splits and 'validation' in splits:
+            self.test_ds = ds(split='validation')
+            self.val_ds = ds(split='validation')
+            logging.warning("same dataset for validation and test")
+
     
     def show(self, idx:int):
         x, y = self.train_ds[idx]
@@ -605,5 +621,4 @@ class ImageSuperResDataModule(ImageDataModule):
         ax[0].set_title('low res')
         ax[1].imshow(y.permute(1,2,0).squeeze())
         ax[1].set_title('high res')
-
 
