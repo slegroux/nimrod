@@ -10,15 +10,20 @@ import torch.nn as nn
 
 import torch
 from torchinfo import summary
+from torchvision.transforms import transforms
+import torch.nn.functional as F
 
 
 from omegaconf import OmegaConf
 from hydra.utils import instantiate
 
+from matplotlib import pyplot as plt
+import math
 
-from .conv import ConvLayer, PreActivationConvLayer
+from .conv import ConvLayer
 from .core import Classifier
 from ..utils import get_device, set_seed
+from ..image.datasets import ImageDataModule
 
 from typing import List, Optional, Callable, Any, Type
 import logging
@@ -35,28 +40,20 @@ class ResBlock(nn.Module):
             self,
             in_channels:int, # Number of input channels
             out_channels:int, # Number of output channels
-            kernel_size:int=3,
             stride:int=1,
-            activation:Optional[Type[nn.Module]]=nn.ReLU, # use nn.Identity for no activation
-            normalization:Optional[Type[nn.Module]]=nn.BatchNorm2d
+            kernel_size:int=3,
+            activation:Optional[Type[nn.Module]]=nn.ReLU
         ):
 
         super().__init__()
         self.activation = activation()
         conv_block = []
-
-        conv_ = partial(
-            PreActivationConvLayer, 
-            kernel_size=kernel_size,
-            stride=stride,
-            activation=activation,
-            normalization=normalization,
-            )
+        conv_ = partial(ConvLayer, stride=1, activation=activation, normalization=nn.BatchNorm2d)
         # conv stride 1 to be able to go deeper while keeping the same spatial resolution
-        c1 = conv_(in_channels, out_channels, stride=1)
+        c1 = conv_(in_channels, out_channels, stride=1, kernel_size=kernel_size)
         # conv stride to be able to go wider in number of channels
         # activation will be added at very end
-        c2 = conv_(out_channels, out_channels, activation=None) #adding activation to the whole layer at the end c.f. forward
+        c2 = conv_(out_channels, out_channels, stride=stride, activation=None, kernel_size=kernel_size) #adding activation to the whole layer at the end c.f. forward
         conv_block += [c1,c2]
         self.conv_layer = nn.Sequential(*conv_block)
 
@@ -64,7 +61,7 @@ class ResBlock(nn.Module):
             self.id = nn.Identity()
         else:
             # resize x to match channels
-            self.id = conv_(in_channels, out_channels, kernel_size=1, stride=1, activation=None) #, normalization=None)
+            self.id = conv_(in_channels, out_channels, kernel_size=1, stride=1, activation=None)
         
         if stride == 1:
             self.pooling = nn.Identity()
@@ -82,13 +79,12 @@ class ResNet(nn.Module):
             self,
             n_features: List[int]=[1, 8, 16, 32, 64, 32], # Number of input & output channels
             num_classes: int=10, # Number of classes
-            activation: Optional[Type[nn.Module]]=partial(nn.LeakyReLU, negative_slope=0.1)
-            ):
+        ):
 
         super().__init__()
         logger.info("ResNet: init")
         layers = []
-        res_ = partial(ResBlock, stride=2, normalization=nn.Identity, activation=activation)
+        res_ = partial(ResBlock, stride=2)
 
         layers.append(res_(in_channels=n_features[0], out_channels=n_features[1], stride=1))
 

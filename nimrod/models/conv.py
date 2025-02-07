@@ -43,13 +43,13 @@ class ConvLayer(nn.Module):
         out_channels:int=16, # output channels
         kernel_size:int=3, # kernel size
         stride:int=2, # stride
-        bias:bool=True,
-        normalization:Optional[Type[nn.Module]]=nn.BatchNorm2d,
-        activation:Optional[Type[nn.Module]]=nn.ReLU,
+        bias:bool=True, # bias is False if BatchNorm
+        normalization:Optional[Type[nn.Module]]=nn.BatchNorm2d, # normalization
+        activation:Optional[Type[nn.Module]]=nn.ReLU, # activation
         # padding=kernel_size//2
         
     ):
-
+                
         super().__init__()
         
         if bias and normalization and issubclass(normalization, (nn.BatchNorm1d,nn.BatchNorm2d,nn.BatchNorm3d)):
@@ -83,7 +83,7 @@ class ConvLayer(nn.Module):
         return self.net(x)
 
 
-# %% ../../nbs/models.conv.ipynb 20
+# %% ../../nbs/models.conv.ipynb 18
 class PreActivationConvLayer(nn.Module):
   
     def __init__(
@@ -134,7 +134,7 @@ class PreActivationConvLayer(nn.Module):
 
     
 
-# %% ../../nbs/models.conv.ipynb 23
+# %% ../../nbs/models.conv.ipynb 21
 class DeconvLayer(nn.Module):
     def __init__(
         self,
@@ -144,31 +144,47 @@ class DeconvLayer(nn.Module):
         bias:bool=True,
         normalization:Optional[Type[nn.Module]]=None,
         activation:Optional[Type[nn.Module]]=nn.ReLU,
-        stride:int = 1,
-        scale_factor:int = 2
+        scale_factor:int = 2,
+        use_transposed_conv:bool=False,
     ):
         super().__init__()
         layers = []
         if normalization:
-            if issubclass(normalization,  (nn.BatchNorm1d,nn.BatchNorm2d,nn.BatchNorm3d)):
+            if issubclass(normalization, (nn.BatchNorm1d,nn.BatchNorm2d,nn.BatchNorm3d)):
                 logger.warning('setting conv bias to False as Batchnorm is used')
                 # https://x.com/karpathy/status/1013245864570073090
                 bias = None
 
-        layers.append(nn.UpsamplingNearest2d(scale_factor=scale_factor))
+        if use_transposed_conv:
+            layers.append(
+                nn.ConvTranspose2d(
+                    in_channels,
+                    out_channels,
+                    kernel_size,
+                    stride=scale_factor,
+                    padding=kernel_size//2,
+                    output_padding=scale_factor-1,
+                    bias=bias
+                )
+            )
+    
+        else:
+            layers.append(nn.UpsamplingNearest2d(scale_factor=scale_factor))
+            layers.append(nn.Conv2d(in_channels, out_channels, kernel_size, stride=1, padding=kernel_size//2, bias=bias))
 
-        layers.append(nn.Conv2d(in_channels, out_channels, kernel_size, stride=stride, padding=kernel_size//2, bias=bias))
         if normalization:
             layers.append(normalization(out_channels))
         if activation:
             layers.append(activation())
         self._net = nn.Sequential(*layers)
 
-    def forward(self, x:torch.Tensor # input image tensor of dimension (B, C, W, H)
-                ) -> torch.Tensor: # output image tensor of dimension (B, C, W*2, H*2)
-        return self._net(x) 
+    def forward(
+        self, x:torch.Tensor # input image tensor of dimension (B, C, W, H)
+        ) -> torch.Tensor: # output image tensor of dimension (B, C, W*2, H*2)
+        
+        return self._net(x)
 
-# %% ../../nbs/models.conv.ipynb 30
+# %% ../../nbs/models.conv.ipynb 28
 class ConvNet(nn.Module):
 
     def __init__(
@@ -187,53 +203,23 @@ class ConvNet(nn.Module):
         conv_ = partial(ConvLayer, kernel_size=kernel_size, bias=bias, normalization=normalization, activation=activation)
         # first layer stride 1 to be able to go deeper while keeping the same spatial resolution
         conv_1 = conv_(in_channels=n_features[0], out_channels=n_features[1], stride=1)
-        # conv_1 = ConvLayer(
-        #     in_channels=n_features[0],
-        #     out_channels=n_features[1],
-        #     stride=1,
-        #     kernel_size=kernel_size,
-        #     bias=bias,
-        #     normalization=normalization,
-        #     activation=activation
-        # )
         net.append(conv_1)
 
         for i in range(1, len(n_features) - 1):
-
-            # conv = ConvLayer(
-            #         in_channels=n_features[i],
-            #         out_channels=n_features[i+1],
-            #         kernel_size=kernel_size,
-            #         bias=bias,
-            #         normalization=normalization,
-            #         activation=activation
-            # )
             net.append(conv_(in_channels=n_features[i], out_channels=n_features[i+1], stride=2))
         
-        # last layer -> flatten
-        net.append(
-            conv_(in_channels=n_features[-1], out_channels=num_classes, stride=2)
-            # ConvLayer(
-            #     in_channels=n_features[-1],
-            #     out_channels=num_classes,
-            #     kernel_size=kernel_size,
-            #     bias=True,
-            #     normalization=None,
-            #     activation=None
-            #     )
-            )
+        net.append(conv_(in_channels=n_features[-1], out_channels=num_classes, stride=2))
         net.append(nn.Flatten(start_dim=1, end_dim=-1))
 
         self.net = nn.Sequential(*net)
 
-
     def forward(
-        self,
-        x:torch.Tensor # input image tensor of dimension (B, C, W, H)
-        ) -> torch.Tensor: # output probs (B, N_classes)
+            self,
+            x:torch.Tensor # input image tensor of dimension (B, C, W, H)
+            ) -> torch.Tensor: # output probs (B, N_classes)
         return self.net(x)
 
-# %% ../../nbs/models.conv.ipynb 45
+# %% ../../nbs/models.conv.ipynb 43
 class ConvNetX(Classifier):
     """
     Parameters
