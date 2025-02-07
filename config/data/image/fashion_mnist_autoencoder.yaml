@@ -1,0 +1,30 @@
+_target_: nimrod.image.datasets.ImageSuperResDataModule
+
+name: 'fashion_mnist'
+data_dir: '../data/image'
+train_val_split: [0.8, 0.2]
+batch_size: 512
+num_workers: 0
+pin_memory: True
+persistent_workers: False
+
+transform_x: 
+  _target_: torchvision.transforms.Compose
+  transforms:
+    - _target_: torchvision.transforms.ToTensor
+    - _target_: torchvision.transforms.Resize
+      size: 32
+    - _target_: torchvision.transforms.Normalize
+      mean: 0.28
+      std: 0.35
+
+transform_y:
+  _target_: torchvision.transforms.Compose
+  transforms:
+    - _target_: torchvision.transforms.ToTensor
+    - _target_: torchvision.transforms.Resize
+      size: 32
+    - _target_: torchvision.transforms.Normalize
+      mean: 0.28
+      std: 0.35
+
