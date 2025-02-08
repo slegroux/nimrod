@@ -5,7 +5,7 @@
 # %% auto 0
 __all__ = ['logger', 'AutoEncoder']
 
-# %% ../../nbs/models.autoencoders.ipynb 3
+# %% ../../nbs/models.autoencoders.ipynb 4
 import torch.nn as nn
 import torch
 from torch.utils.data import DataLoader
@@ -28,14 +28,14 @@ from ..utils import time_it, set_seed, get_device
 import logging
 import warnings
 
-# %% ../../nbs/models.autoencoders.ipynb 4
+# %% ../../nbs/models.autoencoders.ipynb 5
 set_seed(42)
 logger = logging.getLogger(__name__)
 # logger.setLevel(logging.DEBUG)
 plt.set_loglevel('INFO')
 warnings.filterwarnings("ignore", category=UserWarning, module="matplotlib")
 
-# %% ../../nbs/models.autoencoders.ipynb 20
+# %% ../../nbs/models.autoencoders.ipynb 21
 class AutoEncoder(nn.Module):
     """ A modular autoencoder with configurable encoder and decoder """
     def __init__(self,
