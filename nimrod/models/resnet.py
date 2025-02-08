@@ -13,14 +13,13 @@ from torchinfo import summary
 from torchvision.transforms import transforms
 import torch.nn.functional as F
 
-
 from omegaconf import OmegaConf
 from hydra.utils import instantiate
 
 from matplotlib import pyplot as plt
 import math
 
-from .conv import ConvLayer
+from .conv import ConvBlock
 from .core import Classifier
 from ..utils import get_device, set_seed
 from ..image.datasets import ImageDataModule
@@ -40,15 +39,16 @@ class ResBlock(nn.Module):
             self,
             in_channels:int, # Number of input channels
             out_channels:int, # Number of output channels
-            stride:int=1,
-            kernel_size:int=3,
-            activation:Optional[Type[nn.Module]]=nn.ReLU
+            stride:int=2, # Stride
+            kernel_size:int=3, # Kernel size
+            activation:Optional[Type[nn.Module]]=nn.ReLU, # Activation class if no activatoin set to nn.Identity
+            normalization:Optional[Type[nn.Module]]=nn.BatchNorm2d # Normalization class
         ):
 
         super().__init__()
         self.activation = activation()
         conv_block = []
-        conv_ = partial(ConvLayer, stride=1, activation=activation, normalization=nn.BatchNorm2d)
+        conv_ = partial(ConvBlock, stride=1, activation=activation, normalization=normalization)
         # conv stride 1 to be able to go deeper while keeping the same spatial resolution
         c1 = conv_(in_channels, out_channels, stride=1, kernel_size=kernel_size)
         # conv stride to be able to go wider in number of channels
@@ -69,7 +69,6 @@ class ResBlock(nn.Module):
             # resize x to match the stride
             self.pooling = nn.AvgPool2d(stride, ceil_mode=True)
 
-
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.activation(self.conv_layer(x) + self.id(self.pooling(x)))
 
@@ -79,12 +78,14 @@ class ResNet(nn.Module):
             self,
             n_features: List[int]=[1, 8, 16, 32, 64, 32], # Number of input & output channels
             num_classes: int=10, # Number of classes
+            activation:Optional[Type[nn.Module]]=nn.ReLU, # Activation function if None set to nn.Identity
+            normalization:Optional[Type[nn.Module]]=nn.BatchNorm2d # Normalization function if None set to nn.Identity
         ):
 
         super().__init__()
         logger.info("ResNet: init")
         layers = []
-        res_ = partial(ResBlock, stride=2)
+        res_ = partial(ResBlock, stride=2, activation=activation, normalization=normalization)
 
         layers.append(res_(in_channels=n_features[0], out_channels=n_features[1], stride=1))
 
@@ -101,7 +102,7 @@ class ResNet(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.layers(x)
 
-# %% ../../nbs/models.resnet.ipynb 13
+# %% ../../nbs/models.resnet.ipynb 16
 class ResNetX(Classifier):
     def __init__(
         self,
@@ -116,7 +117,7 @@ class ResNetX(Classifier):
             nnet=nnet,
             num_classes=num_classes,
             optimizer=optimizer,
-            scheduler=scheduler
+            scheduler=scheduler,
             )
 
     def _step(self, batch, batch_idx):
