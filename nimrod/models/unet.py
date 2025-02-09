@@ -45,26 +45,56 @@ class TinyUnet(nn.Module):
         n_features:List[int]=[3, 32, 64, 128, 256, 512, 1024], # Number of features in each layer
         activation=partial(nn.LeakyReLU, negative_slope=0.1), # Activation function
         leaky:float=0.1,# Leaky ReLU negative slope
-        normalization=nn.BatchNorm2d # Normalization function
+        normalization=nn.BatchNorm2d, # Normalization function
+        pre_activation:bool=False # use Resblock with pre-activation
+
     ):
         super().__init__()
         if len(n_features) < 3:
             raise ValueError("n_features must be at least 3")
         # first layer
-        self.start = ResBlock(n_features[0], n_features[1], kernel_size=3, stride=1, activation=activation, normalization=normalization)
+        self.start = ResBlock(
+            n_features[0],
+            n_features[1],
+            kernel_size=3,
+            stride=1,
+            activation=activation,
+            normalization=normalization,
+            pre_activation=pre_activation
+            )
+
         self.encoder = nn.ModuleList()
         # encoder downsample receptive field
-        down = partial(ResBlock, kernel_size=3,  stride=2, activation=activation, normalization=normalization)
+        down = partial(
+            ResBlock,
+            kernel_size=3, 
+            stride=2,
+            activation=activation,
+            normalization=normalization,
+            pre_activation=pre_activation
+            )
+
         for i in range(1, len(n_features)-1):
             self.encoder.append(down(n_features[i], n_features[i+1]))
 
         # decoder upsampling receptive field
         up = partial(DeconvBlock, kernel_size=3, activation=activation, normalization=normalization)
+
         self.decoder = nn.ModuleList()
         for i in range(len(n_features)-1, 1, -1):
             self.decoder.append(up(n_features[i], n_features[i-1]))
+
         self.decoder += [down(n_features[1], n_features[0], stride=1)]
-        self.end = ResBlock(n_features[0], n_features[0], kernel_size=3, stride=1, activation=nn.Identity, normalization=normalization)
+
+        self.end = ResBlock(
+            n_features[0],
+            n_features[0],
+            kernel_size=3,
+            stride=1,
+            activation=nn.Identity,
+            normalization=normalization,
+            pre_activation=pre_activation
+            )
 
     def forward(self, x:torch.Tensor)->torch.Tensor:
         layers = [] # store the output of each layer

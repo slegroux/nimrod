@@ -19,7 +19,7 @@ from hydra.utils import instantiate
 from matplotlib import pyplot as plt
 import math
 
-from .conv import ConvBlock
+from .conv import ConvBlock, PreActivationConvBlock
 from .core import Classifier
 from ..utils import get_device, set_seed
 from ..image.datasets import ImageDataModule
@@ -42,13 +42,17 @@ class ResBlock(nn.Module):
             stride:int=2, # Stride
             kernel_size:int=3, # Kernel size
             activation:Optional[Type[nn.Module]]=nn.ReLU, # Activation class if no activatoin set to nn.Identity
-            normalization:Optional[Type[nn.Module]]=nn.BatchNorm2d # Normalization class
+            normalization:Optional[Type[nn.Module]]=nn.BatchNorm2d, # Normalization class
+            pre_activation:bool=False # replace conv block by pre-act block. used in unets e.g.
         ):
 
         super().__init__()
         self.activation = activation()
         conv_block = []
-        conv_ = partial(ConvBlock, stride=1, activation=activation, normalization=normalization)
+        if pre_activation:
+            conv_ = partial(PreActivationConvBlock, stride=1, activation=activation, normalization=normalization)
+        else:
+            conv_ = partial(ConvBlock, stride=1, activation=activation, normalization=normalization)
         # conv stride 1 to be able to go deeper while keeping the same spatial resolution
         c1 = conv_(in_channels, out_channels, stride=1, kernel_size=kernel_size)
         # conv stride to be able to go wider in number of channels
