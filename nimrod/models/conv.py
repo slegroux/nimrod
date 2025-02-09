@@ -29,12 +29,11 @@ from .core import Classifier
 from pprint import pprint
 import logging
 
-
-# %% ../../nbs/models.conv.ipynb 4
 logger = logging.getLogger(__name__)
 set_seed()
 
-# %% ../../nbs/models.conv.ipynb 11
+
+# %% ../../nbs/models.conv.ipynb 10
 class ConvBlock(nn.Module):
   
     def __init__(
@@ -83,7 +82,7 @@ class ConvBlock(nn.Module):
         return self.net(x)
 
 
-# %% ../../nbs/models.conv.ipynb 18
+# %% ../../nbs/models.conv.ipynb 17
 class PreActivationConvBlock(nn.Module):
   
     def __init__(
@@ -134,7 +133,7 @@ class PreActivationConvBlock(nn.Module):
 
     
 
-# %% ../../nbs/models.conv.ipynb 21
+# %% ../../nbs/models.conv.ipynb 20
 class DeconvBlock(nn.Module):
     def __init__(
         self,
@@ -184,7 +183,7 @@ class DeconvBlock(nn.Module):
         
         return self._net(x)
 
-# %% ../../nbs/models.conv.ipynb 28
+# %% ../../nbs/models.conv.ipynb 27
 class ConvNet(nn.Module):
 
     def __init__(
@@ -219,7 +218,7 @@ class ConvNet(nn.Module):
             ) -> torch.Tensor: # output probs (B, N_classes)
         return self.net(x)
 
-# %% ../../nbs/models.conv.ipynb 43
+# %% ../../nbs/models.conv.ipynb 42
 class ConvNetX(Classifier):
     """
     Parameters
