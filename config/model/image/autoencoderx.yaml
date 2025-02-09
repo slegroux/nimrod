@@ -1,0 +1,20 @@
+_target_: nimrod.models.superres.SuperResAutoencoderX
+_partial_: true
+
+nnet:
+  _target_: nimrod.models.superres.SuperResAutoencoder
+  n_features: [3, 32, 64, 128, 256, 512, 1024]  # channel/feature expansion
+  # activation:
+  #   _target_: torch.nn.ReLU
+  #   _partial_: true
+  # leaky: 0.0
+
+  activation:
+    _target_: torch.nn.LeakyReLU
+    _partial_: true
+    negative_slope: 0.1
+
+  leaky: 0.1 #init
+
+# optimizer
+# schedule

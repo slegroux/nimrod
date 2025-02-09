@@ -1,0 +1,5 @@
+  _target_: nimrod.models.mlp.MLP
+  n_in: 784
+  n_h: 64
+  n_out: 10
+  dropout: 0.2

@@ -10,15 +10,18 @@ import torch.nn as nn
 import torch
 
 from lightning import LightningModule, Trainer
+from lightning.pytorch.tuner.tuning import Tuner
 from lightning.pytorch.loggers import CSVLogger
 
 from hydra.utils import instantiate
 from omegaconf import OmegaConf
 from matplotlib import pyplot as plt
 import pandas as pd
+from typing import Callable, Optional, Any
 
 from ..utils import get_device
 from .core import Classifier
+
 # torch.set_num_interop_threads(1)
 # from IPython.core.debugger import set_trace
 
@@ -26,7 +29,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-# %% ../../nbs/models.mlp.ipynb 6
+# %% ../../nbs/models.mlp.ipynb 5
 class MLP(nn.Module):
     def __init__(
                 self,
@@ -47,24 +50,24 @@ class MLP(nn.Module):
                 ) -> torch.Tensor:
         return self.layers(x)
 
-# %% ../../nbs/models.mlp.ipynb 17
+# %% ../../nbs/models.mlp.ipynb 14
 class MLP_X(Classifier, LightningModule):
     def __init__(
             self,
-            nnet:MLP,
-            num_classes:int,
-            optimizer:torch.optim.Optimizer,
-            scheduler:torch.optim.lr_scheduler
+            nnet:MLP, # mlp neural net
+            num_classes:int, # number of classes
+            optimizer:Callable[...,torch.optim.Optimizer], # optimizer
+            scheduler:Optional[Callable[...,Any]]=None, # scheduler
         ):
         
         logger.info("MLP_X init")
-        super().__init__(num_classes, optimizer, scheduler)
-        self.nnet = nnet
-        self.save_hyperparameters(logger=False,ignore=['nnet'])
-        self.lr = optimizer.keywords['lr'] # for lr finder
+        super().__init__(nnet=nnet, num_classes=num_classes, optimizer=optimizer, scheduler=scheduler)
+        # self.nnet = nnet
+        # self.save_hyperparameters(logger=False,ignore=['nnet'])
+        # self.lr = optimizer.keywords['lr'] # for lr finder
     
-    def forward(self, x:torch.Tensor)->torch.Tensor:
-        return self.nnet(x)
+    # def forward(self, x:torch.Tensor)->torch.Tensor:
+    #     return self.nnet(x)
     
     def _step(self, batch, batch_idx):
         x, y = batch

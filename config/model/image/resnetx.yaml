@@ -1,0 +1,19 @@
+_target_: nimrod.models.resnet.ResNetX
+_partial_: true
+
+num_classes: 10  # default value overridden by hydra at instantiation if necessary
+
+nnet:
+  _target_: nimrod.models.resnet.ResNet
+  n_features: [1, 8, 16, 32, 16]  # channel/feature expansion
+  num_classes: ${..num_classes}  # number of output classes
+  activation:
+    _target_: torch.nn.LeakyReLU
+    _partial_: true
+    negative_slope: 0.01 # fai default: 0.1
+  normalization:
+    _target_: hydra.utils.get_class
+    path: torch.nn.BatchNorm2d
+
+# optimizer
+# scheduler

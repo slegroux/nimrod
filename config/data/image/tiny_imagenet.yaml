@@ -1,0 +1,18 @@
+_target_: nimrod.image.datasets.ImageDataModule
+name: 'slegroux/tiny-imagenet-200-clean'
+data_dir: '../data/image'
+train_val_split: [0.8, 0.2]
+batch_size: 512
+num_workers: 0
+pin_memory: True
+persistent_workers: False
+transforms: 
+  _target_: torchvision.transforms.Compose
+  transforms:
+    - _target_: torchvision.transforms.ToTensor
+    - _target_: torchvision.transforms.Normalize
+      mean: [0.4822, 0.4495, 0.3985]
+      std: [0.2771, 0.2690, 0.2826]
+    # - _target_: torchvision.transforms.Resize
+    #   size: [32,32]
+

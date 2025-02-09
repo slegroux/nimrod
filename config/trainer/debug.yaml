@@ -1,0 +1,5 @@
+defaults:
+  - default
+
+fast_dev_run: true
+

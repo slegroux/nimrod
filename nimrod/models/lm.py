@@ -3,7 +3,7 @@
 # %% auto 0
 __all__ = ['logger', 'NNLMConfig', 'NNLM', 'NNLM_X', 'NNBigram']
 
-# %% ../../nbs/models.lm.ipynb 3
+# %% ../../nbs/models.lm.ipynb 4
 import torch.nn as nn
 import torch
 import torch.nn.functional as F

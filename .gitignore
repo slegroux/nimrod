@@ -131,17 +131,21 @@ dmypy.json
 *.gz
 recipes/*/logs
 *.bak
+*.bk
 tests/
 .hydra/
 *.png
 *.wav
 *.pt
+*.npy
 *.onnx
 *.ckpt
 *.pkg
 *.lca
 *.wandb
 *tfevents*
+
+
 
 */wandb/*
 *_logs*
@@ -152,6 +156,8 @@ _docs/
 /data/codeparrot
 /data/en/Libri*
 /data/
+/sandbox/
+recipes
 token
 env-file
 Dockerfile.base
@@ -160,7 +166,7 @@ Dockerfile.paperspace
 # wandb stuff
 wandb
 artifacts
-
+Miniforge*
 .vscode
 *.swp
 
