@@ -10,7 +10,7 @@ nnet:
   activation:
     _target_: torch.nn.LeakyReLU
     _partial_: true
-    negative_slope: 0.01
+    negative_slope: 0.01 # fai default: 0.1
   normalization:
     _target_: hydra.utils.get_class
     path: torch.nn.BatchNorm2d
