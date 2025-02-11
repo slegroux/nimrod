@@ -20,7 +20,7 @@ from matplotlib import pyplot as plt
 import math
 
 from .conv import ConvBlock, PreActivationConvBlock
-from .core import Classifier
+from .core import Classifier, weight_init
 from ..utils import get_device, set_seed
 from ..image.datasets import ImageDataModule
 
@@ -83,13 +83,15 @@ class ResNet(nn.Module):
             n_features: List[int]=[1, 8, 16, 32, 64, 32], # Number of input & output channels
             num_classes: int=10, # Number of classes
             activation:Optional[Type[nn.Module]]=nn.ReLU, # Activation function if None set to nn.Identity
-            normalization:Optional[Type[nn.Module]]=nn.BatchNorm2d # Normalization function if None set to nn.Identity
+            normalization:Optional[Type[nn.Module]]=nn.BatchNorm2d, # Normalization function if None set to nn.Identity
+            weight_initialization: bool = False, # weight init with kaiming
+            pre_activation: bool = False # pre-activation block for deep nets
         ):
 
         super().__init__()
         logger.info("ResNet: init")
         layers = []
-        res_ = partial(ResBlock, stride=2, activation=activation, normalization=normalization)
+        res_ = partial(ResBlock, stride=2, activation=activation, normalization=normalization, pre_activation=pre_activation)
 
         layers.append(res_(in_channels=n_features[0], out_channels=n_features[1], stride=1))
 
@@ -102,6 +104,16 @@ class ResNet(nn.Module):
 
         # layers += [nn.Flatten(), nn.Linear(n_features[-1], num_classes, bias=False), nn.BatchNorm1d(num_classes)]
         self.layers = nn.Sequential(*layers)
+        if weight_initialization:
+            logger.info("Init conv & linear with kaiming")
+            if isinstance(activation, partial):
+                if activation.func == nn.LeakyReLU:
+                    logger.info("LeakyRelu layers weight init")
+                    wi = partial(weight_init, leaky=activation.keywords.get('negative_slope'))
+                self.apply(wi)
+            else:
+                logger.info("ReLU layers weight init")
+                self.apply(weight_init)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.layers(x)

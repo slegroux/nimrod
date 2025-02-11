@@ -14,6 +14,8 @@ nnet:
   normalization:
     _target_: hydra.utils.get_class
     path: torch.nn.BatchNorm2d
+  weight_initialization: false
+  pre_activation: false
 
 # optimizer
 # scheduler
