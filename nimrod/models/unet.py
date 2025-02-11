@@ -18,7 +18,7 @@ from matplotlib import pyplot as plt
 
 from .conv import ConvBlock, DeconvBlock
 from .resnet import ResBlock
-from .core import Regressor
+from .core import Regressor, weight_init
 from ..utils import get_device, set_seed
 
 from functools import partial
@@ -44,9 +44,9 @@ class TinyUnet(nn.Module):
         self,
         n_features:List[int]=[3, 32, 64, 128, 256, 512, 1024], # Number of features in each layer
         activation=partial(nn.LeakyReLU, negative_slope=0.1), # Activation function
-        leaky:float=0.1,# Leaky ReLU negative slope
         normalization=nn.BatchNorm2d, # Normalization function
-        pre_activation:bool=False # use Resblock with pre-activation
+        pre_activation:bool=False, # use Resblock with pre-activation
+        weight_initialization=False
 
     ):
         super().__init__()
@@ -95,6 +95,17 @@ class TinyUnet(nn.Module):
             normalization=normalization,
             pre_activation=pre_activation
             )
+
+        if weight_initialization:
+            logger.info("Init conv & linear with kaiming")
+            if isinstance(activation, partial):
+                if activation.func == nn.LeakyReLU:
+                    logger.info("LeakyRelu layers weight init")
+                    wi = partial(weight_init, leaky=activation.keywords.get('negative_slope'))
+                self.apply(wi)
+            else:
+                logger.info("ReLU layers weight init")
+                self.apply(weight_init)
 
     def forward(self, x:torch.Tensor)->torch.Tensor:
         layers = [] # store the output of each layer
