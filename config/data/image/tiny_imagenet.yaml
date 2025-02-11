@@ -11,8 +11,10 @@ transforms:
   transforms:
     - _target_: torchvision.transforms.ToTensor
     - _target_: torchvision.transforms.Normalize
-      mean: [0.4822, 0.4495, 0.3985]
-      std: [0.2771, 0.2690, 0.2826]
+      mean: [0.4822, 0.4494, 0.3978]
+      std: [0.2754, 0.2679, 0.2811]
+      # mean: [0.4822, 0.4495, 0.3985]
+      # std: [0.2771, 0.2690, 0.2826]
     # - _target_: torchvision.transforms.Resize
     #   size: [32,32]
 
