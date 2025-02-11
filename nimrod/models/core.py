@@ -45,9 +45,11 @@ def weight_init(
         m:nn.Module, # the module to initialize
         leaky:int=0 # if leaky relu used
         ):
-    if isinstance(m, nn.Conv2d):
-        nn.init.kaiming_normal_(m.weight,a=leaky)
-
+    if isinstance(m, (nn.Conv1d, nn.Conv2d, nn.Conv3d)):
+        nn.init.kaiming_normal_(m.weight, a=leaky)
+    if isinstance(m, nn.Linear):
+        nn.init.kaiming_normal_(m.weight, a=leaky)
+        nn.init.constant_(m.bias, 0)
 
 # %% ../../nbs/models.core.ipynb 8
 class Classifier(ABC, L.LightningModule):
