@@ -6,12 +6,12 @@ batch_size: 64
 num_workers: 0
 
 pin_memory: True
-persistent_workers: False
+persistent_workers: True
 transforms:
-  _target_: torchvision.transforms.Compose
+  _target_: torchvision.transforms.v2.Compose
   transforms:
-    - _target_: torchvision.transforms.ToTensor
-    - _target_: torchvision.transforms.Normalize
+    - _target_: torchvision.transforms.v2.ToImage
+    - _target_: torchvision.transforms.v2.Normalize
       mean: [0.1307,]
       std: [0.3081,]
 
