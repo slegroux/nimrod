@@ -9,8 +9,8 @@ __all__ = ['logger', 'DiffusorX']
 import torch.nn as nn
 import torch.nn.functional as F
 import torch
-from torchvision.transforms import transforms
-
+import torchvision.transforms.v2 as transforms
+from lightning import Trainer
 import os
 import logging
 import warnings
@@ -34,12 +34,11 @@ from diffusers import UNet2DModel, DDPMScheduler, DDPMPipeline, DDIMScheduler
 from diffusers.utils import make_image_grid
 from diffusers.optimization import get_cosine_schedule_with_warmup
 
-# %% ../../nbs/models.diffusion.ipynb 4
 set_seed(42)
 logger = logging.getLogger(__name__)
 warnings.filterwarnings("ignore", category=UserWarning, module="matplotlib.image")
 
-# %% ../../nbs/models.diffusion.ipynb 32
+# %% ../../nbs/models.diffusion.ipynb 30
 class DiffusorX(Regressor):
     def __init__(
         self,
@@ -79,3 +78,12 @@ class DiffusorX(Regressor):
         loss = self.criterion(noise_pred, noise)
         return loss, noise_pred, noise # loss, y_hat, y
 
+    def generate_images(self, img_shape):
+        logger.info("diffuse a batch")
+        B, C, H, W = img_shape
+        sample = torch.randn(img_shape).to(self.device)
+        for i, t in enumerate(self.noise_scheduler.timesteps):
+            with torch.no_grad():
+                residual = self.forward(sample, t)
+                sample = self.noise_scheduler.step(residual, t, sample).prev_sample
+        return sample
