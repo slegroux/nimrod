@@ -45,7 +45,7 @@ class CharTokenizer:
         vocabulary = set(text)
         return cls(sorted(list(vocabulary)))
 
-    def encode(self, text):
+    def encode(self, text:str):
         ids = [self.ctoi[c] for c in text]
         return torch.tensor(ids, dtype=torch.long)
     

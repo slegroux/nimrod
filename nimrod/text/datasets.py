@@ -53,7 +53,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-# %% ../../nbs/text.datasets.ipynb 7
+# %% ../../nbs/text.datasets.ipynb 6
 class Vocab:
     def __init__(self,
                 data_path: str | os.PathLike='../data/text/tiny_shakespeare.txt', # path to text data file
@@ -122,7 +122,7 @@ class Vocab:
         return sorted(set([k for k,v in self._stoi.items()]))
 
 
-# %% ../../nbs/text.datasets.ipynb 13
+# %% ../../nbs/text.datasets.ipynb 12
 class SimpleCharDataset(Dataset):
     def __init__(self, data, context_length):
         self.data = data
@@ -137,7 +137,7 @@ class SimpleCharDataset(Dataset):
         return (len(self.data) - self.context_length)
     
 
-# %% ../../nbs/text.datasets.ipynb 16
+# %% ../../nbs/text.datasets.ipynb 15
 class CharDataset(Dataset):
     def __init__(self,
                 data_path: str | os.PathLike='../data/text/tiny_shakespeare.txt', # path to the data file
@@ -209,7 +209,7 @@ class CharDataset(Dataset):
     def from_tokens(self, tokens: torch.Tensor) -> str:
         return "".join([self.v.itos(int(i)) for i in tokens])
 
-# %% ../../nbs/text.datasets.ipynb 22
+# %% ../../nbs/text.datasets.ipynb 21
 class CharDataModule(DataModule, LightningDataModule):
     def __init__(self,
             # dataset
