@@ -3,7 +3,7 @@
 # %% auto 0
 __all__ = ['AttentionHead', 'MultiHeadAttention', 'FeedFoward', 'Block', 'GPTLanguageModel']
 
-# %% ../../nbs/models.transformer.ipynb 5
+# %% ../../nbs/models.transformer.ipynb 4
 # torch
 import torch.nn as nn
 import torch
@@ -27,12 +27,15 @@ from typing import Dict, List, Tuple, Optional, Set
 from collections import Counter, OrderedDict
 from dataclasses import dataclass, asdict
 from plum import dispatch
+from pathlib import Path
 
 # nimrod
-from .lm import Vocab
+# from nimrod.models.lm import Vocab
+from ..text.tokenizers import CharTokenizer
+from ..text.datasets import SimpleCharDataset
 from ..utils import get_device
 
-# %% ../../nbs/models.transformer.ipynb 19
+# %% ../../nbs/models.transformer.ipynb 10
 class AttentionHead(nn.Module):
     """ self attention head """
     def __init__(self, n_embd, head_size, block_size, dropout):
@@ -45,7 +48,7 @@ class AttentionHead(nn.Module):
         self.dropout = nn.Dropout(dropout)
 
     def forward(self, x):
-        # input of size (batch, time-step, channels)
+        # input of size (batch, time-step, channels/n_embd)
         # output of size (batch, time-step, head size)
         B,T,C = x.shape
         k = self.key(x)   # (B,T,hs)
@@ -60,68 +63,69 @@ class AttentionHead(nn.Module):
         out = wei @ v # (B, T, T) @ (B, T, hs) -> (B, T, hs)
         return out
 
-# %% ../../nbs/models.transformer.ipynb 21
+# %% ../../nbs/models.transformer.ipynb 13
 class MultiHeadAttention(nn.Module):
     """ multiple heads of self-attention in parallel """
 
-    def __init__(self, num_heads, head_size, n_embd, block_size, dropout):
+    def __init__(self, num_heads, head_size, embed_dim, block_size, dropout):
         super().__init__()
-        self.heads = nn.ModuleList([AttentionHead(n_embd, head_size, block_size, dropout) for _ in range(num_heads)])
-        self.proj = nn.Linear(head_size * num_heads, n_embd)
+        self.heads = nn.ModuleList([AttentionHead(embed_dim, head_size, block_size, dropout) for _ in range(num_heads)]) # each head: B,T,Head_size
+        self.proj = nn.Linear(head_size * num_heads, embed_dim) # actually head_size*num_heads == embed_dim
         self.dropout = nn.Dropout(dropout)
 
     def forward(self, x):
-        out = torch.cat([h(x) for h in self.heads], dim=-1)
+        heads_output = [h(x) for h in self.heads]
+        out = torch.cat(heads_output, dim=-1) # concatenate along last dim (head_size) to get head_size*num_heads=embed_dim
         out = self.dropout(self.proj(out))
         return out
 
-# %% ../../nbs/models.transformer.ipynb 24
+# %% ../../nbs/models.transformer.ipynb 17
 class FeedFoward(nn.Module):
     """ a simple linear layer followed by a non-linearity """
 
-    def __init__(self, n_embd, dropout):
+    def __init__(self,embed_dim, dropout):
         super().__init__()
         self.net = nn.Sequential(
-            nn.Linear(n_embd, 4 * n_embd),
-            nn.ReLU(),
-            nn.Linear(4 * n_embd, n_embd),
+            nn.Linear(embed_dim, 4 *embed_dim), # 4*embed_dim somewhat arbitrary. heuristic.
+            nn.ReLU(), #nn.GELU
+            nn.Linear(4 *embed_dim,embed_dim),
             nn.Dropout(dropout),
         )
 
     def forward(self, x):
         return self.net(x)
 
-# %% ../../nbs/models.transformer.ipynb 27
+# %% ../../nbs/models.transformer.ipynb 20
 class Block(nn.Module):
     """ Transformer block: communication followed by computation """
 
-    def __init__(self, n_embd, n_head, block_size, dropout):
-        # n_embd: embedding dimension, n_head: the number of heads we'd like
+    def __init__(self, embed_dim, n_head, block_size, dropout):
+        # embed_dim: embedding dimension, n_head: the number of heads we'd like
         super().__init__()
-        head_size = n_embd // n_head
+        head_size = embed_dim // n_head
 
-        self.sa = MultiHeadAttention(n_head, head_size, n_embd, block_size, dropout)
-        self.ffwd = FeedFoward(n_embd, dropout)
-        self.ln1 = nn.LayerNorm(n_embd)
-        self.ln2 = nn.LayerNorm(n_embd)
+        self.ln1 = nn.LayerNorm(embed_dim) 
+        self.sa = MultiHeadAttention(n_head, head_size, embed_dim, block_size, dropout) # B, T, C/embed_dim
+        self.ln2 = nn.LayerNorm(embed_dim)
+        self.ffwd = FeedFoward(embed_dim, dropout) # B, T, C
 
     def forward(self, x):
         x = x + self.sa(self.ln1(x))
         x = x + self.ffwd(self.ln2(x))
         return x
 
-# %% ../../nbs/models.transformer.ipynb 30
+# %% ../../nbs/models.transformer.ipynb 23
 class GPTLanguageModel(nn.Module):
 
-    def __init__(self, vocab_size, n_embd, block_size, n_head, n_layer, dropout):
+    def __init__(self, vocab_size, embed_dim, block_size, n_head, n_layer, dropout):
         super().__init__()
         # each token directly reads off the logits for the next token from a lookup table
         self.block_size = block_size
-        self.token_embedding_table = nn.Embedding(vocab_size, n_embd)
-        self.position_embedding_table = nn.Embedding(block_size, n_embd)
-        self.blocks = nn.Sequential(*[Block(n_embd, n_head, block_size, dropout) for _ in range(n_layer)])
-        self.ln_f = nn.LayerNorm(n_embd) # final layer norm
-        self.lm_head = nn.Linear(n_embd, vocab_size)
+        self.token_embedding_table = nn.Embedding(vocab_size, embed_dim)
+        self.position_embedding_table = nn.Embedding(block_size, embed_dim)
+        self.blocks = nn.Sequential(*[Block(embed_dim, n_head, block_size, dropout) for _ in range(n_layer)])
+        self.ln_f = nn.LayerNorm(embed_dim) # final layer norm
+        self.lm_head = nn.Linear(embed_dim, vocab_size) # back to vocab size dim
 
         # better init, not covered in the original GPT video, but important, will cover in followup video
         self.apply(self._init_weights)
@@ -134,12 +138,12 @@ class GPTLanguageModel(nn.Module):
         elif isinstance(module, nn.Embedding):
             torch.nn.init.normal_(module.weight, mean=0.0, std=0.02)
 
-    def forward(self, idx, targets=None, device='cuda'):
-        B, T = idx.shape
+    def forward(self, x, targets=None):
+        B, T = x.shape #x is token IDs
 
-        # idx and targets are both (B,T) tensor of integers
-        tok_emb = self.token_embedding_table(idx) # (B,T,C)
-        pos_emb = self.position_embedding_table(torch.arange(T, device=device)) # (T,C)
+        # x and targets are both (B,T) tensor of integers
+        tok_emb = self.token_embedding_table(x) # (B,T,C)
+        pos_emb = self.position_embedding_table(torch.arange(T, device=x.device)) # (T,C)
         x = tok_emb + pos_emb # (B,T,C)
         x = self.blocks(x) # (B,T,C)
         x = self.ln_f(x) # (B,T,C)
@@ -155,19 +159,19 @@ class GPTLanguageModel(nn.Module):
 
         return logits, loss
 
-    def generate(self, idx, max_new_tokens):
-        # idx is (B, T) array of indices in the current context
+    def generate(self, ids, max_new_tokens):
+        # ids is (B, T) arr #ids is token ID say of indices in the current context
         for _ in range(max_new_tokens):
-            # crop idx to the last block_size tokens
-            idx_cond = idx[:, -self.block_size:]
+            # crop ids to the last block_size tokens
+            ids_cond = ids[:, -self.block_size:]
             # get the predictions
-            logits, loss = self(idx_cond)
+            logits, loss = self(ids_cond)
             # focus only on the last time step
             logits = logits[:, -1, :] # becomes (B, C)
             # apply softmax to get probabilities
             probs = F.softmax(logits, dim=-1) # (B, C)
             # sample from the distribution
-            idx_next = torch.multinomial(probs, num_samples=1) # (B, 1)
+            ids_next = torch.multinomial(probs, num_samples=1) # (B, 1)
             # append sampled index to the running sequence
-            idx = torch.cat((idx, idx_next), dim=1) # (B, T+1)
-        return idx
+            ids = torch.cat((ids, ids_next), dim=1) # (B, T+1)
+        return ids #ids is token IDs
