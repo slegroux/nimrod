@@ -1,0 +1,1934 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.43">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Collection of Autoencoder models">
+
+<title>AutoEncoders – slg_nimrod</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-d4d76bf8491c20bad77d141916dc28e1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-4ec7d0a1075ca37dcf8a21c3600a4173.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+<script src="https://unpkg.com/@jupyter-widgets/html-manager@*/dist/embed-amd.js" crossorigin="anonymous"></script>
+
+
+<link rel="stylesheet" href="styles.css">
+<meta property="og:title" content="AutoEncoders – slg_nimrod">
+<meta property="og:description" content="Collection of Autoencoder models">
+<meta property="og:image" content="https://slegroux.github.io/nimrod/models.autoencoders_files/figure-html/cell-3-output-1.png">
+<meta property="og:site_name" content="slg_nimrod">
+<meta property="og:image:height" content="990">
+<meta property="og:image:width" content="966">
+<meta name="twitter:title" content="AutoEncoders – slg_nimrod">
+<meta name="twitter:description" content="Collection of Autoencoder models">
+<meta name="twitter:image" content="https://slegroux.github.io/nimrod/models.autoencoders_files/figure-html/cell-3-output-1.png">
+<meta name="twitter:image-height" content="990">
+<meta name="twitter:image-width" content="966">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-sidebar docked nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">slg_nimrod</span>
+    </a>
+  </div>
+        <div class="quarto-navbar-tools tools-end">
+</div>
+          <div id="quarto-search" class="" title="Search"></div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Image</li><li class="breadcrumb-item"><a href="./models.autoencoders.html">Models</a></li><li class="breadcrumb-item"><a href="./models.autoencoders.html">AutoEncoders</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Nimrod</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Audio</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Data</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./audio.datasets.stt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Speech to Text Datasets</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./audio.datasets.tts.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Audio TTS Datasets</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+ <span class="menu-text">data.utils.lhotse.ipynb</span>
+  </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Embeddings</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./audio.embeddings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Audio Embedders</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Utils</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./audio.utils.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Audio Utilities</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Image</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false">
+ <span class="menu-text">Data</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./image.datasets.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Image Datasets</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true">
+ <span class="menu-text">Models</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth2 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./models.autoencoders.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">AutoEncoders</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./models.conv.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Convolution Neural Networks</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./models.mlp.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Multi Layer Perceptron</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="true">
+ <span class="menu-text">Text</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="false">
+ <span class="menu-text">Data</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./text.datasets.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Text datasets</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+ <span class="menu-text">text.phonemizers.ipynb</span>
+  </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./text.normalizers.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Text Normalizers</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./text.tokenizers.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Text tokenizers</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" role="navigation" aria-expanded="false">
+ <span class="menu-text">Models</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-10" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./models.aligners.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Aligners</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./models.ngram.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">N-gram Language Models</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./models.lm.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Neural Net Language Models</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./models.transformer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Transformer Language Models</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" role="navigation" aria-expanded="true">
+ <span class="menu-text">Misc</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-11" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./models.core.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Model Core Utils</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./data.core.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data Core Utils</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./utils.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Utils</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#fashion-mnist" id="toc-fashion-mnist" class="nav-link active" data-scroll-target="#fashion-mnist">Fashion MNIST</a>
+  <ul class="collapse">
+  <li><a href="#convnet" id="toc-convnet" class="nav-link" data-scroll-target="#convnet">ConvNet</a></li>
+  <li><a href="#lr-finder" id="toc-lr-finder" class="nav-link" data-scroll-target="#lr-finder">LR Finder</a></li>
+  <li><a href="#fit" id="toc-fit" class="nav-link" data-scroll-target="#fit">Fit</a></li>
+  </ul></li>
+  <li><a href="#fc-autoencoder" id="toc-fc-autoencoder" class="nav-link" data-scroll-target="#fc-autoencoder">FC Autoencoder</a></li>
+  <li><a href="#convnet-autoencoder" id="toc-convnet-autoencoder" class="nav-link" data-scroll-target="#convnet-autoencoder">ConvNet Autoencoder</a></li>
+  <li><a href="#autoencoder_x" id="toc-autoencoder_x" class="nav-link" data-scroll-target="#autoencoder_x">AutoEncoder_X</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/slegroux/nimrod/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Image</li><li class="breadcrumb-item"><a href="./models.autoencoders.html">Models</a></li><li class="breadcrumb-item"><a href="./models.autoencoders.html">AutoEncoders</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">AutoEncoders</h1>
+</div>
+
+<div>
+  <div class="description">
+    Collection of Autoencoder models
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<section id="fashion-mnist" class="level2">
+<h2 class="anchored" data-anchor-id="fashion-mnist">Fashion MNIST</h2>
+<div id="cell-3" class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>cfg <span class="op">=</span> OmegaConf.load(<span class="st">'../config/data/image/image.yaml'</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>dm <span class="op">=</span> instantiate(cfg, name<span class="op">=</span><span class="st">'fashion_mnist'</span>, data_dir<span class="op">=</span><span class="st">'../data/image/'</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>dm.prepare_data()</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>dm.setup()</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(dm.num_classes)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>[15:41:01] INFO - Init ImageDataModule for fashion_mnist</code></pre>
+</div>
+<div class="cell-output cell-output-error">
+<div class="ansi-escaped-output">
+<pre><span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">HTTPError</span>                                 Traceback (most recent call last)
+File <span class="ansi-green-fg">~/miniconda3/envs/nimrod/lib/python3.11/site-packages/huggingface_hub/utils/_http.py:406</span>, in <span class="ansi-cyan-fg">hf_raise_for_status</span><span class="ansi-blue-fg">(response, endpoint_name)</span>
+<span class="ansi-green-fg ansi-bold">    405</span> <span style="font-weight:bold;color:rgb(0,135,0)">try</span>:
+<span class="ansi-green-fg">--&gt; 406</span>     response<span style="color:rgb(98,98,98)">.</span>raise_for_status()
+<span class="ansi-green-fg ansi-bold">    407</span> <span style="font-weight:bold;color:rgb(0,135,0)">except</span> HTTPError <span style="font-weight:bold;color:rgb(0,135,0)">as</span> e:
+
+File <span class="ansi-green-fg">~/miniconda3/envs/nimrod/lib/python3.11/site-packages/requests/models.py:1024</span>, in <span class="ansi-cyan-fg">Response.raise_for_status</span><span class="ansi-blue-fg">(self)</span>
+<span class="ansi-green-fg ansi-bold">   1023</span> <span style="font-weight:bold;color:rgb(0,135,0)">if</span> http_error_msg:
+<span class="ansi-green-fg">-&gt; 1024</span>     <span style="font-weight:bold;color:rgb(0,135,0)">raise</span> HTTPError(http_error_msg, response<span style="color:rgb(98,98,98)">=</span><span style="color:rgb(0,135,0)">self</span>)
+
+<span class="ansi-red-fg">HTTPError</span>: 504 Server Error: Gateway Time-out for url: https://huggingface.co/api/datasets/zalando-datasets/fashion_mnist/paths-info/531be5e2ccc9dba0c201ad3ae567a4f3d16ecdd2
+
+The above exception was the direct cause of the following exception:
+
+<span class="ansi-red-fg">HfHubHTTPError</span>                            Traceback (most recent call last)
+Cell <span class="ansi-green-fg">In[5], line 4</span>
+<span class="ansi-green-fg ansi-bold">      2</span> cfg <span style="color:rgb(98,98,98)">=</span> OmegaConf<span style="color:rgb(98,98,98)">.</span>load(<span style="color:rgb(175,0,0)">'</span><span style="color:rgb(175,0,0)">../config/data/image/image.yaml</span><span style="color:rgb(175,0,0)">'</span>)
+<span class="ansi-green-fg ansi-bold">      3</span> dm <span style="color:rgb(98,98,98)">=</span> instantiate(cfg, name<span style="color:rgb(98,98,98)">=</span><span style="color:rgb(175,0,0)">'</span><span style="color:rgb(175,0,0)">fashion_mnist</span><span style="color:rgb(175,0,0)">'</span>, data_dir<span style="color:rgb(98,98,98)">=</span><span style="color:rgb(175,0,0)">'</span><span style="color:rgb(175,0,0)">../data/image/</span><span style="color:rgb(175,0,0)">'</span>)
+<span class="ansi-green-fg">----&gt; 4</span> dm<span style="color:rgb(98,98,98)">.</span>prepare_data()
+<span class="ansi-green-fg ansi-bold">      5</span> dm<span style="color:rgb(98,98,98)">.</span>setup()
+<span class="ansi-green-fg ansi-bold">      6</span> <span style="color:rgb(0,135,0)">print</span>(dm<span style="color:rgb(98,98,98)">.</span>num_classes)
+
+File <span class="ansi-green-fg">~/Projects/nimrod/nimrod/image/datasets.py:415</span>, in <span class="ansi-cyan-fg">ImageDataModule.prepare_data</span><span class="ansi-blue-fg">(self)</span>
+<span class="ansi-green-fg ansi-bold">    412</span> <span style="font-style:italic;color:rgb(175,0,0)">"""Download data if needed </span>
+<span class="ansi-green-fg ansi-bold">    413</span> <span style="font-style:italic;color:rgb(175,0,0)">"""</span>
+<span class="ansi-green-fg ansi-bold">    414</span> <span style="font-style:italic;color:rgb(95,135,135)"># train set</span>
+<span class="ansi-green-fg">--&gt; 415</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>train_ds <span style="color:rgb(98,98,98)">=</span> ImageDataset(
+<span class="ansi-green-fg ansi-bold">    416</span>     <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>hparams<span style="color:rgb(98,98,98)">.</span>name,
+<span class="ansi-green-fg ansi-bold">    417</span>     <span style="color:rgb(98,98,98)">*</span><span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>args,
+<span class="ansi-green-fg ansi-bold">    418</span>     data_dir <span style="color:rgb(98,98,98)">=</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>hparams<span style="color:rgb(98,98,98)">.</span>data_dir,
+<span class="ansi-green-fg ansi-bold">    419</span>     split<span style="color:rgb(98,98,98)">=</span><span style="color:rgb(175,0,0)">'</span><span style="color:rgb(175,0,0)">train</span><span style="color:rgb(175,0,0)">'</span>,
+<span class="ansi-green-fg ansi-bold">    420</span>     transforms <span style="color:rgb(98,98,98)">=</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>hparams<span style="color:rgb(98,98,98)">.</span>transforms,
+<span class="ansi-green-fg ansi-bold">    421</span>     <span style="color:rgb(98,98,98)">*</span><span style="color:rgb(98,98,98)">*</span><span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>kwargs
+<span class="ansi-green-fg ansi-bold">    422</span> )
+<span class="ansi-green-fg ansi-bold">    423</span> <span style="font-style:italic;color:rgb(95,135,135)"># get num classes before setup method converst ImageDataset to Subset</span>
+<span class="ansi-green-fg ansi-bold">    424</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_num_classes <span style="color:rgb(98,98,98)">=</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>train_ds<span style="color:rgb(98,98,98)">.</span>num_classes
+
+File <span class="ansi-green-fg">~/Projects/nimrod/nimrod/image/datasets.py:204</span>, in <span class="ansi-cyan-fg">ImageDataset.__init__</span><span class="ansi-blue-fg">(self, name, data_dir, split, transforms, streaming, exclude_grey_scale, verification_mode, from_image_folder, from_disk, *args)</span>
+<span class="ansi-green-fg ansi-bold">    202</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>exclude_grey_scale <span style="color:rgb(98,98,98)">=</span> exclude_grey_scale
+<span class="ansi-green-fg ansi-bold">    203</span> <span style="font-weight:bold;color:rgb(0,135,0)">if</span> <span style="font-weight:bold;color:rgb(175,0,255)">not</span> from_image_folder:
+<span class="ansi-green-fg">--&gt; 204</span>     <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>info <span style="color:rgb(98,98,98)">=</span> load_dataset_builder(name, <span style="color:rgb(98,98,98)">*</span>args)
+<span class="ansi-green-fg ansi-bold">    205</span>     <span style="font-weight:bold;color:rgb(0,135,0)">if</span> split <span style="font-weight:bold;color:rgb(175,0,255)">not</span> <span style="font-weight:bold;color:rgb(175,0,255)">in</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>info<span style="color:rgb(98,98,98)">.</span>info<span style="color:rgb(98,98,98)">.</span>splits:
+<span class="ansi-green-fg ansi-bold">    206</span>         <span style="font-weight:bold;color:rgb(0,135,0)">raise</span> <span style="font-weight:bold;color:rgb(215,95,95)">ValueError</span>(<span style="color:rgb(175,0,0)">f</span><span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">The specified split </span><span style="color:rgb(175,0,0)">'</span><span style="font-weight:bold;color:rgb(175,95,135)">{</span>split<span style="font-weight:bold;color:rgb(175,95,135)">}</span><span style="color:rgb(175,0,0)">'</span><span style="color:rgb(175,0,0)"> does not exist in the dataset </span><span style="color:rgb(175,0,0)">'</span><span style="font-weight:bold;color:rgb(175,95,135)">{</span>name<span style="font-weight:bold;color:rgb(175,95,135)">}</span><span style="color:rgb(175,0,0)">'</span><span style="color:rgb(175,0,0)">. Available splits: </span><span style="font-weight:bold;color:rgb(175,95,135)">{</span><span style="color:rgb(0,135,0)">list</span>(<span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>info<span style="color:rgb(98,98,98)">.</span>info<span style="color:rgb(98,98,98)">.</span>splits<span style="color:rgb(98,98,98)">.</span>keys())<span style="font-weight:bold;color:rgb(175,95,135)">}</span><span style="color:rgb(175,0,0)">"</span>)
+
+File <span class="ansi-green-fg">~/miniconda3/envs/nimrod/lib/python3.11/site-packages/datasets/load.py:1886</span>, in <span class="ansi-cyan-fg">load_dataset_builder</span><span class="ansi-blue-fg">(path, name, data_dir, data_files, cache_dir, features, download_config, download_mode, revision, token, storage_options, trust_remote_code, _require_default_config_name, **config_kwargs)</span>
+<span class="ansi-green-fg ansi-bold">   1884</span> builder_cls <span style="color:rgb(98,98,98)">=</span> get_dataset_builder_class(dataset_module, dataset_name<span style="color:rgb(98,98,98)">=</span>dataset_name)
+<span class="ansi-green-fg ansi-bold">   1885</span> <span style="font-style:italic;color:rgb(95,135,135)"># Instantiate the dataset builder</span>
+<span class="ansi-green-fg">-&gt; 1886</span> builder_instance: DatasetBuilder <span style="color:rgb(98,98,98)">=</span> builder_cls(
+<span class="ansi-green-fg ansi-bold">   1887</span>     cache_dir<span style="color:rgb(98,98,98)">=</span>cache_dir,
+<span class="ansi-green-fg ansi-bold">   1888</span>     dataset_name<span style="color:rgb(98,98,98)">=</span>dataset_name,
+<span class="ansi-green-fg ansi-bold">   1889</span>     config_name<span style="color:rgb(98,98,98)">=</span>config_name,
+<span class="ansi-green-fg ansi-bold">   1890</span>     data_dir<span style="color:rgb(98,98,98)">=</span>data_dir,
+<span class="ansi-green-fg ansi-bold">   1891</span>     data_files<span style="color:rgb(98,98,98)">=</span>data_files,
+<span class="ansi-green-fg ansi-bold">   1892</span>     <span style="color:rgb(0,135,0)">hash</span><span style="color:rgb(98,98,98)">=</span>dataset_module<span style="color:rgb(98,98,98)">.</span>hash,
+<span class="ansi-green-fg ansi-bold">   1893</span>     info<span style="color:rgb(98,98,98)">=</span>info,
+<span class="ansi-green-fg ansi-bold">   1894</span>     features<span style="color:rgb(98,98,98)">=</span>features,
+<span class="ansi-green-fg ansi-bold">   1895</span>     token<span style="color:rgb(98,98,98)">=</span>token,
+<span class="ansi-green-fg ansi-bold">   1896</span>     storage_options<span style="color:rgb(98,98,98)">=</span>storage_options,
+<span class="ansi-green-fg ansi-bold">   1897</span>     <span style="color:rgb(98,98,98)">*</span><span style="color:rgb(98,98,98)">*</span>builder_kwargs,
+<span class="ansi-green-fg ansi-bold">   1898</span>     <span style="color:rgb(98,98,98)">*</span><span style="color:rgb(98,98,98)">*</span>config_kwargs,
+<span class="ansi-green-fg ansi-bold">   1899</span> )
+<span class="ansi-green-fg ansi-bold">   1900</span> builder_instance<span style="color:rgb(98,98,98)">.</span>_use_legacy_cache_dir_if_possible(dataset_module)
+<span class="ansi-green-fg ansi-bold">   1902</span> <span style="font-weight:bold;color:rgb(0,135,0)">return</span> builder_instance
+
+File <span class="ansi-green-fg">~/miniconda3/envs/nimrod/lib/python3.11/site-packages/datasets/builder.py:342</span>, in <span class="ansi-cyan-fg">DatasetBuilder.__init__</span><span class="ansi-blue-fg">(self, cache_dir, dataset_name, config_name, hash, base_path, info, features, token, repo_id, data_files, data_dir, storage_options, writer_batch_size, **config_kwargs)</span>
+<span class="ansi-green-fg ansi-bold">    340</span>     config_kwargs[<span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">data_dir</span><span style="color:rgb(175,0,0)">"</span>] <span style="color:rgb(98,98,98)">=</span> data_dir
+<span class="ansi-green-fg ansi-bold">    341</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>config_kwargs <span style="color:rgb(98,98,98)">=</span> config_kwargs
+<span class="ansi-green-fg">--&gt; 342</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>config, <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>config_id <span style="color:rgb(98,98,98)">=</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_create_builder_config(
+<span class="ansi-green-fg ansi-bold">    343</span>     config_name<span style="color:rgb(98,98,98)">=</span>config_name,
+<span class="ansi-green-fg ansi-bold">    344</span>     custom_features<span style="color:rgb(98,98,98)">=</span>features,
+<span class="ansi-green-fg ansi-bold">    345</span>     <span style="color:rgb(98,98,98)">*</span><span style="color:rgb(98,98,98)">*</span>config_kwargs,
+<span class="ansi-green-fg ansi-bold">    346</span> )
+<span class="ansi-green-fg ansi-bold">    348</span> <span style="font-style:italic;color:rgb(95,135,135)"># prepare info: DatasetInfo are a standardized dataclass across all datasets</span>
+<span class="ansi-green-fg ansi-bold">    349</span> <span style="font-style:italic;color:rgb(95,135,135)"># Prefill datasetinfo</span>
+<span class="ansi-green-fg ansi-bold">    350</span> <span style="font-weight:bold;color:rgb(0,135,0)">if</span> info <span style="font-weight:bold;color:rgb(175,0,255)">is</span> <span style="font-weight:bold;color:rgb(0,135,0)">None</span>:
+<span class="ansi-green-fg ansi-bold">    351</span>     <span style="font-style:italic;color:rgb(95,135,135)"># TODO FOR PACKAGED MODULES IT IMPORTS DATA FROM src/packaged_modules which doesn't make sense</span>
+
+File <span class="ansi-green-fg">~/miniconda3/envs/nimrod/lib/python3.11/site-packages/datasets/builder.py:597</span>, in <span class="ansi-cyan-fg">DatasetBuilder._create_builder_config</span><span class="ansi-blue-fg">(self, config_name, custom_features, **config_kwargs)</span>
+<span class="ansi-green-fg ansi-bold">    594</span>     <span style="font-weight:bold;color:rgb(0,135,0)">raise</span> <span style="font-weight:bold;color:rgb(215,95,95)">ValueError</span>(<span style="color:rgb(175,0,0)">f</span><span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">BuilderConfig must have a name, got </span><span style="font-weight:bold;color:rgb(175,95,135)">{</span>builder_config<span style="color:rgb(98,98,98)">.</span>name<span style="font-weight:bold;color:rgb(175,95,135)">}</span><span style="color:rgb(175,0,0)">"</span>)
+<span class="ansi-green-fg ansi-bold">    596</span> <span style="font-style:italic;color:rgb(95,135,135)"># resolve data files if needed</span>
+<span class="ansi-green-fg">--&gt; 597</span> builder_config<span style="color:rgb(98,98,98)">.</span>_resolve_data_files(
+<span class="ansi-green-fg ansi-bold">    598</span>     base_path<span style="color:rgb(98,98,98)">=</span><span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>base_path,
+<span class="ansi-green-fg ansi-bold">    599</span>     download_config<span style="color:rgb(98,98,98)">=</span>DownloadConfig(token<span style="color:rgb(98,98,98)">=</span><span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>token, storage_options<span style="color:rgb(98,98,98)">=</span><span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>storage_options),
+<span class="ansi-green-fg ansi-bold">    600</span> )
+<span class="ansi-green-fg ansi-bold">    602</span> <span style="font-style:italic;color:rgb(95,135,135)"># compute the config id that is going to be used for caching</span>
+<span class="ansi-green-fg ansi-bold">    603</span> config_id <span style="color:rgb(98,98,98)">=</span> builder_config<span style="color:rgb(98,98,98)">.</span>create_config_id(
+<span class="ansi-green-fg ansi-bold">    604</span>     config_kwargs,
+<span class="ansi-green-fg ansi-bold">    605</span>     custom_features<span style="color:rgb(98,98,98)">=</span>custom_features,
+<span class="ansi-green-fg ansi-bold">    606</span> )
+
+File <span class="ansi-green-fg">~/miniconda3/envs/nimrod/lib/python3.11/site-packages/datasets/builder.py:206</span>, in <span class="ansi-cyan-fg">BuilderConfig._resolve_data_files</span><span class="ansi-blue-fg">(self, base_path, download_config)</span>
+<span class="ansi-green-fg ansi-bold">    204</span> <span style="font-weight:bold;color:rgb(0,135,0)">if</span> <span style="color:rgb(0,135,0)">isinstance</span>(<span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>data_files, DataFilesPatternsDict):
+<span class="ansi-green-fg ansi-bold">    205</span>     base_path <span style="color:rgb(98,98,98)">=</span> xjoin(base_path, <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>data_dir) <span style="font-weight:bold;color:rgb(0,135,0)">if</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>data_dir <span style="font-weight:bold;color:rgb(0,135,0)">else</span> base_path
+<span class="ansi-green-fg">--&gt; 206</span>     <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>data_files <span style="color:rgb(98,98,98)">=</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>data_files<span style="color:rgb(98,98,98)">.</span>resolve(base_path, download_config)
+
+File <span class="ansi-green-fg">~/miniconda3/envs/nimrod/lib/python3.11/site-packages/datasets/data_files.py:818</span>, in <span class="ansi-cyan-fg">DataFilesPatternsDict.resolve</span><span class="ansi-blue-fg">(self, base_path, download_config)</span>
+<span class="ansi-green-fg ansi-bold">    816</span> out <span style="color:rgb(98,98,98)">=</span> DataFilesDict()
+<span class="ansi-green-fg ansi-bold">    817</span> <span style="font-weight:bold;color:rgb(0,135,0)">for</span> key, data_files_patterns_list <span style="font-weight:bold;color:rgb(175,0,255)">in</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>items():
+<span class="ansi-green-fg">--&gt; 818</span>     out[key] <span style="color:rgb(98,98,98)">=</span> data_files_patterns_list<span style="color:rgb(98,98,98)">.</span>resolve(base_path, download_config)
+<span class="ansi-green-fg ansi-bold">    819</span> <span style="font-weight:bold;color:rgb(0,135,0)">return</span> out
+
+File <span class="ansi-green-fg">~/miniconda3/envs/nimrod/lib/python3.11/site-packages/datasets/data_files.py:771</span>, in <span class="ansi-cyan-fg">DataFilesPatternsList.resolve</span><span class="ansi-blue-fg">(self, base_path, download_config)</span>
+<span class="ansi-green-fg ansi-bold">    768</span> <span style="font-weight:bold;color:rgb(0,135,0)">for</span> pattern, allowed_extensions <span style="font-weight:bold;color:rgb(175,0,255)">in</span> <span style="color:rgb(0,135,0)">zip</span>(<span style="color:rgb(0,135,0)">self</span>, <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>allowed_extensions):
+<span class="ansi-green-fg ansi-bold">    769</span>     <span style="font-weight:bold;color:rgb(0,135,0)">try</span>:
+<span class="ansi-green-fg ansi-bold">    770</span>         data_files<span style="color:rgb(98,98,98)">.</span>extend(
+<span class="ansi-green-fg">--&gt; 771</span>             resolve_pattern(
+<span class="ansi-green-fg ansi-bold">    772</span>                 pattern,
+<span class="ansi-green-fg ansi-bold">    773</span>                 base_path<span style="color:rgb(98,98,98)">=</span>base_path,
+<span class="ansi-green-fg ansi-bold">    774</span>                 allowed_extensions<span style="color:rgb(98,98,98)">=</span>allowed_extensions,
+<span class="ansi-green-fg ansi-bold">    775</span>                 download_config<span style="color:rgb(98,98,98)">=</span>download_config,
+<span class="ansi-green-fg ansi-bold">    776</span>             )
+<span class="ansi-green-fg ansi-bold">    777</span>         )
+<span class="ansi-green-fg ansi-bold">    778</span>     <span style="font-weight:bold;color:rgb(0,135,0)">except</span> <span style="font-weight:bold;color:rgb(215,95,95)">FileNotFoundError</span>:
+<span class="ansi-green-fg ansi-bold">    779</span>         <span style="font-weight:bold;color:rgb(0,135,0)">if</span> <span style="font-weight:bold;color:rgb(175,0,255)">not</span> has_magic(pattern):
+
+File <span class="ansi-green-fg">~/miniconda3/envs/nimrod/lib/python3.11/site-packages/datasets/data_files.py:388</span>, in <span class="ansi-cyan-fg">resolve_pattern</span><span class="ansi-blue-fg">(pattern, base_path, allowed_extensions, download_config)</span>
+<span class="ansi-green-fg ansi-bold">    383</span> <span style="font-weight:bold;color:rgb(0,135,0)">if</span> protocol <span style="color:rgb(98,98,98)">==</span> <span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">hf</span><span style="color:rgb(175,0,0)">"</span> <span style="font-weight:bold;color:rgb(175,0,255)">and</span> config<span style="color:rgb(98,98,98)">.</span>HF_HUB_VERSION <span style="color:rgb(98,98,98)">&gt;</span><span style="color:rgb(98,98,98)">=</span> version<span style="color:rgb(98,98,98)">.</span>parse(<span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">0.20.0</span><span style="color:rgb(175,0,0)">"</span>):
+<span class="ansi-green-fg ansi-bold">    384</span>     <span style="font-style:italic;color:rgb(95,135,135)"># 10 times faster glob with detail=True (ignores costly info like lastCommit)</span>
+<span class="ansi-green-fg ansi-bold">    385</span>     glob_kwargs[<span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">expand_info</span><span style="color:rgb(175,0,0)">"</span>] <span style="color:rgb(98,98,98)">=</span> <span style="font-weight:bold;color:rgb(0,135,0)">False</span>
+<span class="ansi-green-fg ansi-bold">    386</span> matched_paths <span style="color:rgb(98,98,98)">=</span> [
+<span class="ansi-green-fg ansi-bold">    387</span>     filepath <span style="font-weight:bold;color:rgb(0,135,0)">if</span> filepath<span style="color:rgb(98,98,98)">.</span>startswith(protocol_prefix) <span style="font-weight:bold;color:rgb(0,135,0)">else</span> protocol_prefix <span style="color:rgb(98,98,98)">+</span> filepath
+<span class="ansi-green-fg">--&gt; 388</span>     <span style="font-weight:bold;color:rgb(0,135,0)">for</span> filepath, info <span style="font-weight:bold;color:rgb(175,0,255)">in</span> fs<span style="color:rgb(98,98,98)">.</span>glob(pattern, detail<span style="color:rgb(98,98,98)">=</span><span style="font-weight:bold;color:rgb(0,135,0)">True</span>, <span style="color:rgb(98,98,98)">*</span><span style="color:rgb(98,98,98)">*</span>glob_kwargs)<span style="color:rgb(98,98,98)">.</span>items()
+<span class="ansi-green-fg ansi-bold">    389</span>     <span style="font-weight:bold;color:rgb(0,135,0)">if</span> info[<span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">type</span><span style="color:rgb(175,0,0)">"</span>] <span style="color:rgb(98,98,98)">==</span> <span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">file</span><span style="color:rgb(175,0,0)">"</span>
+<span class="ansi-green-fg ansi-bold">    390</span>     <span style="font-weight:bold;color:rgb(175,0,255)">and</span> (xbasename(filepath) <span style="font-weight:bold;color:rgb(175,0,255)">not</span> <span style="font-weight:bold;color:rgb(175,0,255)">in</span> files_to_ignore)
+<span class="ansi-green-fg ansi-bold">    391</span>     <span style="font-weight:bold;color:rgb(175,0,255)">and</span> <span style="font-weight:bold;color:rgb(175,0,255)">not</span> _is_inside_unrequested_special_dir(filepath, fs_pattern)
+<span class="ansi-green-fg ansi-bold">    392</span>     <span style="font-weight:bold;color:rgb(175,0,255)">and</span> <span style="font-weight:bold;color:rgb(175,0,255)">not</span> _is_unrequested_hidden_file_or_is_inside_unrequested_hidden_dir(filepath, fs_pattern)
+<span class="ansi-green-fg ansi-bold">    393</span> ]  <span style="font-style:italic;color:rgb(95,135,135)"># ignore .ipynb and __pycache__, but keep /../</span>
+<span class="ansi-green-fg ansi-bold">    394</span> <span style="font-weight:bold;color:rgb(0,135,0)">if</span> allowed_extensions <span style="font-weight:bold;color:rgb(175,0,255)">is</span> <span style="font-weight:bold;color:rgb(175,0,255)">not</span> <span style="font-weight:bold;color:rgb(0,135,0)">None</span>:
+<span class="ansi-green-fg ansi-bold">    395</span>     out <span style="color:rgb(98,98,98)">=</span> [
+<span class="ansi-green-fg ansi-bold">    396</span>         filepath
+<span class="ansi-green-fg ansi-bold">    397</span>         <span style="font-weight:bold;color:rgb(0,135,0)">for</span> filepath <span style="font-weight:bold;color:rgb(175,0,255)">in</span> matched_paths
+<span class="ansi-green-fg ansi-bold">    398</span>         <span style="font-weight:bold;color:rgb(0,135,0)">if</span> <span style="color:rgb(0,135,0)">any</span>(<span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">.</span><span style="color:rgb(175,0,0)">"</span> <span style="color:rgb(98,98,98)">+</span> suffix <span style="font-weight:bold;color:rgb(175,0,255)">in</span> allowed_extensions <span style="font-weight:bold;color:rgb(0,135,0)">for</span> suffix <span style="font-weight:bold;color:rgb(175,0,255)">in</span> xbasename(filepath)<span style="color:rgb(98,98,98)">.</span>split(<span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">.</span><span style="color:rgb(175,0,0)">"</span>)[<span style="color:rgb(98,98,98)">1</span>:])
+<span class="ansi-green-fg ansi-bold">    399</span>     ]
+
+File <span class="ansi-green-fg">~/miniconda3/envs/nimrod/lib/python3.11/site-packages/huggingface_hub/hf_file_system.py:521</span>, in <span class="ansi-cyan-fg">HfFileSystem.glob</span><span class="ansi-blue-fg">(self, path, **kwargs)</span>
+<span class="ansi-green-fg ansi-bold">    519</span> kwargs <span style="color:rgb(98,98,98)">=</span> {<span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">expand_info</span><span style="color:rgb(175,0,0)">"</span>: kwargs<span style="color:rgb(98,98,98)">.</span>get(<span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">detail</span><span style="color:rgb(175,0,0)">"</span>, <span style="font-weight:bold;color:rgb(0,135,0)">False</span>), <span style="color:rgb(98,98,98)">*</span><span style="color:rgb(98,98,98)">*</span>kwargs}
+<span class="ansi-green-fg ansi-bold">    520</span> path <span style="color:rgb(98,98,98)">=</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>resolve_path(path, revision<span style="color:rgb(98,98,98)">=</span>kwargs<span style="color:rgb(98,98,98)">.</span>get(<span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">revision</span><span style="color:rgb(175,0,0)">"</span>))<span style="color:rgb(98,98,98)">.</span>unresolve()
+<span class="ansi-green-fg">--&gt; 521</span> <span style="font-weight:bold;color:rgb(0,135,0)">return</span> <span style="color:rgb(0,135,0)">super</span>()<span style="color:rgb(98,98,98)">.</span>glob(path, <span style="color:rgb(98,98,98)">*</span><span style="color:rgb(98,98,98)">*</span>kwargs)
+
+File <span class="ansi-green-fg">~/miniconda3/envs/nimrod/lib/python3.11/site-packages/fsspec/spec.py:611</span>, in <span class="ansi-cyan-fg">AbstractFileSystem.glob</span><span class="ansi-blue-fg">(self, path, maxdepth, **kwargs)</span>
+<span class="ansi-green-fg ansi-bold">    608</span>     <span style="font-weight:bold;color:rgb(0,135,0)">else</span>:
+<span class="ansi-green-fg ansi-bold">    609</span>         depth <span style="color:rgb(98,98,98)">=</span> <span style="font-weight:bold;color:rgb(0,135,0)">None</span>
+<span class="ansi-green-fg">--&gt; 611</span> allpaths <span style="color:rgb(98,98,98)">=</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>find(root, maxdepth<span style="color:rgb(98,98,98)">=</span>depth, withdirs<span style="color:rgb(98,98,98)">=</span><span style="font-weight:bold;color:rgb(0,135,0)">True</span>, detail<span style="color:rgb(98,98,98)">=</span><span style="font-weight:bold;color:rgb(0,135,0)">True</span>, <span style="color:rgb(98,98,98)">*</span><span style="color:rgb(98,98,98)">*</span>kwargs)
+<span class="ansi-green-fg ansi-bold">    613</span> pattern <span style="color:rgb(98,98,98)">=</span> glob_translate(path <span style="color:rgb(98,98,98)">+</span> (<span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">/</span><span style="color:rgb(175,0,0)">"</span> <span style="font-weight:bold;color:rgb(0,135,0)">if</span> ends_with_sep <span style="font-weight:bold;color:rgb(0,135,0)">else</span> <span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">"</span>))
+<span class="ansi-green-fg ansi-bold">    614</span> pattern <span style="color:rgb(98,98,98)">=</span> re<span style="color:rgb(98,98,98)">.</span>compile(pattern)
+
+File <span class="ansi-green-fg">~/miniconda3/envs/nimrod/lib/python3.11/site-packages/huggingface_hub/hf_file_system.py:556</span>, in <span class="ansi-cyan-fg">HfFileSystem.find</span><span class="ansi-blue-fg">(self, path, maxdepth, withdirs, detail, refresh, revision, **kwargs)</span>
+<span class="ansi-green-fg ansi-bold">    533</span> <span style="font-style:italic;color:rgb(175,0,0)">"""</span>
+<span class="ansi-green-fg ansi-bold">    534</span> <span style="font-style:italic;color:rgb(175,0,0)">List all files below path.</span>
+<span class="ansi-green-fg ansi-bold">    535</span> 
+<span class="ansi-green-fg">   (...)</span>
+<span class="ansi-green-fg ansi-bold">    553</span> <span style="font-style:italic;color:rgb(175,0,0)">    `Union[List[str], Dict[str, Dict[str, Any]]]`: List of paths or dict of file information.</span>
+<span class="ansi-green-fg ansi-bold">    554</span> <span style="font-style:italic;color:rgb(175,0,0)">"""</span>
+<span class="ansi-green-fg ansi-bold">    555</span> <span style="font-weight:bold;color:rgb(0,135,0)">if</span> maxdepth:
+<span class="ansi-green-fg">--&gt; 556</span>     <span style="font-weight:bold;color:rgb(0,135,0)">return</span> <span style="color:rgb(0,135,0)">super</span>()<span style="color:rgb(98,98,98)">.</span>find(
+<span class="ansi-green-fg ansi-bold">    557</span>         path, maxdepth<span style="color:rgb(98,98,98)">=</span>maxdepth, withdirs<span style="color:rgb(98,98,98)">=</span>withdirs, detail<span style="color:rgb(98,98,98)">=</span>detail, refresh<span style="color:rgb(98,98,98)">=</span>refresh, revision<span style="color:rgb(98,98,98)">=</span>revision, <span style="color:rgb(98,98,98)">*</span><span style="color:rgb(98,98,98)">*</span>kwargs
+<span class="ansi-green-fg ansi-bold">    558</span>     )
+<span class="ansi-green-fg ansi-bold">    559</span> resolved_path <span style="color:rgb(98,98,98)">=</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>resolve_path(path, revision<span style="color:rgb(98,98,98)">=</span>revision)
+<span class="ansi-green-fg ansi-bold">    560</span> path <span style="color:rgb(98,98,98)">=</span> resolved_path<span style="color:rgb(98,98,98)">.</span>unresolve()
+
+File <span class="ansi-green-fg">~/miniconda3/envs/nimrod/lib/python3.11/site-packages/fsspec/spec.py:502</span>, in <span class="ansi-cyan-fg">AbstractFileSystem.find</span><span class="ansi-blue-fg">(self, path, maxdepth, withdirs, detail, **kwargs)</span>
+<span class="ansi-green-fg ansi-bold">    499</span> <span style="font-style:italic;color:rgb(95,135,135)"># Add the root directory if withdirs is requested</span>
+<span class="ansi-green-fg ansi-bold">    500</span> <span style="font-style:italic;color:rgb(95,135,135)"># This is needed for posix glob compliance</span>
+<span class="ansi-green-fg ansi-bold">    501</span> <span style="font-weight:bold;color:rgb(0,135,0)">if</span> withdirs <span style="font-weight:bold;color:rgb(175,0,255)">and</span> path <span style="color:rgb(98,98,98)">!=</span> <span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">"</span> <span style="font-weight:bold;color:rgb(175,0,255)">and</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>isdir(path):
+<span class="ansi-green-fg">--&gt; 502</span>     out[path] <span style="color:rgb(98,98,98)">=</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>info(path)
+<span class="ansi-green-fg ansi-bold">    504</span> <span style="font-weight:bold;color:rgb(0,135,0)">for</span> _, dirs, files <span style="font-weight:bold;color:rgb(175,0,255)">in</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>walk(path, maxdepth, detail<span style="color:rgb(98,98,98)">=</span><span style="font-weight:bold;color:rgb(0,135,0)">True</span>, <span style="color:rgb(98,98,98)">*</span><span style="color:rgb(98,98,98)">*</span>kwargs):
+<span class="ansi-green-fg ansi-bold">    505</span>     <span style="font-weight:bold;color:rgb(0,135,0)">if</span> withdirs:
+
+File <span class="ansi-green-fg">~/miniconda3/envs/nimrod/lib/python3.11/site-packages/huggingface_hub/hf_file_system.py:719</span>, in <span class="ansi-cyan-fg">HfFileSystem.info</span><span class="ansi-blue-fg">(self, path, refresh, revision, **kwargs)</span>
+<span class="ansi-green-fg ansi-bold">    717</span>     out <span style="color:rgb(98,98,98)">=</span> out1[<span style="color:rgb(98,98,98)">0</span>]
+<span class="ansi-green-fg ansi-bold">    718</span> <span style="font-weight:bold;color:rgb(0,135,0)">if</span> refresh <span style="font-weight:bold;color:rgb(175,0,255)">or</span> out <span style="font-weight:bold;color:rgb(175,0,255)">is</span> <span style="font-weight:bold;color:rgb(0,135,0)">None</span> <span style="font-weight:bold;color:rgb(175,0,255)">or</span> (expand_info <span style="font-weight:bold;color:rgb(175,0,255)">and</span> out <span style="font-weight:bold;color:rgb(175,0,255)">and</span> out[<span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">last_commit</span><span style="color:rgb(175,0,0)">"</span>] <span style="font-weight:bold;color:rgb(175,0,255)">is</span> <span style="font-weight:bold;color:rgb(0,135,0)">None</span>):
+<span class="ansi-green-fg">--&gt; 719</span>     paths_info <span style="color:rgb(98,98,98)">=</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_api<span style="color:rgb(98,98,98)">.</span>get_paths_info(
+<span class="ansi-green-fg ansi-bold">    720</span>         resolved_path<span style="color:rgb(98,98,98)">.</span>repo_id,
+<span class="ansi-green-fg ansi-bold">    721</span>         resolved_path<span style="color:rgb(98,98,98)">.</span>path_in_repo,
+<span class="ansi-green-fg ansi-bold">    722</span>         expand<span style="color:rgb(98,98,98)">=</span>expand_info,
+<span class="ansi-green-fg ansi-bold">    723</span>         revision<span style="color:rgb(98,98,98)">=</span>resolved_path<span style="color:rgb(98,98,98)">.</span>revision,
+<span class="ansi-green-fg ansi-bold">    724</span>         repo_type<span style="color:rgb(98,98,98)">=</span>resolved_path<span style="color:rgb(98,98,98)">.</span>repo_type,
+<span class="ansi-green-fg ansi-bold">    725</span>     )
+<span class="ansi-green-fg ansi-bold">    726</span>     <span style="font-weight:bold;color:rgb(0,135,0)">if</span> <span style="font-weight:bold;color:rgb(175,0,255)">not</span> paths_info:
+<span class="ansi-green-fg ansi-bold">    727</span>         _raise_file_not_found(path, <span style="font-weight:bold;color:rgb(0,135,0)">None</span>)
+
+File <span class="ansi-green-fg">~/miniconda3/envs/nimrod/lib/python3.11/site-packages/huggingface_hub/utils/_validators.py:114</span>, in <span class="ansi-cyan-fg">validate_hf_hub_args.&lt;locals&gt;._inner_fn</span><span class="ansi-blue-fg">(*args, **kwargs)</span>
+<span class="ansi-green-fg ansi-bold">    111</span> <span style="font-weight:bold;color:rgb(0,135,0)">if</span> check_use_auth_token:
+<span class="ansi-green-fg ansi-bold">    112</span>     kwargs <span style="color:rgb(98,98,98)">=</span> smoothly_deprecate_use_auth_token(fn_name<span style="color:rgb(98,98,98)">=</span>fn<span style="color:rgb(98,98,98)">.</span><span style="color:rgb(0,0,135)">__name__</span>, has_token<span style="color:rgb(98,98,98)">=</span>has_token, kwargs<span style="color:rgb(98,98,98)">=</span>kwargs)
+<span class="ansi-green-fg">--&gt; 114</span> <span style="font-weight:bold;color:rgb(0,135,0)">return</span> fn(<span style="color:rgb(98,98,98)">*</span>args, <span style="color:rgb(98,98,98)">*</span><span style="color:rgb(98,98,98)">*</span>kwargs)
+
+File <span class="ansi-green-fg">~/miniconda3/envs/nimrod/lib/python3.11/site-packages/huggingface_hub/hf_api.py:3303</span>, in <span class="ansi-cyan-fg">HfApi.get_paths_info</span><span class="ansi-blue-fg">(self, repo_id, paths, expand, revision, repo_type, token)</span>
+<span class="ansi-green-fg ansi-bold">   3293</span> headers <span style="color:rgb(98,98,98)">=</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_build_hf_headers(token<span style="color:rgb(98,98,98)">=</span>token)
+<span class="ansi-green-fg ansi-bold">   3295</span> response <span style="color:rgb(98,98,98)">=</span> get_session()<span style="color:rgb(98,98,98)">.</span>post(
+<span class="ansi-green-fg ansi-bold">   3296</span>     <span style="color:rgb(175,0,0)">f</span><span style="color:rgb(175,0,0)">"</span><span style="font-weight:bold;color:rgb(175,95,135)">{</span><span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>endpoint<span style="font-weight:bold;color:rgb(175,95,135)">}</span><span style="color:rgb(175,0,0)">/api/</span><span style="font-weight:bold;color:rgb(175,95,135)">{</span>repo_type<span style="font-weight:bold;color:rgb(175,95,135)">}</span><span style="color:rgb(175,0,0)">s/</span><span style="font-weight:bold;color:rgb(175,95,135)">{</span>repo_id<span style="font-weight:bold;color:rgb(175,95,135)">}</span><span style="color:rgb(175,0,0)">/paths-info/</span><span style="font-weight:bold;color:rgb(175,95,135)">{</span>revision<span style="font-weight:bold;color:rgb(175,95,135)">}</span><span style="color:rgb(175,0,0)">"</span>,
+<span class="ansi-green-fg ansi-bold">   3297</span>     data<span style="color:rgb(98,98,98)">=</span>{
+<span class="ansi-green-fg">   (...)</span>
+<span class="ansi-green-fg ansi-bold">   3301</span>     headers<span style="color:rgb(98,98,98)">=</span>headers,
+<span class="ansi-green-fg ansi-bold">   3302</span> )
+<span class="ansi-green-fg">-&gt; 3303</span> hf_raise_for_status(response)
+<span class="ansi-green-fg ansi-bold">   3304</span> paths_info <span style="color:rgb(98,98,98)">=</span> response<span style="color:rgb(98,98,98)">.</span>json()
+<span class="ansi-green-fg ansi-bold">   3305</span> <span style="font-weight:bold;color:rgb(0,135,0)">return</span> [
+<span class="ansi-green-fg ansi-bold">   3306</span>     RepoFile(<span style="color:rgb(98,98,98)">*</span><span style="color:rgb(98,98,98)">*</span>path_info) <span style="font-weight:bold;color:rgb(0,135,0)">if</span> path_info[<span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">type</span><span style="color:rgb(175,0,0)">"</span>] <span style="color:rgb(98,98,98)">==</span> <span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">file</span><span style="color:rgb(175,0,0)">"</span> <span style="font-weight:bold;color:rgb(0,135,0)">else</span> RepoFolder(<span style="color:rgb(98,98,98)">*</span><span style="color:rgb(98,98,98)">*</span>path_info)
+<span class="ansi-green-fg ansi-bold">   3307</span>     <span style="font-weight:bold;color:rgb(0,135,0)">for</span> path_info <span style="font-weight:bold;color:rgb(175,0,255)">in</span> paths_info
+<span class="ansi-green-fg ansi-bold">   3308</span> ]
+
+File <span class="ansi-green-fg">~/miniconda3/envs/nimrod/lib/python3.11/site-packages/huggingface_hub/utils/_http.py:477</span>, in <span class="ansi-cyan-fg">hf_raise_for_status</span><span class="ansi-blue-fg">(response, endpoint_name)</span>
+<span class="ansi-green-fg ansi-bold">    473</span>     <span style="font-weight:bold;color:rgb(0,135,0)">raise</span> _format(HfHubHTTPError, message, response) <span style="font-weight:bold;color:rgb(0,135,0)">from</span> <span style="font-weight:bold;color:rgb(0,0,255)">e</span>
+<span class="ansi-green-fg ansi-bold">    475</span> <span style="font-style:italic;color:rgb(95,135,135)"># Convert `HTTPError` into a `HfHubHTTPError` to display request information</span>
+<span class="ansi-green-fg ansi-bold">    476</span> <span style="font-style:italic;color:rgb(95,135,135)"># as well (request id and/or server error message)</span>
+<span class="ansi-green-fg">--&gt; 477</span> <span style="font-weight:bold;color:rgb(0,135,0)">raise</span> _format(HfHubHTTPError, <span style="color:rgb(0,135,0)">str</span>(e), response) <span style="font-weight:bold;color:rgb(0,135,0)">from</span> <span style="font-weight:bold;color:rgb(0,0,255)">e</span>
+
+<span class="ansi-red-fg">HfHubHTTPError</span>: 504 Server Error: Gateway Time-out for url: https://huggingface.co/api/datasets/zalando-datasets/fashion_mnist/paths-info/531be5e2ccc9dba0c201ad3ae567a4f3d16ecdd2</pre>
+</div>
+</div>
+</div>
+<div id="cell-4" class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>dm.show_grid(<span class="dv">3</span>,<span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="models.autoencoders_files/figure-html/cell-3-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-5" class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(dm.label_names)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-error">
+<div class="ansi-escaped-output">
+<pre><span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">RuntimeError</span>                              Traceback (most recent call last)
+Cell <span class="ansi-green-fg">In[6], line 2</span>
+<span class="ansi-green-fg ansi-bold">      1</span> <span style="font-style:italic;color:rgb(95,135,135)">#| notest</span>
+<span class="ansi-green-fg">----&gt; 2</span> <span style="color:rgb(0,135,0)">print</span>(dm<span style="color:rgb(98,98,98)">.</span>label_names)
+
+File <span class="ansi-green-fg">~/Projects/nimrod/nimrod/image/datasets.py:409</span>, in <span class="ansi-cyan-fg">ImageDataModule.label_names</span><span class="ansi-blue-fg">(self)</span>
+<span class="ansi-green-fg ansi-bold">    407</span> <span style="font-weight:bold;color:rgb(0,135,0)">if</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>train_ds <span style="font-weight:bold;color:rgb(175,0,255)">is</span> <span style="font-weight:bold;color:rgb(175,0,255)">not</span> <span style="font-weight:bold;color:rgb(0,135,0)">None</span>:
+<span class="ansi-green-fg ansi-bold">    408</span>     <span style="font-weight:bold;color:rgb(0,135,0)">return</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_label_names
+<span class="ansi-green-fg">--&gt; 409</span> <span style="font-weight:bold;color:rgb(0,135,0)">raise</span> <span style="font-weight:bold;color:rgb(215,95,95)">RuntimeError</span>(<span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">train_ds is not initialized. Call prepare_data() first.</span><span style="color:rgb(175,0,0)">"</span>)
+
+<span class="ansi-red-fg">RuntimeError</span>: train_ds is not initialized. Call prepare_data() first.</pre>
+</div>
+</div>
+</div>
+<section id="convnet" class="level3">
+<h3 class="anchored" data-anchor-id="convnet">ConvNet</h3>
+<div id="cell-7" class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>cfg <span class="op">=</span> OmegaConf.load(<span class="st">'../config/model/image/convnetx_adam.yaml'</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># nnet = instantiate(cfg.nnet, num_classes=dm.num_classes)</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># optimizer = instantiate(cfg.optimizer)</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># scheduler = instantiate(cfg.scheduler)</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co"># model = ConvNetX(nnet, dm.num_classes, optimizer, scheduler)</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> instantiate(cfg, num_classes<span class="op">=</span><span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>[15:41:17] INFO - ConvNetX: init
+[15:41:17] INFO - Classifier: init</code></pre>
+</div>
+</div>
+<div id="cell-8" class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>MAX_EPOCHS <span class="op">=</span> <span class="dv">5</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>dm.batch_size <span class="op">=</span> <span class="dv">256</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(dm.batch_size)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># lr = 0.4</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>trainer <span class="op">=</span> Trainer(</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    max_epochs<span class="op">=</span>MAX_EPOCHS,</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    logger<span class="op">=</span>CSVLogger(<span class="st">"logs"</span>, name<span class="op">=</span><span class="st">"fashion_mnist_convnet"</span>),</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    callbacks <span class="op">=</span> [LearningRateMonitor(logging_interval<span class="op">=</span><span class="st">"step"</span>)],</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    check_val_every_n_epoch<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    log_every_n_steps<span class="op">=</span><span class="dv">1</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+HPU available: False, using: 0 HPUs</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>256</code></pre>
+</div>
+</div>
+</section>
+<section id="lr-finder" class="level3">
+<h3 class="anchored" data-anchor-id="lr-finder">LR Finder</h3>
+<div id="cell-10" class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>tuner <span class="op">=</span> Tuner(trainer)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>lr_finder <span class="op">=</span> tuner.lr_find(</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    model,</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    datamodule<span class="op">=</span>dm,</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    min_lr<span class="op">=</span><span class="fl">1e-6</span>,</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    max_lr<span class="op">=</span><span class="fl">1.0</span>,</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    num_training<span class="op">=</span><span class="dv">100</span>,  <span class="co"># number of iterations</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># attr_name="optimizer.lr",</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> lr_finder.plot(suggest<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Suggested learning rate: </span><span class="sc">{</span>lr_finder<span class="sc">.</span>suggestion()<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>You are using a CUDA device ('NVIDIA GeForce RTX 4090') that has Tensor Cores. To properly utilize them, you should set `torch.set_float32_matmul_precision('medium' | 'high')` which will trade-off precision for performance. For more details, read https://pytorch.org/docs/stable/generated/torch.set_float32_matmul_precision.html#torch.set_float32_matmul_precision
+[22:43:36] INFO - loading dataset fashion_mnist with args () from split train
+[22:43:36] INFO - loading dataset fashion_mnist from split train
+Overwrite dataset info from restored data version if exists.
+[22:43:37] INFO - Overwrite dataset info from restored data version if exists.
+Loading Dataset info from ../data/image/fashion_mnist/fashion_mnist/0.0.0/531be5e2ccc9dba0c201ad3ae567a4f3d16ecdd2
+[22:43:37] INFO - Loading Dataset info from ../data/image/fashion_mnist/fashion_mnist/0.0.0/531be5e2ccc9dba0c201ad3ae567a4f3d16ecdd2
+Found cached dataset fashion_mnist (/user/s/slegroux/Projects/nimrod/nbs/../data/image/fashion_mnist/fashion_mnist/0.0.0/531be5e2ccc9dba0c201ad3ae567a4f3d16ecdd2)
+[22:43:37] INFO - Found cached dataset fashion_mnist (/user/s/slegroux/Projects/nimrod/nbs/../data/image/fashion_mnist/fashion_mnist/0.0.0/531be5e2ccc9dba0c201ad3ae567a4f3d16ecdd2)
+Loading Dataset info from /user/s/slegroux/Projects/nimrod/nbs/../data/image/fashion_mnist/fashion_mnist/0.0.0/531be5e2ccc9dba0c201ad3ae567a4f3d16ecdd2
+[22:43:37] INFO - Loading Dataset info from /user/s/slegroux/Projects/nimrod/nbs/../data/image/fashion_mnist/fashion_mnist/0.0.0/531be5e2ccc9dba0c201ad3ae567a4f3d16ecdd2
+[22:43:41] INFO - loading dataset fashion_mnist with args () from split test
+[22:43:41] INFO - loading dataset fashion_mnist from split test
+Overwrite dataset info from restored data version if exists.
+[22:43:43] INFO - Overwrite dataset info from restored data version if exists.
+Loading Dataset info from ../data/image/fashion_mnist/fashion_mnist/0.0.0/531be5e2ccc9dba0c201ad3ae567a4f3d16ecdd2
+[22:43:43] INFO - Loading Dataset info from ../data/image/fashion_mnist/fashion_mnist/0.0.0/531be5e2ccc9dba0c201ad3ae567a4f3d16ecdd2
+Found cached dataset fashion_mnist (/user/s/slegroux/Projects/nimrod/nbs/../data/image/fashion_mnist/fashion_mnist/0.0.0/531be5e2ccc9dba0c201ad3ae567a4f3d16ecdd2)
+[22:43:43] INFO - Found cached dataset fashion_mnist (/user/s/slegroux/Projects/nimrod/nbs/../data/image/fashion_mnist/fashion_mnist/0.0.0/531be5e2ccc9dba0c201ad3ae567a4f3d16ecdd2)
+Loading Dataset info from /user/s/slegroux/Projects/nimrod/nbs/../data/image/fashion_mnist/fashion_mnist/0.0.0/531be5e2ccc9dba0c201ad3ae567a4f3d16ecdd2
+[22:43:43] INFO - Loading Dataset info from /user/s/slegroux/Projects/nimrod/nbs/../data/image/fashion_mnist/fashion_mnist/0.0.0/531be5e2ccc9dba0c201ad3ae567a4f3d16ecdd2
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+[22:43:43] INFO - Optimizer: &lt;class 'torch.optim.adam.Adam'&gt;
+[22:43:43] INFO - Scheduler: &lt;class 'torch.optim.lr_scheduler.ReduceLROnPlateau'&gt;
+/user/s/slegroux/miniconda3/envs/nimrod/lib/python3.11/site-packages/lightning/pytorch/core/optimizer.py:317: The lr scheduler dict contains the key(s) ['monitor'], but the keys will be ignored. You need to call `lr_scheduler.step()` manually in manual optimization.
+/user/s/slegroux/miniconda3/envs/nimrod/lib/python3.11/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:425: The 'train_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=23` in the `DataLoader` to improve performance.
+/user/s/slegroux/miniconda3/envs/nimrod/lib/python3.11/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:425: The 'val_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=23` in the `DataLoader` to improve performance.</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"c46b4a2821414c2db90d5f3891950988","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+</script>
+</div>
+<div class="cell-output cell-output-error">
+<div class="ansi-escaped-output">
+<pre><span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">RuntimeError</span>                              Traceback (most recent call last)
+Cell <span class="ansi-green-fg">In[12], line 3</span>
+<span class="ansi-green-fg ansi-bold">      1</span> <span style="font-style:italic;color:rgb(95,135,135)">#| notest</span>
+<span class="ansi-green-fg ansi-bold">      2</span> tuner <span style="color:rgb(98,98,98)">=</span> Tuner(trainer)
+<span class="ansi-green-fg">----&gt; 3</span> lr_finder <span style="color:rgb(98,98,98)">=</span> tuner<span style="color:rgb(98,98,98)">.</span>lr_find(
+<span class="ansi-green-fg ansi-bold">      4</span>     model,
+<span class="ansi-green-fg ansi-bold">      5</span>     datamodule<span style="color:rgb(98,98,98)">=</span>dm,
+<span class="ansi-green-fg ansi-bold">      6</span>     min_lr<span style="color:rgb(98,98,98)">=</span><span style="color:rgb(98,98,98)">1e-6</span>,
+<span class="ansi-green-fg ansi-bold">      7</span>     max_lr<span style="color:rgb(98,98,98)">=</span><span style="color:rgb(98,98,98)">1.0</span>,
+<span class="ansi-green-fg ansi-bold">      8</span>     num_training<span style="color:rgb(98,98,98)">=</span><span style="color:rgb(98,98,98)">100</span>,  <span style="font-style:italic;color:rgb(95,135,135)"># number of iterations</span>
+<span class="ansi-green-fg ansi-bold">      9</span>     <span style="font-style:italic;color:rgb(95,135,135)"># attr_name="optimizer.lr",</span>
+<span class="ansi-green-fg ansi-bold">     10</span> )
+<span class="ansi-green-fg ansi-bold">     11</span> fig <span style="color:rgb(98,98,98)">=</span> lr_finder<span style="color:rgb(98,98,98)">.</span>plot(suggest<span style="color:rgb(98,98,98)">=</span><span style="font-weight:bold;color:rgb(0,135,0)">True</span>)
+<span class="ansi-green-fg ansi-bold">     12</span> plt<span style="color:rgb(98,98,98)">.</span>show()
+
+File <span class="ansi-green-fg">~/miniconda3/envs/nimrod/lib/python3.11/site-packages/lightning/pytorch/tuner/tuning.py:180</span>, in <span class="ansi-cyan-fg">Tuner.lr_find</span><span class="ansi-blue-fg">(self, model, train_dataloaders, val_dataloaders, dataloaders, datamodule, method, min_lr, max_lr, num_training, mode, early_stop_threshold, update_attr, attr_name)</span>
+<span class="ansi-green-fg ansi-bold">    177</span> lr_finder_callback<span style="color:rgb(98,98,98)">.</span>_early_exit <span style="color:rgb(98,98,98)">=</span> <span style="font-weight:bold;color:rgb(0,135,0)">True</span>
+<span class="ansi-green-fg ansi-bold">    178</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_trainer<span style="color:rgb(98,98,98)">.</span>callbacks <span style="color:rgb(98,98,98)">=</span> [lr_finder_callback] <span style="color:rgb(98,98,98)">+</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_trainer<span style="color:rgb(98,98,98)">.</span>callbacks
+<span class="ansi-green-fg">--&gt; 180</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_trainer<span style="color:rgb(98,98,98)">.</span>fit(model, train_dataloaders, val_dataloaders, datamodule)
+<span class="ansi-green-fg ansi-bold">    182</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_trainer<span style="color:rgb(98,98,98)">.</span>callbacks <span style="color:rgb(98,98,98)">=</span> [cb <span style="font-weight:bold;color:rgb(0,135,0)">for</span> cb <span style="font-weight:bold;color:rgb(175,0,255)">in</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_trainer<span style="color:rgb(98,98,98)">.</span>callbacks <span style="font-weight:bold;color:rgb(0,135,0)">if</span> cb <span style="font-weight:bold;color:rgb(175,0,255)">is</span> <span style="font-weight:bold;color:rgb(175,0,255)">not</span> lr_finder_callback]
+<span class="ansi-green-fg ansi-bold">    184</span> <span style="font-weight:bold;color:rgb(0,135,0)">return</span> lr_finder_callback<span style="color:rgb(98,98,98)">.</span>optimal_lr
+
+File <span class="ansi-green-fg">~/miniconda3/envs/nimrod/lib/python3.11/site-packages/lightning/pytorch/trainer/trainer.py:539</span>, in <span class="ansi-cyan-fg">Trainer.fit</span><span class="ansi-blue-fg">(self, model, train_dataloaders, val_dataloaders, datamodule, ckpt_path)</span>
+<span class="ansi-green-fg ansi-bold">    537</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>state<span style="color:rgb(98,98,98)">.</span>status <span style="color:rgb(98,98,98)">=</span> TrainerStatus<span style="color:rgb(98,98,98)">.</span>RUNNING
+<span class="ansi-green-fg ansi-bold">    538</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>training <span style="color:rgb(98,98,98)">=</span> <span style="font-weight:bold;color:rgb(0,135,0)">True</span>
+<span class="ansi-green-fg">--&gt; 539</span> call<span style="color:rgb(98,98,98)">.</span>_call_and_handle_interrupt(
+<span class="ansi-green-fg ansi-bold">    540</span>     <span style="color:rgb(0,135,0)">self</span>, <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_fit_impl, model, train_dataloaders, val_dataloaders, datamodule, ckpt_path
+<span class="ansi-green-fg ansi-bold">    541</span> )
+
+File <span class="ansi-green-fg">~/miniconda3/envs/nimrod/lib/python3.11/site-packages/lightning/pytorch/trainer/call.py:47</span>, in <span class="ansi-cyan-fg">_call_and_handle_interrupt</span><span class="ansi-blue-fg">(trainer, trainer_fn, *args, **kwargs)</span>
+<span class="ansi-green-fg ansi-bold">     45</span>     <span style="font-weight:bold;color:rgb(0,135,0)">if</span> trainer<span style="color:rgb(98,98,98)">.</span>strategy<span style="color:rgb(98,98,98)">.</span>launcher <span style="font-weight:bold;color:rgb(175,0,255)">is</span> <span style="font-weight:bold;color:rgb(175,0,255)">not</span> <span style="font-weight:bold;color:rgb(0,135,0)">None</span>:
+<span class="ansi-green-fg ansi-bold">     46</span>         <span style="font-weight:bold;color:rgb(0,135,0)">return</span> trainer<span style="color:rgb(98,98,98)">.</span>strategy<span style="color:rgb(98,98,98)">.</span>launcher<span style="color:rgb(98,98,98)">.</span>launch(trainer_fn, <span style="color:rgb(98,98,98)">*</span>args, trainer<span style="color:rgb(98,98,98)">=</span>trainer, <span style="color:rgb(98,98,98)">*</span><span style="color:rgb(98,98,98)">*</span>kwargs)
+<span class="ansi-green-fg">---&gt; 47</span>     <span style="font-weight:bold;color:rgb(0,135,0)">return</span> trainer_fn(<span style="color:rgb(98,98,98)">*</span>args, <span style="color:rgb(98,98,98)">*</span><span style="color:rgb(98,98,98)">*</span>kwargs)
+<span class="ansi-green-fg ansi-bold">     49</span> <span style="font-weight:bold;color:rgb(0,135,0)">except</span> _TunerExitException:
+<span class="ansi-green-fg ansi-bold">     50</span>     _call_teardown_hook(trainer)
+
+File <span class="ansi-green-fg">~/miniconda3/envs/nimrod/lib/python3.11/site-packages/lightning/pytorch/trainer/trainer.py:575</span>, in <span class="ansi-cyan-fg">Trainer._fit_impl</span><span class="ansi-blue-fg">(self, model, train_dataloaders, val_dataloaders, datamodule, ckpt_path)</span>
+<span class="ansi-green-fg ansi-bold">    568</span> <span style="font-weight:bold;color:rgb(0,135,0)">assert</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>state<span style="color:rgb(98,98,98)">.</span>fn <span style="font-weight:bold;color:rgb(175,0,255)">is</span> <span style="font-weight:bold;color:rgb(175,0,255)">not</span> <span style="font-weight:bold;color:rgb(0,135,0)">None</span>
+<span class="ansi-green-fg ansi-bold">    569</span> ckpt_path <span style="color:rgb(98,98,98)">=</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_checkpoint_connector<span style="color:rgb(98,98,98)">.</span>_select_ckpt_path(
+<span class="ansi-green-fg ansi-bold">    570</span>     <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>state<span style="color:rgb(98,98,98)">.</span>fn,
+<span class="ansi-green-fg ansi-bold">    571</span>     ckpt_path,
+<span class="ansi-green-fg ansi-bold">    572</span>     model_provided<span style="color:rgb(98,98,98)">=</span><span style="font-weight:bold;color:rgb(0,135,0)">True</span>,
+<span class="ansi-green-fg ansi-bold">    573</span>     model_connected<span style="color:rgb(98,98,98)">=</span><span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>lightning_module <span style="font-weight:bold;color:rgb(175,0,255)">is</span> <span style="font-weight:bold;color:rgb(175,0,255)">not</span> <span style="font-weight:bold;color:rgb(0,135,0)">None</span>,
+<span class="ansi-green-fg ansi-bold">    574</span> )
+<span class="ansi-green-fg">--&gt; 575</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_run(model, ckpt_path<span style="color:rgb(98,98,98)">=</span>ckpt_path)
+<span class="ansi-green-fg ansi-bold">    577</span> <span style="font-weight:bold;color:rgb(0,135,0)">assert</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>state<span style="color:rgb(98,98,98)">.</span>stopped
+<span class="ansi-green-fg ansi-bold">    578</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>training <span style="color:rgb(98,98,98)">=</span> <span style="font-weight:bold;color:rgb(0,135,0)">False</span>
+
+File <span class="ansi-green-fg">~/miniconda3/envs/nimrod/lib/python3.11/site-packages/lightning/pytorch/trainer/trainer.py:962</span>, in <span class="ansi-cyan-fg">Trainer._run</span><span class="ansi-blue-fg">(self, model, ckpt_path)</span>
+<span class="ansi-green-fg ansi-bold">    960</span> <span style="font-style:italic;color:rgb(95,135,135)"># hook</span>
+<span class="ansi-green-fg ansi-bold">    961</span> <span style="font-weight:bold;color:rgb(0,135,0)">if</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>state<span style="color:rgb(98,98,98)">.</span>fn <span style="color:rgb(98,98,98)">==</span> TrainerFn<span style="color:rgb(98,98,98)">.</span>FITTING:
+<span class="ansi-green-fg">--&gt; 962</span>     call<span style="color:rgb(98,98,98)">.</span>_call_callback_hooks(<span style="color:rgb(0,135,0)">self</span>, <span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">on_fit_start</span><span style="color:rgb(175,0,0)">"</span>)
+<span class="ansi-green-fg ansi-bold">    963</span>     call<span style="color:rgb(98,98,98)">.</span>_call_lightning_module_hook(<span style="color:rgb(0,135,0)">self</span>, <span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">on_fit_start</span><span style="color:rgb(175,0,0)">"</span>)
+<span class="ansi-green-fg ansi-bold">    965</span> _log_hyperparams(<span style="color:rgb(0,135,0)">self</span>)
+
+File <span class="ansi-green-fg">~/miniconda3/envs/nimrod/lib/python3.11/site-packages/lightning/pytorch/trainer/call.py:222</span>, in <span class="ansi-cyan-fg">_call_callback_hooks</span><span class="ansi-blue-fg">(trainer, hook_name, monitoring_callbacks, *args, **kwargs)</span>
+<span class="ansi-green-fg ansi-bold">    220</span>     <span style="font-weight:bold;color:rgb(0,135,0)">if</span> <span style="color:rgb(0,135,0)">callable</span>(fn):
+<span class="ansi-green-fg ansi-bold">    221</span>         <span style="font-weight:bold;color:rgb(0,135,0)">with</span> trainer<span style="color:rgb(98,98,98)">.</span>profiler<span style="color:rgb(98,98,98)">.</span>profile(<span style="color:rgb(175,0,0)">f</span><span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">[Callback]</span><span style="font-weight:bold;color:rgb(175,95,135)">{</span>callback<span style="color:rgb(98,98,98)">.</span>state_key<span style="font-weight:bold;color:rgb(175,95,135)">}</span><span style="color:rgb(175,0,0)">.</span><span style="font-weight:bold;color:rgb(175,95,135)">{</span>hook_name<span style="font-weight:bold;color:rgb(175,95,135)">}</span><span style="color:rgb(175,0,0)">"</span>):
+<span class="ansi-green-fg">--&gt; 222</span>             fn(trainer, trainer<span style="color:rgb(98,98,98)">.</span>lightning_module, <span style="color:rgb(98,98,98)">*</span>args, <span style="color:rgb(98,98,98)">*</span><span style="color:rgb(98,98,98)">*</span>kwargs)
+<span class="ansi-green-fg ansi-bold">    224</span> <span style="font-weight:bold;color:rgb(0,135,0)">if</span> pl_module:
+<span class="ansi-green-fg ansi-bold">    225</span>     <span style="font-style:italic;color:rgb(95,135,135)"># restore current_fx when nested context</span>
+<span class="ansi-green-fg ansi-bold">    226</span>     pl_module<span style="color:rgb(98,98,98)">.</span>_current_fx_name <span style="color:rgb(98,98,98)">=</span> prev_fx_name
+
+File <span class="ansi-green-fg">~/miniconda3/envs/nimrod/lib/python3.11/site-packages/lightning/pytorch/callbacks/lr_finder.py:130</span>, in <span class="ansi-cyan-fg">LearningRateFinder.on_fit_start</span><span class="ansi-blue-fg">(self, trainer, pl_module)</span>
+<span class="ansi-green-fg ansi-bold">    128</span> <span style="color:rgb(175,0,255)">@override</span>
+<span class="ansi-green-fg ansi-bold">    129</span> <span style="font-weight:bold;color:rgb(0,135,0)">def</span> <span style="color:rgb(0,0,255)">on_fit_start</span>(<span style="color:rgb(0,135,0)">self</span>, trainer: <span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">pl.Trainer</span><span style="color:rgb(175,0,0)">"</span>, pl_module: <span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">pl.LightningModule</span><span style="color:rgb(175,0,0)">"</span>) <span style="color:rgb(98,98,98)">-</span><span style="color:rgb(98,98,98)">&gt;</span> <span style="font-weight:bold;color:rgb(0,135,0)">None</span>:
+<span class="ansi-green-fg">--&gt; 130</span>     <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>lr_find(trainer, pl_module)
+
+File <span class="ansi-green-fg">~/miniconda3/envs/nimrod/lib/python3.11/site-packages/lightning/pytorch/callbacks/lr_finder.py:113</span>, in <span class="ansi-cyan-fg">LearningRateFinder.lr_find</span><span class="ansi-blue-fg">(self, trainer, pl_module)</span>
+<span class="ansi-green-fg ansi-bold">    111</span> <span style="font-weight:bold;color:rgb(0,135,0)">def</span> <span style="color:rgb(0,0,255)">lr_find</span>(<span style="color:rgb(0,135,0)">self</span>, trainer: <span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">pl.Trainer</span><span style="color:rgb(175,0,0)">"</span>, pl_module: <span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">pl.LightningModule</span><span style="color:rgb(175,0,0)">"</span>) <span style="color:rgb(98,98,98)">-</span><span style="color:rgb(98,98,98)">&gt;</span> <span style="font-weight:bold;color:rgb(0,135,0)">None</span>:
+<span class="ansi-green-fg ansi-bold">    112</span>     <span style="font-weight:bold;color:rgb(0,135,0)">with</span> isolate_rng():
+<span class="ansi-green-fg">--&gt; 113</span>         <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>optimal_lr <span style="color:rgb(98,98,98)">=</span> _lr_find(
+<span class="ansi-green-fg ansi-bold">    114</span>             trainer,
+<span class="ansi-green-fg ansi-bold">    115</span>             pl_module,
+<span class="ansi-green-fg ansi-bold">    116</span>             min_lr<span style="color:rgb(98,98,98)">=</span><span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_min_lr,
+<span class="ansi-green-fg ansi-bold">    117</span>             max_lr<span style="color:rgb(98,98,98)">=</span><span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_max_lr,
+<span class="ansi-green-fg ansi-bold">    118</span>             num_training<span style="color:rgb(98,98,98)">=</span><span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_num_training_steps,
+<span class="ansi-green-fg ansi-bold">    119</span>             mode<span style="color:rgb(98,98,98)">=</span><span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_mode,
+<span class="ansi-green-fg ansi-bold">    120</span>             early_stop_threshold<span style="color:rgb(98,98,98)">=</span><span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_early_stop_threshold,
+<span class="ansi-green-fg ansi-bold">    121</span>             update_attr<span style="color:rgb(98,98,98)">=</span><span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_update_attr,
+<span class="ansi-green-fg ansi-bold">    122</span>             attr_name<span style="color:rgb(98,98,98)">=</span><span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_attr_name,
+<span class="ansi-green-fg ansi-bold">    123</span>         )
+<span class="ansi-green-fg ansi-bold">    125</span>     <span style="font-weight:bold;color:rgb(0,135,0)">if</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_early_exit:
+<span class="ansi-green-fg ansi-bold">    126</span>         <span style="font-weight:bold;color:rgb(0,135,0)">raise</span> _TunerExitException()
+
+File <span class="ansi-green-fg">~/miniconda3/envs/nimrod/lib/python3.11/site-packages/lightning/pytorch/tuner/lr_finder.py:278</span>, in <span class="ansi-cyan-fg">_lr_find</span><span class="ansi-blue-fg">(trainer, model, min_lr, max_lr, num_training, mode, early_stop_threshold, update_attr, attr_name)</span>
+<span class="ansi-green-fg ansi-bold">    275</span> lr_finder<span style="color:rgb(98,98,98)">.</span>_exchange_scheduler(trainer)
+<span class="ansi-green-fg ansi-bold">    277</span> <span style="font-style:italic;color:rgb(95,135,135)"># Fit, lr &amp; loss logged in callback</span>
+<span class="ansi-green-fg">--&gt; 278</span> _try_loop_run(trainer, params)
+<span class="ansi-green-fg ansi-bold">    280</span> <span style="font-style:italic;color:rgb(95,135,135)"># Prompt if we stopped early</span>
+<span class="ansi-green-fg ansi-bold">    281</span> <span style="font-weight:bold;color:rgb(0,135,0)">if</span> trainer<span style="color:rgb(98,98,98)">.</span>global_step <span style="color:rgb(98,98,98)">!=</span> num_training <span style="color:rgb(98,98,98)">+</span> start_steps:
+
+File <span class="ansi-green-fg">~/miniconda3/envs/nimrod/lib/python3.11/site-packages/lightning/pytorch/tuner/lr_finder.py:523</span>, in <span class="ansi-cyan-fg">_try_loop_run</span><span class="ansi-blue-fg">(trainer, params)</span>
+<span class="ansi-green-fg ansi-bold">    521</span> loop<span style="color:rgb(98,98,98)">.</span>load_state_dict(deepcopy(params[<span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">loop_state_dict</span><span style="color:rgb(175,0,0)">"</span>]))
+<span class="ansi-green-fg ansi-bold">    522</span> loop<span style="color:rgb(98,98,98)">.</span>restarting <span style="color:rgb(98,98,98)">=</span> <span style="font-weight:bold;color:rgb(0,135,0)">False</span>
+<span class="ansi-green-fg">--&gt; 523</span> loop<span style="color:rgb(98,98,98)">.</span>run()
+
+File <span class="ansi-green-fg">~/miniconda3/envs/nimrod/lib/python3.11/site-packages/lightning/pytorch/loops/fit_loop.py:216</span>, in <span class="ansi-cyan-fg">_FitLoop.run</span><span class="ansi-blue-fg">(self)</span>
+<span class="ansi-green-fg ansi-bold">    214</span> <span style="font-weight:bold;color:rgb(0,135,0)">try</span>:
+<span class="ansi-green-fg ansi-bold">    215</span>     <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>on_advance_start()
+<span class="ansi-green-fg">--&gt; 216</span>     <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>advance()
+<span class="ansi-green-fg ansi-bold">    217</span>     <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>on_advance_end()
+<span class="ansi-green-fg ansi-bold">    218</span> <span style="font-weight:bold;color:rgb(0,135,0)">except</span> <span style="font-weight:bold;color:rgb(215,95,95)">StopIteration</span>:
+
+File <span class="ansi-green-fg">~/miniconda3/envs/nimrod/lib/python3.11/site-packages/lightning/pytorch/loops/fit_loop.py:455</span>, in <span class="ansi-cyan-fg">_FitLoop.advance</span><span class="ansi-blue-fg">(self)</span>
+<span class="ansi-green-fg ansi-bold">    453</span> <span style="font-weight:bold;color:rgb(0,135,0)">with</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>trainer<span style="color:rgb(98,98,98)">.</span>profiler<span style="color:rgb(98,98,98)">.</span>profile(<span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">run_training_epoch</span><span style="color:rgb(175,0,0)">"</span>):
+<span class="ansi-green-fg ansi-bold">    454</span>     <span style="font-weight:bold;color:rgb(0,135,0)">assert</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_data_fetcher <span style="font-weight:bold;color:rgb(175,0,255)">is</span> <span style="font-weight:bold;color:rgb(175,0,255)">not</span> <span style="font-weight:bold;color:rgb(0,135,0)">None</span>
+<span class="ansi-green-fg">--&gt; 455</span>     <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>epoch_loop<span style="color:rgb(98,98,98)">.</span>run(<span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_data_fetcher)
+
+File <span class="ansi-green-fg">~/miniconda3/envs/nimrod/lib/python3.11/site-packages/lightning/pytorch/loops/training_epoch_loop.py:150</span>, in <span class="ansi-cyan-fg">_TrainingEpochLoop.run</span><span class="ansi-blue-fg">(self, data_fetcher)</span>
+<span class="ansi-green-fg ansi-bold">    148</span> <span style="font-weight:bold;color:rgb(0,135,0)">while</span> <span style="font-weight:bold;color:rgb(175,0,255)">not</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>done:
+<span class="ansi-green-fg ansi-bold">    149</span>     <span style="font-weight:bold;color:rgb(0,135,0)">try</span>:
+<span class="ansi-green-fg">--&gt; 150</span>         <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>advance(data_fetcher)
+<span class="ansi-green-fg ansi-bold">    151</span>         <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>on_advance_end(data_fetcher)
+<span class="ansi-green-fg ansi-bold">    152</span>     <span style="font-weight:bold;color:rgb(0,135,0)">except</span> <span style="font-weight:bold;color:rgb(215,95,95)">StopIteration</span>:
+
+File <span class="ansi-green-fg">~/miniconda3/envs/nimrod/lib/python3.11/site-packages/lightning/pytorch/loops/training_epoch_loop.py:322</span>, in <span class="ansi-cyan-fg">_TrainingEpochLoop.advance</span><span class="ansi-blue-fg">(self, data_fetcher)</span>
+<span class="ansi-green-fg ansi-bold">    320</span>             batch_output <span style="color:rgb(98,98,98)">=</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>automatic_optimization<span style="color:rgb(98,98,98)">.</span>run(trainer<span style="color:rgb(98,98,98)">.</span>optimizers[<span style="color:rgb(98,98,98)">0</span>], batch_idx, kwargs)
+<span class="ansi-green-fg ansi-bold">    321</span>         <span style="font-weight:bold;color:rgb(0,135,0)">else</span>:
+<span class="ansi-green-fg">--&gt; 322</span>             batch_output <span style="color:rgb(98,98,98)">=</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>manual_optimization<span style="color:rgb(98,98,98)">.</span>run(kwargs)
+<span class="ansi-green-fg ansi-bold">    324</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>batch_progress<span style="color:rgb(98,98,98)">.</span>increment_processed()
+<span class="ansi-green-fg ansi-bold">    326</span> <span style="font-style:italic;color:rgb(95,135,135)"># update non-plateau LR schedulers</span>
+<span class="ansi-green-fg ansi-bold">    327</span> <span style="font-style:italic;color:rgb(95,135,135)"># update epoch-interval ones only when we are at the end of training epoch</span>
+
+File <span class="ansi-green-fg">~/miniconda3/envs/nimrod/lib/python3.11/site-packages/lightning/pytorch/loops/optimization/manual.py:94</span>, in <span class="ansi-cyan-fg">_ManualOptimization.run</span><span class="ansi-blue-fg">(self, kwargs)</span>
+<span class="ansi-green-fg ansi-bold">     92</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>on_run_start()
+<span class="ansi-green-fg ansi-bold">     93</span> <span style="font-weight:bold;color:rgb(0,135,0)">with</span> suppress(<span style="font-weight:bold;color:rgb(215,95,95)">StopIteration</span>):  <span style="font-style:italic;color:rgb(95,135,135)"># no loop to break at this level</span>
+<span class="ansi-green-fg">---&gt; 94</span>     <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>advance(kwargs)
+<span class="ansi-green-fg ansi-bold">     95</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_restarting <span style="color:rgb(98,98,98)">=</span> <span style="font-weight:bold;color:rgb(0,135,0)">False</span>
+<span class="ansi-green-fg ansi-bold">     96</span> <span style="font-weight:bold;color:rgb(0,135,0)">return</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>on_run_end()
+
+File <span class="ansi-green-fg">~/miniconda3/envs/nimrod/lib/python3.11/site-packages/lightning/pytorch/loops/optimization/manual.py:114</span>, in <span class="ansi-cyan-fg">_ManualOptimization.advance</span><span class="ansi-blue-fg">(self, kwargs)</span>
+<span class="ansi-green-fg ansi-bold">    111</span> trainer <span style="color:rgb(98,98,98)">=</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>trainer
+<span class="ansi-green-fg ansi-bold">    113</span> <span style="font-style:italic;color:rgb(95,135,135)"># manually capture logged metrics</span>
+<span class="ansi-green-fg">--&gt; 114</span> training_step_output <span style="color:rgb(98,98,98)">=</span> call<span style="color:rgb(98,98,98)">.</span>_call_strategy_hook(trainer, <span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">training_step</span><span style="color:rgb(175,0,0)">"</span>, <span style="color:rgb(98,98,98)">*</span>kwargs<span style="color:rgb(98,98,98)">.</span>values())
+<span class="ansi-green-fg ansi-bold">    115</span> <span style="font-weight:bold;color:rgb(0,135,0)">del</span> kwargs  <span style="font-style:italic;color:rgb(95,135,135)"># release the batch from memory</span>
+<span class="ansi-green-fg ansi-bold">    116</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>trainer<span style="color:rgb(98,98,98)">.</span>strategy<span style="color:rgb(98,98,98)">.</span>post_training_step()  <span style="font-style:italic;color:rgb(95,135,135)"># unused hook - call anyway for backward compatibility</span>
+
+File <span class="ansi-green-fg">~/miniconda3/envs/nimrod/lib/python3.11/site-packages/lightning/pytorch/trainer/call.py:323</span>, in <span class="ansi-cyan-fg">_call_strategy_hook</span><span class="ansi-blue-fg">(trainer, hook_name, *args, **kwargs)</span>
+<span class="ansi-green-fg ansi-bold">    320</span>     <span style="font-weight:bold;color:rgb(0,135,0)">return</span> <span style="font-weight:bold;color:rgb(0,135,0)">None</span>
+<span class="ansi-green-fg ansi-bold">    322</span> <span style="font-weight:bold;color:rgb(0,135,0)">with</span> trainer<span style="color:rgb(98,98,98)">.</span>profiler<span style="color:rgb(98,98,98)">.</span>profile(<span style="color:rgb(175,0,0)">f</span><span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">[Strategy]</span><span style="font-weight:bold;color:rgb(175,95,135)">{</span>trainer<span style="color:rgb(98,98,98)">.</span>strategy<span style="color:rgb(98,98,98)">.</span><span style="color:rgb(0,0,135)">__class__</span><span style="color:rgb(98,98,98)">.</span><span style="color:rgb(0,0,135)">__name__</span><span style="font-weight:bold;color:rgb(175,95,135)">}</span><span style="color:rgb(175,0,0)">.</span><span style="font-weight:bold;color:rgb(175,95,135)">{</span>hook_name<span style="font-weight:bold;color:rgb(175,95,135)">}</span><span style="color:rgb(175,0,0)">"</span>):
+<span class="ansi-green-fg">--&gt; 323</span>     output <span style="color:rgb(98,98,98)">=</span> fn(<span style="color:rgb(98,98,98)">*</span>args, <span style="color:rgb(98,98,98)">*</span><span style="color:rgb(98,98,98)">*</span>kwargs)
+<span class="ansi-green-fg ansi-bold">    325</span> <span style="font-style:italic;color:rgb(95,135,135)"># restore current_fx when nested context</span>
+<span class="ansi-green-fg ansi-bold">    326</span> pl_module<span style="color:rgb(98,98,98)">.</span>_current_fx_name <span style="color:rgb(98,98,98)">=</span> prev_fx_name
+
+File <span class="ansi-green-fg">~/miniconda3/envs/nimrod/lib/python3.11/site-packages/lightning/pytorch/strategies/strategy.py:391</span>, in <span class="ansi-cyan-fg">Strategy.training_step</span><span class="ansi-blue-fg">(self, *args, **kwargs)</span>
+<span class="ansi-green-fg ansi-bold">    389</span> <span style="font-weight:bold;color:rgb(0,135,0)">if</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>model <span style="color:rgb(98,98,98)">!=</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>lightning_module:
+<span class="ansi-green-fg ansi-bold">    390</span>     <span style="font-weight:bold;color:rgb(0,135,0)">return</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_forward_redirection(<span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>model, <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>lightning_module, <span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">training_step</span><span style="color:rgb(175,0,0)">"</span>, <span style="color:rgb(98,98,98)">*</span>args, <span style="color:rgb(98,98,98)">*</span><span style="color:rgb(98,98,98)">*</span>kwargs)
+<span class="ansi-green-fg">--&gt; 391</span> <span style="font-weight:bold;color:rgb(0,135,0)">return</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>lightning_module<span style="color:rgb(98,98,98)">.</span>training_step(<span style="color:rgb(98,98,98)">*</span>args, <span style="color:rgb(98,98,98)">*</span><span style="color:rgb(98,98,98)">*</span>kwargs)
+
+File <span class="ansi-green-fg">~/Projects/nimrod/nimrod/models/core.py:186</span>, in <span class="ansi-cyan-fg">Classifier.training_step</span><span class="ansi-blue-fg">(self, batch, batch_idx)</span>
+<span class="ansi-green-fg ansi-bold">    183</span>     sched<span style="color:rgb(98,98,98)">.</span>step() <span style="font-style:italic;color:rgb(95,135,135)">#reduce plateau sched is updated at end of epoch only instead TODO: should it be applied to val loop by default?</span>
+<span class="ansi-green-fg ansi-bold">    185</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>train_loss(loss)
+<span class="ansi-green-fg">--&gt; 186</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>train_acc(preds, y)
+<span class="ansi-green-fg ansi-bold">    187</span> metrics <span style="color:rgb(98,98,98)">=</span> {<span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">train/loss</span><span style="color:rgb(175,0,0)">"</span>: <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>train_loss, <span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">train/acc</span><span style="color:rgb(175,0,0)">"</span>: <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>train_acc}
+<span class="ansi-green-fg ansi-bold">    188</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>log_dict(metrics, on_epoch<span style="color:rgb(98,98,98)">=</span><span style="font-weight:bold;color:rgb(0,135,0)">True</span>, on_step<span style="color:rgb(98,98,98)">=</span><span style="font-weight:bold;color:rgb(0,135,0)">True</span>, prog_bar<span style="color:rgb(98,98,98)">=</span><span style="font-weight:bold;color:rgb(0,135,0)">True</span>)<span style="font-style:italic;color:rgb(95,135,135)"># Pass the validation loss to the scheduler</span>
+
+File <span class="ansi-green-fg">~/miniconda3/envs/nimrod/lib/python3.11/site-packages/torch/nn/modules/module.py:1532</span>, in <span class="ansi-cyan-fg">Module._wrapped_call_impl</span><span class="ansi-blue-fg">(self, *args, **kwargs)</span>
+<span class="ansi-green-fg ansi-bold">   1530</span>     <span style="font-weight:bold;color:rgb(0,135,0)">return</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_compiled_call_impl(<span style="color:rgb(98,98,98)">*</span>args, <span style="color:rgb(98,98,98)">*</span><span style="color:rgb(98,98,98)">*</span>kwargs)  <span style="font-style:italic;color:rgb(95,135,135)"># type: ignore[misc]</span>
+<span class="ansi-green-fg ansi-bold">   1531</span> <span style="font-weight:bold;color:rgb(0,135,0)">else</span>:
+<span class="ansi-green-fg">-&gt; 1532</span>     <span style="font-weight:bold;color:rgb(0,135,0)">return</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_call_impl(<span style="color:rgb(98,98,98)">*</span>args, <span style="color:rgb(98,98,98)">*</span><span style="color:rgb(98,98,98)">*</span>kwargs)
+
+File <span class="ansi-green-fg">~/miniconda3/envs/nimrod/lib/python3.11/site-packages/torch/nn/modules/module.py:1541</span>, in <span class="ansi-cyan-fg">Module._call_impl</span><span class="ansi-blue-fg">(self, *args, **kwargs)</span>
+<span class="ansi-green-fg ansi-bold">   1536</span> <span style="font-style:italic;color:rgb(95,135,135)"># If we don't have any hooks, we want to skip the rest of the logic in</span>
+<span class="ansi-green-fg ansi-bold">   1537</span> <span style="font-style:italic;color:rgb(95,135,135)"># this function, and just call forward.</span>
+<span class="ansi-green-fg ansi-bold">   1538</span> <span style="font-weight:bold;color:rgb(0,135,0)">if</span> <span style="font-weight:bold;color:rgb(175,0,255)">not</span> (<span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_backward_hooks <span style="font-weight:bold;color:rgb(175,0,255)">or</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_backward_pre_hooks <span style="font-weight:bold;color:rgb(175,0,255)">or</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_forward_hooks <span style="font-weight:bold;color:rgb(175,0,255)">or</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_forward_pre_hooks
+<span class="ansi-green-fg ansi-bold">   1539</span>         <span style="font-weight:bold;color:rgb(175,0,255)">or</span> _global_backward_pre_hooks <span style="font-weight:bold;color:rgb(175,0,255)">or</span> _global_backward_hooks
+<span class="ansi-green-fg ansi-bold">   1540</span>         <span style="font-weight:bold;color:rgb(175,0,255)">or</span> _global_forward_hooks <span style="font-weight:bold;color:rgb(175,0,255)">or</span> _global_forward_pre_hooks):
+<span class="ansi-green-fg">-&gt; 1541</span>     <span style="font-weight:bold;color:rgb(0,135,0)">return</span> forward_call(<span style="color:rgb(98,98,98)">*</span>args, <span style="color:rgb(98,98,98)">*</span><span style="color:rgb(98,98,98)">*</span>kwargs)
+<span class="ansi-green-fg ansi-bold">   1543</span> <span style="font-weight:bold;color:rgb(0,135,0)">try</span>:
+<span class="ansi-green-fg ansi-bold">   1544</span>     result <span style="color:rgb(98,98,98)">=</span> <span style="font-weight:bold;color:rgb(0,135,0)">None</span>
+
+File <span class="ansi-green-fg">~/miniconda3/envs/nimrod/lib/python3.11/site-packages/torchmetrics/metric.py:316</span>, in <span class="ansi-cyan-fg">Metric.forward</span><span class="ansi-blue-fg">(self, *args, **kwargs)</span>
+<span class="ansi-green-fg ansi-bold">    314</span>     <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_forward_cache <span style="color:rgb(98,98,98)">=</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_forward_full_state_update(<span style="color:rgb(98,98,98)">*</span>args, <span style="color:rgb(98,98,98)">*</span><span style="color:rgb(98,98,98)">*</span>kwargs)
+<span class="ansi-green-fg ansi-bold">    315</span> <span style="font-weight:bold;color:rgb(0,135,0)">else</span>:
+<span class="ansi-green-fg">--&gt; 316</span>     <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_forward_cache <span style="color:rgb(98,98,98)">=</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_forward_reduce_state_update(<span style="color:rgb(98,98,98)">*</span>args, <span style="color:rgb(98,98,98)">*</span><span style="color:rgb(98,98,98)">*</span>kwargs)
+<span class="ansi-green-fg ansi-bold">    318</span> <span style="font-weight:bold;color:rgb(0,135,0)">return</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_forward_cache
+
+File <span class="ansi-green-fg">~/miniconda3/envs/nimrod/lib/python3.11/site-packages/torchmetrics/metric.py:385</span>, in <span class="ansi-cyan-fg">Metric._forward_reduce_state_update</span><span class="ansi-blue-fg">(self, *args, **kwargs)</span>
+<span class="ansi-green-fg ansi-bold">    382</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_enable_grad <span style="color:rgb(98,98,98)">=</span> <span style="font-weight:bold;color:rgb(0,135,0)">True</span>  <span style="font-style:italic;color:rgb(95,135,135)"># allow grads for batch computation</span>
+<span class="ansi-green-fg ansi-bold">    384</span> <span style="font-style:italic;color:rgb(95,135,135)"># calculate batch state and compute batch value</span>
+<span class="ansi-green-fg">--&gt; 385</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>update(<span style="color:rgb(98,98,98)">*</span>args, <span style="color:rgb(98,98,98)">*</span><span style="color:rgb(98,98,98)">*</span>kwargs)
+<span class="ansi-green-fg ansi-bold">    386</span> batch_val <span style="color:rgb(98,98,98)">=</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>compute()
+<span class="ansi-green-fg ansi-bold">    388</span> <span style="font-style:italic;color:rgb(95,135,135)"># reduce batch and global state</span>
+
+File <span class="ansi-green-fg">~/miniconda3/envs/nimrod/lib/python3.11/site-packages/torchmetrics/metric.py:560</span>, in <span class="ansi-cyan-fg">Metric._wrap_update.&lt;locals&gt;.wrapped_func</span><span class="ansi-blue-fg">(*args, **kwargs)</span>
+<span class="ansi-green-fg ansi-bold">    552</span>         <span style="font-weight:bold;color:rgb(0,135,0)">if</span> <span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">Expected all tensors to be on</span><span style="color:rgb(175,0,0)">"</span> <span style="font-weight:bold;color:rgb(175,0,255)">in</span> <span style="color:rgb(0,135,0)">str</span>(err):
+<span class="ansi-green-fg ansi-bold">    553</span>             <span style="font-weight:bold;color:rgb(0,135,0)">raise</span> <span style="font-weight:bold;color:rgb(215,95,95)">RuntimeError</span>(
+<span class="ansi-green-fg ansi-bold">    554</span>                 <span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">Encountered different devices in metric calculation (see stacktrace for details).</span><span style="color:rgb(175,0,0)">"</span>
+<span class="ansi-green-fg ansi-bold">    555</span>                 <span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)"> This could be due to the metric class not being on the same device as input.</span><span style="color:rgb(175,0,0)">"</span>
+<span class="ansi-green-fg">   (...)</span>
+<span class="ansi-green-fg ansi-bold">    558</span>                 <span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)"> device corresponds to the device of the input.</span><span style="color:rgb(175,0,0)">"</span>
+<span class="ansi-green-fg ansi-bold">    559</span>             ) <span style="font-weight:bold;color:rgb(0,135,0)">from</span> <span style="font-weight:bold;color:rgb(0,0,255)">err</span>
+<span class="ansi-green-fg">--&gt; 560</span>         <span style="font-weight:bold;color:rgb(0,135,0)">raise</span> err
+<span class="ansi-green-fg ansi-bold">    562</span> <span style="font-weight:bold;color:rgb(0,135,0)">if</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>compute_on_cpu:
+<span class="ansi-green-fg ansi-bold">    563</span>     <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_move_list_states_to_cpu()
+
+File <span class="ansi-green-fg">~/miniconda3/envs/nimrod/lib/python3.11/site-packages/torchmetrics/metric.py:550</span>, in <span class="ansi-cyan-fg">Metric._wrap_update.&lt;locals&gt;.wrapped_func</span><span class="ansi-blue-fg">(*args, **kwargs)</span>
+<span class="ansi-green-fg ansi-bold">    548</span> <span style="font-weight:bold;color:rgb(0,135,0)">with</span> torch<span style="color:rgb(98,98,98)">.</span>set_grad_enabled(<span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_enable_grad):
+<span class="ansi-green-fg ansi-bold">    549</span>     <span style="font-weight:bold;color:rgb(0,135,0)">try</span>:
+<span class="ansi-green-fg">--&gt; 550</span>         update(<span style="color:rgb(98,98,98)">*</span>args, <span style="color:rgb(98,98,98)">*</span><span style="color:rgb(98,98,98)">*</span>kwargs)
+<span class="ansi-green-fg ansi-bold">    551</span>     <span style="font-weight:bold;color:rgb(0,135,0)">except</span> <span style="font-weight:bold;color:rgb(215,95,95)">RuntimeError</span> <span style="font-weight:bold;color:rgb(0,135,0)">as</span> err:
+<span class="ansi-green-fg ansi-bold">    552</span>         <span style="font-weight:bold;color:rgb(0,135,0)">if</span> <span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">Expected all tensors to be on</span><span style="color:rgb(175,0,0)">"</span> <span style="font-weight:bold;color:rgb(175,0,255)">in</span> <span style="color:rgb(0,135,0)">str</span>(err):
+
+File <span class="ansi-green-fg">~/miniconda3/envs/nimrod/lib/python3.11/site-packages/torchmetrics/classification/stat_scores.py:339</span>, in <span class="ansi-cyan-fg">MulticlassStatScores.update</span><span class="ansi-blue-fg">(self, preds, target)</span>
+<span class="ansi-green-fg ansi-bold">    337</span> <span style="font-style:italic;color:rgb(175,0,0)">"""Update state with predictions and targets."""</span>
+<span class="ansi-green-fg ansi-bold">    338</span> <span style="font-weight:bold;color:rgb(0,135,0)">if</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>validate_args:
+<span class="ansi-green-fg">--&gt; 339</span>     _multiclass_stat_scores_tensor_validation(
+<span class="ansi-green-fg ansi-bold">    340</span>         preds, target, <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>num_classes, <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>multidim_average, <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>ignore_index
+<span class="ansi-green-fg ansi-bold">    341</span>     )
+<span class="ansi-green-fg ansi-bold">    342</span> preds, target <span style="color:rgb(98,98,98)">=</span> _multiclass_stat_scores_format(preds, target, <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>top_k)
+<span class="ansi-green-fg ansi-bold">    343</span> tp, fp, tn, fn <span style="color:rgb(98,98,98)">=</span> _multiclass_stat_scores_update(
+<span class="ansi-green-fg ansi-bold">    344</span>     preds, target, <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>num_classes, <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>top_k, <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>average, <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>multidim_average, <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>ignore_index
+<span class="ansi-green-fg ansi-bold">    345</span> )
+
+File <span class="ansi-green-fg">~/miniconda3/envs/nimrod/lib/python3.11/site-packages/torchmetrics/functional/classification/stat_scores.py:318</span>, in <span class="ansi-cyan-fg">_multiclass_stat_scores_tensor_validation</span><span class="ansi-blue-fg">(preds, target, num_classes, multidim_average, ignore_index)</span>
+<span class="ansi-green-fg ansi-bold">    316</span> num_unique_values <span style="color:rgb(98,98,98)">=</span> <span style="color:rgb(0,135,0)">len</span>(torch<span style="color:rgb(98,98,98)">.</span>unique(t, dim<span style="color:rgb(98,98,98)">=</span><span style="font-weight:bold;color:rgb(0,135,0)">None</span>))
+<span class="ansi-green-fg ansi-bold">    317</span> <span style="font-weight:bold;color:rgb(0,135,0)">if</span> num_unique_values <span style="color:rgb(98,98,98)">&gt;</span> check_value:
+<span class="ansi-green-fg">--&gt; 318</span>     <span style="font-weight:bold;color:rgb(0,135,0)">raise</span> <span style="font-weight:bold;color:rgb(215,95,95)">RuntimeError</span>(
+<span class="ansi-green-fg ansi-bold">    319</span>         <span style="color:rgb(175,0,0)">f</span><span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">Detected more unique values in `</span><span style="font-weight:bold;color:rgb(175,95,135)">{</span>name<span style="font-weight:bold;color:rgb(175,95,135)">}</span><span style="color:rgb(175,0,0)">` than expected. Expected only </span><span style="font-weight:bold;color:rgb(175,95,135)">{</span>check_value<span style="font-weight:bold;color:rgb(175,95,135)">}</span><span style="color:rgb(175,0,0)"> but found</span><span style="color:rgb(175,0,0)">"</span>
+<span class="ansi-green-fg ansi-bold">    320</span>         <span style="color:rgb(175,0,0)">f</span><span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)"> </span><span style="font-weight:bold;color:rgb(175,95,135)">{</span>num_unique_values<span style="font-weight:bold;color:rgb(175,95,135)">}</span><span style="color:rgb(175,0,0)"> in `</span><span style="font-weight:bold;color:rgb(175,95,135)">{</span>name<span style="font-weight:bold;color:rgb(175,95,135)">}</span><span style="color:rgb(175,0,0)">`. Found values: </span><span style="font-weight:bold;color:rgb(175,95,135)">{</span>torch<span style="color:rgb(98,98,98)">.</span>unique(t,<span style="color:rgb(188,188,188)"> </span>dim<span style="color:rgb(98,98,98)">=</span><span style="font-weight:bold;color:rgb(0,135,0)">None</span>)<span style="font-weight:bold;color:rgb(175,95,135)">}</span><span style="color:rgb(175,0,0)">.</span><span style="color:rgb(175,0,0)">"</span>
+<span class="ansi-green-fg ansi-bold">    321</span>     )
+
+<span class="ansi-red-fg">RuntimeError</span>: Detected more unique values in `preds` than expected. Expected only 10 but found 30 in `preds`. Found values: tensor([ 0,  1,  3,  6,  7,  8,  9, 10, 11, 13, 14, 15, 16, 17, 19, 20, 21, 22,
+        23, 25, 27, 28, 29, 30, 31, 32, 33, 34, 38, 39], device='cuda:0').</pre>
+</div>
+</div>
+</div>
+<div id="cell-11" class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># print(f"lr: {model.lr}, bs: {dm.batch_size}")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>lr: 9.120108393559098e-06, bs: 256</code></pre>
+</div>
+</div>
+</section>
+<section id="fit" class="level3">
+<h3 class="anchored" data-anchor-id="fit">Fit</h3>
+<div id="cell-13" class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>cfg.optimizer.lr <span class="op">=</span> <span class="fl">0.4</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(OmegaConf.to_yaml(cfg))</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> instantiate(cfg)</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>trainer.fit(model, dm.train_dataloader(), dm.val_dataloader())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>[22:10:36] INFO - ConvNetX: init
+[22:10:36] INFO - Classifier: init</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>_target_: nimrod.models.conv.ConvNetX
+num_classes: 10
+nnet:
+  _target_: nimrod.models.conv.ConvNet
+  n_features:
+  - 1
+  - 8
+  - 16
+  - 32
+  - 64
+  num_classes: ${..num_classes}
+  kernel_size: 3
+  bias: null
+  normalization:
+    _target_: hydra.utils.get_class
+    path: torch.nn.BatchNorm2d
+  activation:
+    _target_: hydra.utils.get_class
+    path: torch.nn.ReLU
+optimizer:
+  _target_: torch.optim.Adam
+  _partial_: true
+  lr: 0.4
+scheduler:
+  _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
+  _partial_: true
+  mode: min
+  factor: 0.1
+  patience: 5
+</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>/Users/slegroux/miniforge3/envs/nimrod/lib/python3.11/site-packages/lightning/pytorch/utilities/parsing.py:208: Attribute 'nnet' is an instance of `nn.Module` and is already saved during checkpointing. It is recommended to ignore them using `self.save_hyperparameters(ignore=['nnet'])`.
+[22:10:54] INFO - Optimizer: Adam (
+Parameter Group 0
+    amsgrad: False
+    betas: (0.9, 0.999)
+    capturable: False
+    differentiable: False
+    eps: 1e-08
+    foreach: None
+    fused: None
+    lr: 0.4
+    maximize: False
+    weight_decay: 0
+)
+[22:10:54] INFO - Scheduler: &lt;torch.optim.lr_scheduler.ReduceLROnPlateau object&gt;
+
+  | Name         | Type               | Params | Mode 
+------------------------------------------------------------
+0 | loss         | CrossEntropyLoss   | 0      | train
+1 | train_acc    | MulticlassAccuracy | 0      | train
+2 | val_acc      | MulticlassAccuracy | 0      | train
+3 | test_acc     | MulticlassAccuracy | 0      | train
+4 | train_loss   | MeanMetric         | 0      | train
+5 | val_loss     | MeanMetric         | 0      | train
+6 | test_loss    | MeanMetric         | 0      | train
+7 | val_acc_best | MaxMetric          | 0      | train
+8 | nnet         | ConvNet            | 30.3 K | train
+------------------------------------------------------------
+30.3 K    Trainable params
+0         Non-trainable params
+30.3 K    Total params
+0.121     Total estimated model params size (MB)
+34        Modules in train mode
+0         Modules in eval mode</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"7e0daa9a123c44d58eede66efbdf0107","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"d460d357388444428590ba0ac85a42c2","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"515c8dcb77624e9c83fc76590f095435","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+</script>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>[22:11:24] INFO - scheduler is an instance of Reduce plateau</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"e021dc9e8a61451e9ccaf27ed8ba766c","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+</script>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>[22:11:54] INFO - scheduler is an instance of Reduce plateau</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"7e11afd12c5a4e869ce30bf9b682acbe","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+</script>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>[22:12:24] INFO - scheduler is an instance of Reduce plateau</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"dc2d678696d64b5a82a3720718487693","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+</script>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>[22:12:55] INFO - scheduler is an instance of Reduce plateau</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"4a3f948c0dd24051944f60deced3e9e7","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+</script>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>[22:13:25] INFO - scheduler is an instance of Reduce plateau
+`Trainer.fit` stopped: `max_epochs=5` reached.</code></pre>
+</div>
+</div>
+<div id="cell-14" class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co">########################</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>csv_path <span class="op">=</span> <span class="ss">f"</span><span class="sc">{</span>trainer<span class="sc">.</span>logger<span class="sc">.</span>log_dir<span class="sc">}</span><span class="ss">/metrics.csv"</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>metrics <span class="op">=</span> pd.read_csv(csv_path)</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>metrics.head()</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="co">#########################</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>plt.figure()</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>plt.plot(metrics[<span class="st">'step'</span>], metrics[<span class="st">'train/loss_step'</span>], <span class="st">'b.-'</span>)</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>plt.plot(metrics[<span class="st">'step'</span>], metrics[<span class="st">'val/loss'</span>],<span class="st">'r.-'</span>)</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>plt.figure()</span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>plt.plot(metrics[<span class="st">'step'</span>], metrics[<span class="st">'lr-Adam'</span>], <span class="st">'g.-'</span>)</span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="models.autoencoders_files/figure-html/cell-10-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="models.autoencoders_files/figure-html/cell-10-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-15" class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>trainer.test(model, dm.test_dataloader())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>/Users/slegroux/miniforge3/envs/nimrod/lib/python3.11/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:424: The 'test_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=11` in the `DataLoader` to improve performance.</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"60f8bae674b44e76ad24abebcc9d9cd5","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃<span style="font-weight: bold">        Test metric        </span>┃<span style="font-weight: bold">       DataLoader 0        </span>┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│<span style="color: #008080; text-decoration-color: #008080">         test/acc          </span>│<span style="color: #800080; text-decoration-color: #800080">     0.803600013256073     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">         test/loss         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.5951264500617981     </span>│
+└───────────────────────────┴───────────────────────────┘
+</pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre><code>[{'test/loss': 0.5951264500617981, 'test/acc': 0.803600013256073}]</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="fc-autoencoder" class="level2">
+<h2 class="anchored" data-anchor-id="fc-autoencoder">FC Autoencoder</h2>
+<div id="cell-18" class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> LinearEncoder(nn.Module):</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>):</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.l1 <span class="op">=</span> nn.Sequential(nn.Linear(<span class="dv">28</span> <span class="op">*</span> <span class="dv">28</span>, <span class="dv">64</span>), nn.ReLU(), nn.Linear(<span class="dv">64</span>, <span class="dv">3</span>))</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x):</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.l1(x)</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> LinearDecoder(nn.Module):</span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>):</span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.l1 <span class="op">=</span> nn.Sequential(nn.Linear(<span class="dv">3</span>, <span class="dv">64</span>), nn.ReLU(), nn.Linear(<span class="dv">64</span>, <span class="dv">28</span> <span class="op">*</span> <span class="dv">28</span>))</span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x):</span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.l1(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-19" class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>enc <span class="op">=</span> LinearEncoder()</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>dec <span class="op">=</span> LinearDecoder()</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> AutoEncoder(enc, dec)</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>batch <span class="op">=</span> torch.rand((<span class="dv">5</span>, <span class="dv">3</span>, <span class="dv">28</span><span class="op">*</span><span class="dv">28</span>))</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>encoded <span class="op">=</span> enc(batch)</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(encoded.shape)</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="co"># y = a(batch)</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a><span class="co"># print(y.shape)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>torch.Size([5, 3, 3])</code></pre>
+</div>
+</div>
+<div id="cell-20" class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>ds <span class="op">=</span> ImageDataset(name<span class="op">=</span><span class="st">'fashion_mnist'</span>, data_dir<span class="op">=</span><span class="st">'../data/image/'</span>)</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>dl <span class="op">=</span> DataLoader(ds, batch_size<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> <span class="bu">next</span>(<span class="bu">iter</span>(dl))</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f" X: </span><span class="sc">{</span>b[<span class="dv">0</span>]<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">, Y: </span><span class="sc">{</span>b[<span class="dv">1</span>]<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> X: torch.Size([3, 1, 28, 28]), Y: torch.Size([3])</code></pre>
+</div>
+</div>
+<div id="cell-21" class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>acfg <span class="op">=</span> OmegaConf.load(<span class="st">'../config/data/image/image.yaml'</span>)</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>dm <span class="op">=</span> instantiate(cfg, name<span class="op">=</span><span class="st">'fashion_mnist'</span>, data_dir<span class="op">=</span><span class="st">'../data/image/'</span>)</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>dm.prepare_data()</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>dm.setup()</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a><span class="co"># print(f"num classes: {dm.num_classes}, bs: {dm.batch_size}, labels: {dm.label_names}" if dm.label_names else f"num classes: {dm.num_classes}")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>[14:58:07] INFO - Init ImageDataModule for fashion_mnist
+[14:58:22] INFO - split train into train/val [0.8, 0.2]
+[14:58:22] INFO - train: 48000 val: 12000, test: 10000</code></pre>
+</div>
+</div>
+<div id="cell-22" class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>device <span class="op">=</span> get_device()</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Device: </span><span class="sc">{</span>device<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>enc <span class="op">=</span> LinearEncoder()</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>dec <span class="op">=</span>LinearDecoder()</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> AutoEncoder(enc, dec).to(device)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>[14:55:26] INFO - Using device: mps</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Device: mps</code></pre>
+</div>
+</div>
+<div id="cell-23" class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>criterion <span class="op">=</span> nn.MSELoss()</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>optimizer <span class="op">=</span> torch.optim.Adam(model.parameters(), lr<span class="op">=</span><span class="fl">0.001</span>)</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>N_EPOCHS <span class="op">=</span> <span class="dv">5</span></span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(N_EPOCHS):</span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>    i <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>    model.train()</span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> images, labels <span class="kw">in</span> dm.train_dataloader():</span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a>        optimizer.zero_grad()</span>
+<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a>        images, labels <span class="op">=</span> images.to(device), labels.to(device)</span>
+<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a>        <span class="co"># B x C x H x W -&gt; B x C x L</span></span>
+<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a>        images <span class="op">=</span> images.view(<span class="op">-</span><span class="dv">1</span>, images.size(<span class="dv">2</span>) <span class="op">*</span> images.size(<span class="dv">3</span>))</span>
+<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a>        outputs <span class="op">=</span> model(images)</span>
+<span id="cb37-16"><a href="#cb37-16" aria-hidden="true" tabindex="-1"></a>        <span class="co"># output should be as close to input as possible</span></span>
+<span id="cb37-17"><a href="#cb37-17" aria-hidden="true" tabindex="-1"></a>        loss <span class="op">=</span> criterion(outputs, images)        </span>
+<span id="cb37-18"><a href="#cb37-18" aria-hidden="true" tabindex="-1"></a>        loss.backward()</span>
+<span id="cb37-19"><a href="#cb37-19" aria-hidden="true" tabindex="-1"></a>        optimizer.step()</span>
+<span id="cb37-20"><a href="#cb37-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-21"><a href="#cb37-21" aria-hidden="true" tabindex="-1"></a>    model.<span class="bu">eval</span>()</span>
+<span id="cb37-22"><a href="#cb37-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> torch.no_grad():</span>
+<span id="cb37-23"><a href="#cb37-23" aria-hidden="true" tabindex="-1"></a>        total_loss, epoch_step <span class="op">=</span> <span class="dv">0</span>, <span class="dv">0</span></span>
+<span id="cb37-24"><a href="#cb37-24" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> images, labels <span class="kw">in</span> dm.val_dataloader():</span>
+<span id="cb37-25"><a href="#cb37-25" aria-hidden="true" tabindex="-1"></a>            images, labels <span class="op">=</span> images.to(device), labels.to(device)</span>
+<span id="cb37-26"><a href="#cb37-26" aria-hidden="true" tabindex="-1"></a>            images <span class="op">=</span> images.view(<span class="op">-</span><span class="dv">1</span>, images.size(<span class="dv">2</span>) <span class="op">*</span> images.size(<span class="dv">3</span>))</span>
+<span id="cb37-27"><a href="#cb37-27" aria-hidden="true" tabindex="-1"></a>            outputs <span class="op">=</span> model(images)</span>
+<span id="cb37-28"><a href="#cb37-28" aria-hidden="true" tabindex="-1"></a>            eval_loss <span class="op">=</span> criterion(outputs, images)</span>
+<span id="cb37-29"><a href="#cb37-29" aria-hidden="true" tabindex="-1"></a>            epoch_len <span class="op">=</span> <span class="bu">len</span>(images)</span>
+<span id="cb37-30"><a href="#cb37-30" aria-hidden="true" tabindex="-1"></a>            epoch_step <span class="op">+=</span> epoch_len</span>
+<span id="cb37-31"><a href="#cb37-31" aria-hidden="true" tabindex="-1"></a>            total_loss <span class="op">+=</span> eval_loss.item() <span class="op">*</span> epoch_len</span>
+<span id="cb37-32"><a href="#cb37-32" aria-hidden="true" tabindex="-1"></a>    logger.info(<span class="ss">f"Epoch: </span><span class="sc">{</span>epoch<span class="sc">}</span><span class="ss">, len: </span><span class="sc">{</span>epoch_len<span class="sc">}</span><span class="ss">, Loss: </span><span class="sc">{</span>total_loss <span class="op">/</span> epoch_step<span class="sc">:.3f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>[14:56:24] INFO - Epoch: 0, len: 32, Loss: 0.025
+[14:56:27] INFO - Epoch: 1, len: 32, Loss: 0.025
+[14:56:31] INFO - Epoch: 2, len: 32, Loss: 0.025
+[14:56:35] INFO - Epoch: 3, len: 32, Loss: 0.025
+[14:56:39] INFO - Epoch: 4, len: 32, Loss: 0.025</code></pre>
+</div>
+</div>
+<div id="cell-24" class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>x, y <span class="op">=</span> <span class="bu">next</span>(<span class="bu">iter</span>(dm.train_dataloader()))</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f" X: </span><span class="sc">{</span>x<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">, Y: </span><span class="sc">{</span>y<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> x.to(device)</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>B, C, H, W <span class="op">=</span> x.shape</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>x_hat <span class="op">=</span> model(x.view(<span class="op">-</span><span class="dv">1</span>, H <span class="op">*</span> W)).view(<span class="op">-</span><span class="dv">1</span>, C, H, W)</span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f" X_hat: </span><span class="sc">{</span>x_hat<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>idx <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a>n_rows, n_cols <span class="op">=</span> <span class="dv">1</span>, <span class="dv">2</span></span>
+<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a>fig, axs <span class="op">=</span> plt.subplots(n_rows, n_cols, figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">10</span>))</span>
+<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a>axs[<span class="dv">0</span>].imshow(x[idx].permute(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">0</span>).cpu().numpy(), cmap<span class="op">=</span><span class="st">'gray'</span>)</span>
+<span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a>axs[<span class="dv">1</span>].imshow(x_hat[idx].permute(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">0</span>).detach().cpu().numpy(), cmap<span class="op">=</span><span class="st">'gray'</span>)</span>
+<span id="cb39-12"><a href="#cb39-12" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> X: torch.Size([64, 1, 28, 28]), Y: torch.Size([64])
+ X_hat: torch.Size([64, 1, 28, 28])</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="models.autoencoders_files/figure-html/cell-19-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="convnet-autoencoder" class="level2">
+<h2 class="anchored" data-anchor-id="convnet-autoencoder">ConvNet Autoencoder</h2>
+<div id="cell-26" class="cell">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> ConvEncoder(nn.Module):</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>):</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>        layers <span class="op">=</span> nn.ModuleList()</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>        <span class="co"># X -&gt; B,C,28,28</span></span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>        layers.append(nn.ZeroPad2d(<span class="dv">2</span>)) <span class="co"># X -&gt; B,C,32,32</span></span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>        layers.append(ConvLayer(<span class="dv">1</span>,<span class="dv">2</span>, normalization<span class="op">=</span><span class="va">None</span>)) <span class="co"># 16 x 16</span></span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>        layers.append(ConvLayer(<span class="dv">2</span>,<span class="dv">4</span>, normalization<span class="op">=</span><span class="va">None</span>)) <span class="co"># 8 x 8</span></span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._nnet <span class="op">=</span> nn.Sequential(<span class="op">*</span>layers)</span>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x:torch.Tensor)<span class="op">-&gt;</span>torch.Tensor:</span>
+<span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>._nnet(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-27" class="cell">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> ConvDecoder(nn.Module):</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>):</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>        layers <span class="op">=</span> nn.ModuleList()</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>        layers.append(DeconvLayer(<span class="dv">4</span>,<span class="dv">2</span>, normalization<span class="op">=</span><span class="va">None</span>)) <span class="co"># 16 x 16</span></span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>        layers.append(DeconvLayer(<span class="dv">2</span>,<span class="dv">1</span>, normalization<span class="op">=</span><span class="va">None</span>, activation<span class="op">=</span><span class="va">None</span>)) <span class="co"># 32 x 32</span></span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>        layers.append(nn.ZeroPad2d(<span class="op">-</span><span class="dv">2</span>)) <span class="co"># 28 x 28</span></span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>        layers.append(nn.Sigmoid())</span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._nnet <span class="op">=</span> nn.Sequential(<span class="op">*</span>layers)</span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x:torch.Tensor)<span class="op">-&gt;</span>torch.Tensor:</span>
+<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>._nnet(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-28" class="cell">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>device <span class="op">=</span> get_device()</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Device: </span><span class="sc">{</span>device<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>enc <span class="op">=</span> ConvEncoder()</span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>dec <span class="op">=</span> ConvDecoder()</span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> AutoEncoder(enc, dec).to(device)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>[22:44:23] INFO - Using device: cuda</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Device: cuda</code></pre>
+</div>
+</div>
+<div id="cell-29" class="cell">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>criterion <span class="op">=</span> nn.MSELoss()</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>optimizer <span class="op">=</span> torch.optim.Adam(model.parameters(), lr<span class="op">=</span><span class="fl">0.001</span>)</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>N_EPOCHS <span class="op">=</span> <span class="dv">5</span></span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(N_EPOCHS):</span>
+<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a>    i <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a>    model.train()</span>
+<span id="cb46-10"><a href="#cb46-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> images, labels <span class="kw">in</span> dm.train_dataloader():</span>
+<span id="cb46-11"><a href="#cb46-11" aria-hidden="true" tabindex="-1"></a>        optimizer.zero_grad()</span>
+<span id="cb46-12"><a href="#cb46-12" aria-hidden="true" tabindex="-1"></a>        images, labels <span class="op">=</span> images.to(device), labels.to(device)</span>
+<span id="cb46-13"><a href="#cb46-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-14"><a href="#cb46-14" aria-hidden="true" tabindex="-1"></a>        <span class="co"># images = images.view(-1, images.size(2) * images.size(3))</span></span>
+<span id="cb46-15"><a href="#cb46-15" aria-hidden="true" tabindex="-1"></a>        outputs <span class="op">=</span> model(images)</span>
+<span id="cb46-16"><a href="#cb46-16" aria-hidden="true" tabindex="-1"></a>        <span class="co"># output should be as close to input as possible</span></span>
+<span id="cb46-17"><a href="#cb46-17" aria-hidden="true" tabindex="-1"></a>        loss <span class="op">=</span> criterion(outputs, images)        </span>
+<span id="cb46-18"><a href="#cb46-18" aria-hidden="true" tabindex="-1"></a>        loss.backward()</span>
+<span id="cb46-19"><a href="#cb46-19" aria-hidden="true" tabindex="-1"></a>        optimizer.step()</span>
+<span id="cb46-20"><a href="#cb46-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-21"><a href="#cb46-21" aria-hidden="true" tabindex="-1"></a>    model.<span class="bu">eval</span>()</span>
+<span id="cb46-22"><a href="#cb46-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> torch.no_grad():</span>
+<span id="cb46-23"><a href="#cb46-23" aria-hidden="true" tabindex="-1"></a>        total_loss, epoch_step <span class="op">=</span> <span class="dv">0</span>, <span class="dv">0</span></span>
+<span id="cb46-24"><a href="#cb46-24" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> images, labels <span class="kw">in</span> dm.val_dataloader():</span>
+<span id="cb46-25"><a href="#cb46-25" aria-hidden="true" tabindex="-1"></a>            images, labels <span class="op">=</span> images.to(device), labels.to(device)</span>
+<span id="cb46-26"><a href="#cb46-26" aria-hidden="true" tabindex="-1"></a>            <span class="co"># images = images.view(-1, images.size(2) * images.size(3))</span></span>
+<span id="cb46-27"><a href="#cb46-27" aria-hidden="true" tabindex="-1"></a>            outputs <span class="op">=</span> model(images)</span>
+<span id="cb46-28"><a href="#cb46-28" aria-hidden="true" tabindex="-1"></a>            eval_loss <span class="op">=</span> criterion(outputs, images)</span>
+<span id="cb46-29"><a href="#cb46-29" aria-hidden="true" tabindex="-1"></a>            epoch_len <span class="op">=</span> <span class="bu">len</span>(images)</span>
+<span id="cb46-30"><a href="#cb46-30" aria-hidden="true" tabindex="-1"></a>            epoch_step <span class="op">+=</span> epoch_len</span>
+<span id="cb46-31"><a href="#cb46-31" aria-hidden="true" tabindex="-1"></a>            total_loss <span class="op">+=</span> eval_loss.item() <span class="op">*</span> epoch_len</span>
+<span id="cb46-32"><a href="#cb46-32" aria-hidden="true" tabindex="-1"></a>    logger.info(<span class="ss">f"Epoch: </span><span class="sc">{</span>epoch<span class="sc">}</span><span class="ss">, len: </span><span class="sc">{</span>epoch_len<span class="sc">}</span><span class="ss">, Loss: </span><span class="sc">{</span>total_loss <span class="op">/</span> epoch_step<span class="sc">:.3f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>[15:34:38] INFO - Epoch: 0, len: 32, Loss: 0.012
+[15:34:43] INFO - Epoch: 1, len: 32, Loss: 0.011
+[15:34:48] INFO - Epoch: 2, len: 32, Loss: 0.011
+[15:34:53] INFO - Epoch: 3, len: 32, Loss: 0.011
+[15:34:59] INFO - Epoch: 4, len: 32, Loss: 0.011</code></pre>
+</div>
+</div>
+<div id="cell-30" class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>x, y <span class="op">=</span> <span class="bu">next</span>(<span class="bu">iter</span>(dm.train_dataloader()))</span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f" X: </span><span class="sc">{</span>x<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">, Y: </span><span class="sc">{</span>y<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> x.to(device)</span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>B, C, H, W <span class="op">=</span> x.shape</span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>x_hat <span class="op">=</span> model(x)</span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f" X_hat: </span><span class="sc">{</span>x_hat<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a>idx <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a>n_rows, n_cols <span class="op">=</span> <span class="dv">1</span>, <span class="dv">2</span></span>
+<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a>fig, axs <span class="op">=</span> plt.subplots(n_rows, n_cols, figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">10</span>))</span>
+<span id="cb48-10"><a href="#cb48-10" aria-hidden="true" tabindex="-1"></a>axs[<span class="dv">0</span>].imshow(x[idx].permute(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">0</span>).cpu().numpy(), cmap<span class="op">=</span><span class="st">'gray'</span>)</span>
+<span id="cb48-11"><a href="#cb48-11" aria-hidden="true" tabindex="-1"></a>axs[<span class="dv">1</span>].imshow(x_hat[idx].permute(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">0</span>).detach().cpu().numpy(), cmap<span class="op">=</span><span class="st">'gray'</span>)</span>
+<span id="cb48-12"><a href="#cb48-12" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> X: torch.Size([64, 1, 28, 28]), Y: torch.Size([64])
+ X_hat: torch.Size([64, 1, 28, 28])</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="models.autoencoders_files/figure-html/cell-24-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="autoencoder_x" class="level2">
+<h2 class="anchored" data-anchor-id="autoencoder_x">AutoEncoder_X</h2>
+<div id="cell-32" class="cell">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="co">#show_doc(AutoEncoderPL.forward)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display cell-output-markdown">
+<hr>
+<section id="autoencoderpl.forward" class="level3">
+<h3 class="anchored" data-anchor-id="autoencoderpl.forward">AutoEncoderPL.forward</h3>
+<blockquote class="blockquote">
+<pre><code> AutoEncoderPL.forward (x:torch.Tensor)</code></pre>
+</blockquote>
+<p><em>Forward pass of the AutoEncoder model.</em></p>
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 38%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>x</td>
+<td>Tensor</td>
+<td>Tensor B x L</td>
+</tr>
+<tr class="even">
+<td><strong>Returns</strong></td>
+<td><strong>Tensor</strong></td>
+<td><strong>Reconstructed input tensor of shape B x L</strong></td>
+</tr>
+</tbody>
+</table>
+</section>
+</div>
+</div>
+<div id="cell-33" class="cell">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>autoencoder_pl <span class="op">=</span> AutoEncoderPL(a)</span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> torch.rand((<span class="dv">5</span>,<span class="dv">28</span><span class="op">*</span><span class="dv">28</span>))</span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> autoencoder_pl(b)</span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(y.shape)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>torch.Size([5, 784])</code></pre>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/slegroux\.github\.io\/nimrod");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/slegroux/nimrod/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div></div></footer></body></html>
