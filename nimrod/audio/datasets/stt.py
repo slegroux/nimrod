@@ -8,15 +8,23 @@ __all__ = ['STTDataset', 'LibriSpeechDataModule']
 # %% ../../../nbs/audio.datasets.stt.ipynb 4
 import torch
 from torch.utils.data import DataLoader, Dataset
+import torchaudio
 from lightning import LightningDataModule, LightningModule
-from matplotlib import pyplot as plt
+
+
 from lhotse.dataset import BucketingSampler, OnTheFlyFeatures
 from lhotse.dataset.collation import TokenCollater
 from lhotse.recipes import download_librispeech, prepare_librispeech
 from lhotse.dataset.vis import plot_batch
 from lhotse import CutSet, RecordingSet, SupervisionSet, Fbank, FbankConfig
+
+from matplotlib import pyplot as plt
+
 from pathlib import Path
 from pprint import pprint
+from typing import List
+
+from ...text.tokenizers import CharTokenizer
 
 # %% ../../../nbs/audio.datasets.stt.ipynb 6
 class STTDataset(Dataset):
