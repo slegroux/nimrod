@@ -1,4 +1,9 @@
-from pkg_resources import parse_version
+try:
+    # `packaging` is the modern home for version parsing; `pkg_resources`
+    # was removed in setuptools 81.
+    from packaging.version import parse as parse_version
+except ModuleNotFoundError:  # pragma: no cover - very old build envs
+    from pkg_resources import parse_version
 from configparser import ConfigParser
 import setuptools
 assert parse_version(setuptools.__version__)>=parse_version('36.2')

@@ -1,47 +1,26 @@
-name: base
+# macOS (Apple Silicon) base environment for nimrod.
+#
+#   micromamba env create -f .devcontainer/environment-macos.yml   # creates env "nimrod"
+#   micromamba activate nimrod
+#   pip install -e .                                                # pulls the rest from settings.ini
+#
+# Torch is pinned to the 2.3.0 release matrix on purpose: torchtext is archived
+# at 0.18.0 and supports only torch 2.3.x, and torch 2.3 is not NumPy-2 safe.
+# See INSTALL.md for the full rationale and the optional LM / speech extras.
+name: nimrod
 channels:
-  - fastai
-  - pytorch
   - conda-forge
-  - huggingface
 dependencies:
-  - anyascii
-  - datasets
-  - h5py
-  - hydra-core
-  - inflect
-  - jupyterlab
-  - matplotlib
-  - nbdev
-  - omegaconf
-  - onnxruntime
-  - pandas
-  - portalocker
-  - pre-commit
-  - pytest
-  - python-dotenv
-  - portalocker
-  - spacy
-  - streamlit
-  - optuna
-  - tensorboard
-  - transformers
-  - tqdm
-  - wandb
+  - python=3.11
+  - pip
+  # native libs the audio / speech stack (torchaudio, lhotse, librosa) links at runtime
+  - ffmpeg
+  - libsndfile
   - pip:
-    - encodec
-    - hydra_colorlog
-    - hydra-optuna-sweeper
-    - jupyterlab-quarto
-    - kenlm
-    - lightning
-    - lhotse
-    - plum-dispatch
-    - https://github.com/kpu/kenlm/archive/master.zip
-    - phonemizer
-    - torch
-    - torchvision
-    - torchtext
-    - torchdata
-    - torchaudio
-    - fairscale
+    # torch family — keep these four in lock-step (the 2.3.0 release matrix)
+    - torch==2.3.0
+    - torchvision==0.18.0
+    - torchaudio==2.3.0
+    - torchtext==0.18.0
+    # everything else (lightning, hydra, datasets, lhotse, encodec, phonemizer,
+    # jupyterlab, nbdev, ...) is resolved from settings.ini via `pip install -e .`
