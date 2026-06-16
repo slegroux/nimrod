@@ -7,6 +7,7 @@ nnet:
   n_emb: 10
   n_context: 3
   n_h: 100
+  batch_norm: false # set true to add batchnorm on the hidden layer
 
 optimizer:
   _target_: torch.optim.Adam
