@@ -11,4 +11,10 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    steps: [uses: fastai/workflows/quarto-ghp@master]
+    steps:
+      # Pin Python 3.10: nbdev_docs re-executes notebooks, and that execution is
+      # broken on Python 3.11+ here (a dependency interaction raises "argument of
+      # type 'function' is not iterable"). 3.10 matches the green CI environment.
+      - uses: fastai/workflows/quarto-ghp@master
+        with:
+          version: '3.10'
