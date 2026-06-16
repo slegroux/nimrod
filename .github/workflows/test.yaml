@@ -13,7 +13,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo apt-get install -y espeak
+          sudo apt-get install -y espeak ffmpeg   # ffmpeg: torchcodec audio I/O backend
           python -m pip install --upgrade pip
           # nbdev toolchain (pinned) + torch stack + deps all come from .[dev];
           # CPU torch index keeps the runner from pulling CUDA wheels.
