@@ -6,11 +6,16 @@ batch_size: 64
 num_workers: 0
 
 pin_memory: True
-persistent_workers: True
+persistent_workers: False  # must be False when num_workers == 0 (PyTorch DataLoader constraint)
 transforms:
   _target_: torchvision.transforms.v2.Compose
   transforms:
     - _target_: torchvision.transforms.v2.ToImage
+    - _target_: torchvision.transforms.v2.ToDtype  # uint8 -> float32 in [0,1]; Normalize needs a float tensor
+      dtype:
+        _target_: hydra.utils.get_object
+        path: torch.float32
+      scale: true
     - _target_: torchvision.transforms.v2.Normalize
       mean: [0.1307,]
       std: [0.3081,]
