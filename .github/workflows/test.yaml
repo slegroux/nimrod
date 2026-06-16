@@ -13,10 +13,11 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo apt-get  install espeak
+          sudo apt-get install -y espeak
           python -m pip install --upgrade pip
-          pip install nbdev torch torchvision requests
-          pip install -e ".[dev]"
+          # nbdev toolchain (pinned) + torch stack + deps all come from .[dev];
+          # CPU torch index keeps the runner from pulling CUDA wheels.
+          pip install -e ".[dev]" --extra-index-url https://download.pytorch.org/whl/cpu
 
       - name: Diagnostic Information
         run: |
