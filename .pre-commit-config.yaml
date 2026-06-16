@@ -1,0 +1,30 @@
+# Strips notebook outputs/metadata before every commit so notebooks stay small
+# and produce clean diffs (see nbs/*.ipynb bloat from committed cell outputs).
+#
+# Activate once per clone:   pre-commit install
+# Clean every notebook now:  pre-commit run nbdev_clean --all-files
+#
+# Why a local hook with pinned deps instead of the upstream
+# `repo: https://github.com/fastai/nbdev` hook:
+#   * The upstream hook builds nbdev from git source, whose setup.py imports the
+#     removed `pkg_resources` and fails on modern setuptools (>=81).
+#   * This repo is nbdev 2.x (settings.ini); nbdev 3.x dropped settings.ini and
+#     can't clean it, while latest fastcore/execnb break nbdev 2.x imports.
+# Pinning a known-good nbdev 2.x trio installed as wheels avoids all of the above
+# and keeps the hook reproducible. pre-commit runs it in its own isolated venv,
+# independent of whatever nbdev is in your working environment.
+repos:
+  - repo: local
+    hooks:
+      - id: nbdev_clean
+        name: nbdev_clean (strip notebook outputs)
+        entry: nbdev_clean
+        language: python
+        additional_dependencies:
+          - nbdev==2.3.13
+          - fastcore==1.5.29
+          - execnb==0.1.5
+          - setuptools<81   # nbdev 2.x imports pkg_resources, dropped in setuptools 81
+        always_run: true
+        pass_filenames: false
+        require_serial: true
