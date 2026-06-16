@@ -97,6 +97,14 @@ The Python deps (`torchaudio`, `lhotse`, `encodec`, `librosa`) come from
 `phonemizer` (TTS / text normalization) additionally needs the **espeak**
 system library — see the next tier.
 
+> **Loading audio files on torch 2.9.** `torchaudio.load` now delegates to
+> [`torchcodec`](https://github.com/pytorch/torchcodec), which is intentionally
+> *not* a hard dependency (the library code doesn't decode audio; only some
+> demo notebooks do). To run those, install a torchcodec build matching your
+> torch and an FFmpeg it supports: `pip install torchcodec` plus
+> `conda install -c conda-forge 'ffmpeg=7'`. CI skips the audio-decoding
+> notebooks for this reason.
+
 ### Text / LM recipes (kenlm + espeak)
 Only needed for n-gram LMs (`nimrod/models/ngram.py`) and phoneme-based recipes.
 With the `nimrod` env active:
