@@ -27,37 +27,55 @@ text/LM recipes need the extra steps below.
 > Substitute `conda`/`mamba` for `micromamba` if you prefer — the commands are
 > identical. The env file names the environment `nimrod`.
 
-## Why torch is pinned to 2.3.0
+## Why torch is pinned to 2.9.1
 
-The whole torch family is pinned to the **2.3.0 release matrix**:
+The whole torch family is pinned to the **2.9.1 release matrix**:
 
-| package      | version |
-|--------------|---------|
-| torch        | 2.3.0   |
-| torchvision  | 0.18.0  |
-| torchaudio   | 2.3.0   |
-| torchtext    | 0.18.0  |
-| transformers | `<5`    |
-| numpy        | `<2`    |
+| package      | version  |
+|--------------|----------|
+| torch        | 2.9.1    |
+| torchvision  | 0.24.1   |
+| torchaudio   | 2.9.1    |
+| transformers | `<5`     |
+| numpy        | unpinned |
 
-Three hard constraints force this and they are not negotiable while the code
-uses `torchtext`:
+This matrix runs on every target: **Apple MPS** (dev), **H100** (Hopper), and
+the **DGX Spark / GB10** (Blackwell `sm_121`). Blackwell is the binding
+constraint — it ships CUDA 13, so it needs `libcudart.so.13` (cu130) wheels and
+will not run anything older than torch 2.9.
 
-1. **torchtext is archived.** Its final release is `0.18.0`, which supports
-   **only torch 2.3.x**. `nimrod/text/datasets.py` imports it, so the text
-   recipes require it.
-2. **torch 2.3 predates NumPy 2.** Importing torch 2.3 against `numpy>=2` raises
-   the "compiled using NumPy 1.x" error, so numpy is pinned `<2`.
-3. **transformers 5.x requires torch ≥2.4.** Newer transformers silently
-   disables its PyTorch backend on torch 2.3 ("Disabling PyTorch because
-   PyTorch >= 2.4 is required"), which breaks every transformers-based model
-   (BLIP, CLIP, …). So transformers is pinned `<5` (resolves to the 4.57.x
-   line, which works with torch 2.3).
+Keep the three torch packages in lock-step — bumping one without the others
+breaks the ABI.
 
-Keep the four torch packages in lock-step — bumping one without the others
-breaks the ABI. If you don't need the text recipes, you *can* drop `torchtext`
-and move to a newer torch, but that's a code change (refactor
-`nimrod/text/datasets.py`), not just an install tweak.
+Two pins worth understanding:
+
+- **`numpy` is unpinned now.** The old `numpy<2` pin only existed because torch
+  2.3 was built against NumPy 1.x; torch 2.9 is NumPy-2 safe, and no code uses
+  a NumPy-2-removed alias.
+- **`transformers` stays `<5`.** This is *not* a torch constraint — it's because
+  `nimrod/image/med.py` vendors Salesforce BLIP and imports transformers
+  internals (`transformers.file_utils`, `apply_chunking_to_forward`) that newer
+  releases removed. (Heads-up: `med.py` already fails to import on transformers
+  4.57.x, so BLIP image-captioning needs a separate refactor regardless.)
+
+> **torchtext was removed.** It was archived at 0.18.0 (torch-2.3-only) and was
+> what forced the entire old pin cascade — but the code never actually used it
+> (`nimrod/text/datasets.py` uses a hand-rolled `Vocab`; all torchtext imports
+> were commented out). Dropping it is what unlocked this whole upgrade.
+
+### Linux GPU (H100 / DGX Spark): install from the cu130 index
+
+`environment-macos.yml` installs the default PyPI wheels (Apple MPS). On a Linux
+GPU box, install the torch trio from the CUDA 13 index instead:
+
+```bash
+pip install torch==2.9.1 torchvision==0.24.1 torchaudio==2.9.1 \
+    --index-url https://download.pytorch.org/whl/cu130
+pip install -e .   # the rest of the deps from PyPI
+```
+
+cu130 has both `x86_64` (H100) and `aarch64` (GB10) wheels. Do **not** use a
+cu12x index on the Spark — those link `libcudart.so.12`, which it doesn't have.
 
 ## Tiers
 
@@ -105,18 +123,18 @@ python -c "import torchaudio, lhotse, encodec; print('audio ok')"
 make test     # == pytest -k "not slow"
 ```
 
-Expected: `torch 2.3.0`, `numpy 1.x`.
+Expected: `torch 2.9.1` (or `2.9.1+cu130` on a Linux GPU box).
 
 ## Troubleshooting
 
 - **`ModuleNotFoundError` for lightning/hydra/torchaudio/etc.** — you're almost
   certainly in the wrong env. Check with `echo $CONDA_DEFAULT_ENV` (should be
   `nimrod`, not `base`) and `which python`.
-- **"A module compiled using NumPy 1.x cannot be run in NumPy 2.x"** — numpy got
-  upgraded past the pin. Fix: `pip install "numpy<2"`.
-- **torchtext fails to install / no wheel** — confirm torch is exactly `2.3.0`
-  and Python is `3.9`–`3.12`. torchtext has no wheels for newer torch or
-  Python 3.13+.
+- **`import torch` fails with `libcudart.so.12: cannot open ...` on DGX Spark** —
+  you installed cu12x wheels. Reinstall the torch trio from the **cu130** index
+  (see the Linux GPU section above).
+- **torch CUDA build won't import / `sm_121` not supported** — the box has an
+  older torch than 2.9. Blackwell needs torch ≥2.9 on cu130.
 - **`phonemizer` can't find espeak** — set
   `export PHONEMIZER_ESPEAK_LIBRARY=...` (printed by the install script) in your
   shell profile.
