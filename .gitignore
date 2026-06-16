@@ -157,7 +157,9 @@ _docs/
 /data/en/Libri*
 /data/
 /sandbox/
-recipes
+# Datasets live outside git: code under recipes/ is tracked, data dirs are not.
+# Re-fetch with scripts/download_data.sh
+recipes/**/data/
 token
 env-file
 Dockerfile.base
