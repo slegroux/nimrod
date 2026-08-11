@@ -1,6 +1,7 @@
 _target_: nimrod.image.datasets.ImageSuperResDataModule
 
 name: 'fashion_mnist'
+revision: "531be5e2ccc9dba0c201ad3ae567a4f3d16ecdd2" # pinned fashion_mnist
 data_dir: '../data/image'
 train_val_split: [0.8, 0.2]
 batch_size: 512

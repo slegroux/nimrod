@@ -1,5 +1,6 @@
 _target_: nimrod.image.datasets.ImageDataModule
 name: "mnist"
+revision: "77f3279092a1c1579b2250db8eafed0ad422088c" # pinned mnist
 data_dir: "../data/image"
 train_val_split: [0.8, 0.2]
 batch_size: 64

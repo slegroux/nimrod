@@ -191,8 +191,9 @@ class ImageDataset(ImagePlotMixin, Dataset):
         exclude_grey_scale = False,
         verification_mode="no_checks",
         from_image_folder=False,
-        from_disk=False
-        
+        from_disk=False,
+        revision:Optional[str]=None, # pin the hub dataset to a commit sha; None tracks main
+
     ):
         logging.getLogger('datasets').setLevel(logging.INFO)
         
@@ -200,8 +201,9 @@ class ImageDataset(ImagePlotMixin, Dataset):
             os.makedirs(data_dir, exist_ok=True)
         super().__init__()
         self.exclude_grey_scale = exclude_grey_scale
+        self.revision = revision
         if not from_image_folder:
-            self.info = load_dataset_builder(name, *args)
+            self.info = load_dataset_builder(name, *args, revision=revision)
             if split not in self.info.info.splits:
                 raise ValueError(f"The specified split '{split}' does not exist in the dataset '{name}'. Available splits: {list(self.info.info.splits.keys())}")
         else:
@@ -224,7 +226,7 @@ class ImageDataset(ImagePlotMixin, Dataset):
         elif from_disk:
             self.hf_ds = load_from_disk(name)
         else:
-            logger.info(f"loading dataset {name} from split {split}")
+            logger.info(f"loading dataset {name} from split {split} at revision {revision or 'main'}")
             self.hf_ds = load_dataset(
                 name,
                 *args,
@@ -232,8 +234,9 @@ class ImageDataset(ImagePlotMixin, Dataset):
                 cache_dir=data_dir,
                 download_mode='reuse_dataset_if_exists',
                 streaming=streaming,
-                verification_mode=verification_mode
-                
+                verification_mode=verification_mode,
+                revision=revision
+
             )
 
         # CHANGE IMAGE COLUMN NAME IF NEEDED
@@ -552,10 +555,11 @@ class ImageSuperResDataset(ImageDataset):
             data_dir:str = '../data/image',
             split='train',
             transform_x:Optional[transforms.Compose] = transforms.Compose([transforms.ToTensor(), TFM_LOW_RES]),
-            transform_y:Optional[transforms.Compose] = transforms.Compose([transforms.ToTensor()])
+            transform_y:Optional[transforms.Compose] = transforms.Compose([transforms.ToTensor()]),
+            revision:Optional[str]=None, # pin the hub dataset to a commit sha; None tracks main
     ):
 
-        super().__init__(name=name, data_dir=data_dir, split=split)
+        super().__init__(name=name, data_dir=data_dir, split=split, revision=revision)
         self.transform_x = transform_x
         self.transform_y = transform_y
     
@@ -591,7 +595,9 @@ class ImageSuperResDataModule(ImageDataModule):
         batch_size:int = 64,
         num_workers:int = 0,
         pin_memory:bool = False,
-        persistent_workers:bool = False
+        persistent_workers:bool = False,
+        revision:Optional[str]=None, # pin the hub dataset to a commit sha; None tracks main
+        **kwargs
     ):
         logger.info(f"Init ImageSuperResDataModule for {name}")
         self.save_hyperparameters()
@@ -603,7 +609,9 @@ class ImageSuperResDataModule(ImageDataModule):
             batch_size=batch_size,
             num_workers=num_workers,
             pin_memory=pin_memory,
-            persistent_workers=persistent_workers
+            persistent_workers=persistent_workers,
+            revision=revision,
+            **kwargs
             )
 
         self.train_ds, self.test_ds, self.val_ds = None, None, None
@@ -616,7 +624,8 @@ class ImageSuperResDataModule(ImageDataModule):
             name=self.hparams.name,
             data_dir=self.hparams.data_dir,
             transform_x=self.hparams.transform_x,
-            transform_y=self.hparams.transform_y
+            transform_y=self.hparams.transform_y,
+            revision=self.hparams.revision
             )
         try:
             self.train_ds = ds(split='train')

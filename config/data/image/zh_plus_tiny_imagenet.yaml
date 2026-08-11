@@ -1,5 +1,6 @@
 _target_: nimrod.image.datasets.ImageDataModule
 name: 'zh-plus/tiny-imagenet'
+revision: "5a77092c28e51558c5586e9c5eb71a7e17a5e43f" # pinned zh-plus/tiny-imagenet
 data_dir: "../data/image"
 exclude_grey_scale: true
 train_val_split: [0.8, 0.2]
