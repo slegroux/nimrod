@@ -17,11 +17,10 @@ from typing import Optional, Type, List, Callable, Any
 from functools import partial
 import logging
 
-set_seed(42)
 logger = logging.getLogger(__name__)
 device = get_device()
 
-# %% ../../nbs/models.superres.ipynb 5
+# %% ../../nbs/models.superres.ipynb 6
 class UpBlock(nn.Module):
     def __init__(
         self,
@@ -42,7 +41,7 @@ class UpBlock(nn.Module):
     def forward(self, x):
         return self.nnet(x)
 
-# %% ../../nbs/models.superres.ipynb 7
+# %% ../../nbs/models.superres.ipynb 8
 def init_weights(m, leaky=0.):
     if isinstance(m, (nn.Conv1d,nn.Conv2d,nn.Conv3d)): nn.init.kaiming_normal_(m.weight, a=leaky)
 
@@ -77,7 +76,7 @@ class SuperResAutoencoder(nn.Module):
         return self.autoencoder(x)
         
 
-# %% ../../nbs/models.superres.ipynb 10
+# %% ../../nbs/models.superres.ipynb 11
 class SuperResAutoencoderX(Regressor):
     def __init__(
         self,

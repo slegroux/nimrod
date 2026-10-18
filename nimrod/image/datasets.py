@@ -53,13 +53,12 @@ from ..data.core import DataModule
 from ..utils import set_seed
 
 
-set_seed(42)
 logger = logging.getLogger(__name__)
 # logger.setLevel(logging.DEBUG)
 plt.set_loglevel('INFO')
 logging.getLogger('matplotlib.image').setLevel(logging.ERROR)
 
-# %% ../../nbs/image.datasets.ipynb 5
+# %% ../../nbs/image.datasets.ipynb 6
 def show_images(x:torch.Tensor, ncols:int=8):
     """Given a batch of images x, make a grid and convert to PIL"""
     # x = x * 0.5 + 0.5  # Map from (-1, 1) back to (0, 1)
@@ -76,7 +75,7 @@ def make_grid(images, size=64):
         output_im.paste(im.resize((size, size)), (i * size, 0))
     return output_im
 
-# %% ../../nbs/image.datasets.ipynb 7
+# %% ../../nbs/image.datasets.ipynb 8
 class ImagePlotMixin:
     " Mixin class for image datasets providing visualization of (image, label) samples"
 
@@ -174,7 +173,7 @@ class ImagePlotMixin:
         plt.tight_layout()
         plt.show()
 
-# %% ../../nbs/image.datasets.ipynb 10
+# %% ../../nbs/image.datasets.ipynb 11
 class ImageDataset(ImagePlotMixin, Dataset):
     "Image dataset"
 
@@ -355,7 +354,7 @@ class ImageDataset(ImagePlotMixin, Dataset):
         std = full_batch[0].float().std([0,2,3])
         return mean, std
 
-# %% ../../nbs/image.datasets.ipynb 12
+# %% ../../nbs/image.datasets.ipynb 13
 def normalize_image_datasets(name, data_dir='../data/image', splits=['train', 'validation']):
     mean, std = [], []
     for split in splits:
@@ -373,7 +372,7 @@ def normalize_image_datasets(name, data_dir='../data/image', splits=['train', 'v
     std = torch.stack(std).mean(dim=0)
     return mean, std
 
-# %% ../../nbs/image.datasets.ipynb 15
+# %% ../../nbs/image.datasets.ipynb 16
 class ImageDataModule(ImagePlotMixin, DataModule):
 
     def __init__(
@@ -536,7 +535,7 @@ class ImageDataModule(ImagePlotMixin, DataModule):
         return grid_im
 
 
-# %% ../../nbs/image.datasets.ipynb 26
+# %% ../../nbs/image.datasets.ipynb 27
 TFM_LOW_RES = transforms.Compose(
     [
         transforms.Resize((32, 32), antialias=True), 
@@ -576,7 +575,7 @@ class ImageSuperResDataset(ImageDataset):
         return image_x, image_y
         
 
-# %% ../../nbs/image.datasets.ipynb 30
+# %% ../../nbs/image.datasets.ipynb 31
 TFM_LOW_RES = nn.Sequential(
     transforms.Resize((32, 32), antialias=True),
     transforms.Resize((64, 64), antialias=True)

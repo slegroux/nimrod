@@ -29,9 +29,8 @@ from functools import partial
 
 # %% ../../nbs/models.resnet.ipynb 4
 logger = logging.getLogger(__name__)
-set_seed()
 
-# %% ../../nbs/models.resnet.ipynb 6
+# %% ../../nbs/models.resnet.ipynb 7
 class ResBlock(nn.Module):
     def __init__(
             self,
@@ -74,7 +73,7 @@ class ResBlock(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.activation(self.conv_layer(x) + self.id(self.pooling(x)))
 
-# %% ../../nbs/models.resnet.ipynb 10
+# %% ../../nbs/models.resnet.ipynb 11
 class ResNet(nn.Module):
     def __init__(
             self,
@@ -116,7 +115,7 @@ class ResNet(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.layers(x)
 
-# %% ../../nbs/models.resnet.ipynb 16
+# %% ../../nbs/models.resnet.ipynb 17
 class ResNetX(Classifier):
     def __init__(
         self,

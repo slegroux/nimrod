@@ -26,9 +26,8 @@ import logging
 
 # %% ../../nbs/models.unet.ipynb 4
 logger = logging.getLogger(__name__)
-set_seed()
 
-# %% ../../nbs/models.unet.ipynb 6
+# %% ../../nbs/models.unet.ipynb 7
 def init_weights(m, leaky=0.):
     if isinstance(m, (nn.Conv1d,nn.Conv2d,nn.Conv3d)): nn.init.kaiming_normal_(m.weight, a=leaky)
 
@@ -120,7 +119,7 @@ class TinyUnet(nn.Module):
         return self.end(x+layers[0])
         
 
-# %% ../../nbs/models.unet.ipynb 8
+# %% ../../nbs/models.unet.ipynb 9
 class TinyUnetX(Regressor):
     def __init__(
         self,

@@ -32,11 +32,10 @@ from diffusers import UNet2DModel, DDPMScheduler, DDPMPipeline, DDIMScheduler
 from diffusers.utils import make_image_grid
 from diffusers.optimization import get_cosine_schedule_with_warmup
 
-set_seed(42)
 logger = logging.getLogger(__name__)
 warnings.filterwarnings("ignore", category=UserWarning, module="matplotlib.image")
 
-# %% ../../nbs/models.diffusion.ipynb 30
+# %% ../../nbs/models.diffusion.ipynb 31
 class DiffusorX(Regressor):
     def __init__(
         self,

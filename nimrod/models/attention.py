@@ -32,9 +32,8 @@ from typing import List, Optional, Type
 
 # %% ../../nbs/models.attention.ipynb 4
 logger = logging.getLogger(__name__)
-set_seed()
 
-# %% ../../nbs/models.attention.ipynb 12
+# %% ../../nbs/models.attention.ipynb 13
 class SelfAttention(nn.Module):
     """
     Self-Attention layer for image data.
@@ -89,7 +88,7 @@ class SelfAttention(nn.Module):
         x = x.transpose(1, 2).view(B, C, H, W)
         return x + inp #specific to stable diffusion ~resnet style
 
-# %% ../../nbs/models.attention.ipynb 15
+# %% ../../nbs/models.attention.ipynb 16
 class MultiheadAttention(nn.Module):
     """
     Multihead Attention module.

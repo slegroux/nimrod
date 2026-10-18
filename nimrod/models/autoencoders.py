@@ -27,13 +27,12 @@ import logging
 import warnings
 
 # %% ../../nbs/models.autoencoders.ipynb 5
-set_seed(42)
 logger = logging.getLogger(__name__)
 # logger.setLevel(logging.DEBUG)
 plt.set_loglevel('INFO')
 warnings.filterwarnings("ignore", category=UserWarning, module="matplotlib")
 
-# %% ../../nbs/models.autoencoders.ipynb 21
+# %% ../../nbs/models.autoencoders.ipynb 22
 class AutoEncoder(nn.Module):
     """ A modular autoencoder with configurable encoder and decoder """
     def __init__(self,
