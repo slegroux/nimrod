@@ -205,7 +205,10 @@ class ConvNet(nn.Module):
         for i in range(1, len(n_features) - 1):
             net.append(conv_(in_channels=n_features[i], out_channels=n_features[i+1], stride=2))
         
-        net.append(conv_(in_channels=n_features[-1], out_channels=num_classes, stride=2))
+        # head: plain conv to logits (no normalization/activation so logits can be negative),
+        # then global average pool so any input size / depth gives (B, num_classes)
+        net.append(conv_(in_channels=n_features[-1], out_channels=num_classes, stride=2, bias=True, normalization=None, activation=None))
+        net.append(nn.AdaptiveAvgPool2d(1))
         net.append(nn.Flatten(start_dim=1, end_dim=-1))
 
         self.net = nn.Sequential(*net)
@@ -216,7 +219,7 @@ class ConvNet(nn.Module):
             ) -> torch.Tensor: # output probs (B, N_classes)
         return self.net(x)
 
-# %% ../../nbs/models.conv.ipynb 43
+# %% ../../nbs/models.conv.ipynb 44
 class ConvNetX(Classifier):
     """
     Parameters
