@@ -68,14 +68,13 @@ class Vocab:
         with open(self.data_path, 'r') as f:
             text = f.read()
 
-        chars = set(text)
-        if specials is not None:
-            for special in specials:
-                chars.add(special)
+        # deterministic ids (independent of PYTHONHASHSEED): specials first in given order, then sorted characters
+        specials = list(dict.fromkeys(specials or []))
+        chars = specials + sorted(set(text) - set(specials))
 
         self._stoi = {c: i for i, c in enumerate(chars)}
         self._itos = {i: c for i, c in enumerate(chars)}
-        self.voc = chars
+        self.voc = set(chars)
 
 
     
@@ -122,7 +121,7 @@ class Vocab:
         return sorted(set([k for k,v in self._stoi.items()]))
 
 
-# %% ../../nbs/text.datasets.ipynb 12
+# %% ../../nbs/text.datasets.ipynb 13
 class SimpleCharDataset(Dataset):
     def __init__(self, data, context_length):
         self.data = data
@@ -137,7 +136,7 @@ class SimpleCharDataset(Dataset):
         return (len(self.data) - self.context_length)
     
 
-# %% ../../nbs/text.datasets.ipynb 15
+# %% ../../nbs/text.datasets.ipynb 16
 class CharDataset(Dataset):
     def __init__(self,
                 data_path: str | os.PathLike='../data/text/tiny_shakespeare.txt', # path to the data file
@@ -209,7 +208,7 @@ class CharDataset(Dataset):
     def from_tokens(self, tokens: torch.Tensor) -> str:
         return "".join([self.v.itos(int(i)) for i in tokens])
 
-# %% ../../nbs/text.datasets.ipynb 21
+# %% ../../nbs/text.datasets.ipynb 22
 class CharDataModule(DataModule, LightningDataModule):
     def __init__(self,
             # dataset

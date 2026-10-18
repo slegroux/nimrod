@@ -253,7 +253,7 @@ class ImageDataset(ImagePlotMixin, Dataset):
 
         if name == "huggan/smithsonian_butterflies_subset":
             # no default label col available using 'taxonomy' instead
-            unique_labels =list(set(self.hf_ds['taxonomy']))
+            unique_labels = sorted(set(self.hf_ds['taxonomy'])) # sorted: deterministic label ids across runs
             cl = ClassLabel(names=unique_labels)
             self.hf_ds = self.hf_ds.map(lambda example: {'label': cl.str2int(example['taxonomy'])})
             self.hf_ds = self.hf_ds.cast_column('label', cl)
