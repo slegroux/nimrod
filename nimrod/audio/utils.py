@@ -3,12 +3,12 @@
 # %% auto 0
 __all__ = ['plot_waveform']
 
-# %% ../../nbs/audio.utils.ipynb 3
+# %% ../../nbs/audio.utils.ipynb 4
 import torch
 from matplotlib import pyplot as plt
 import torchaudio
 
-# %% ../../nbs/audio.utils.ipynb 4
+# %% ../../nbs/audio.utils.ipynb 5
 def plot_waveform(waveform, sample_rate, title="Waveform", xlim=None, ylim=None):
    waveform = waveform.numpy()
    num_channels, num_frames = waveform.shape

@@ -146,7 +146,7 @@ class NNLM_X(Classifier, LightningModule):
         y = y[:, -1]  # Get the last token as target
         y_hat = self.forward(x)
         return y_hat.argmax(dim=1)
-    
+
     def sample(self, prompt:str, vocab:Vocab, max_new_tokens:int=50, temperature:float=1.0):
         return self.nnet.sample(prompt, vocab, max_new_tokens, temperature)
 
