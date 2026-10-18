@@ -67,7 +67,6 @@ class Classifier(ABC, L.LightningModule):
         self.register_module('nnet', self.nnet)
         self.lr = optimizer.keywords.get('lr') if optimizer else None # for lr finder
 
-        self.automatic_optimization = False
         self.loss = nn.CrossEntropyLoss()
         
         self.train_acc = Accuracy(task="multiclass", num_classes=num_classes)
@@ -79,7 +78,6 @@ class Classifier(ABC, L.LightningModule):
         self.test_loss = MeanMetric()
 
         self.val_acc_best = MaxMetric()
-        self.step = 0
 
         # self.optimizer_config = None
         # self.scheduler_config = None
@@ -162,30 +160,13 @@ class Classifier(ABC, L.LightningModule):
         self.val_acc_best.reset()
 
     def training_step(self, batch, batch_idx):
-
-        # if isinstance(self.scheduler, torch.optim.lr_scheduler.OneCycleLR):
-        #     logger.info("scheduler is instance of OneCycleLR")
-        #     if self.step >= self.scheduler.total_steps:
-        #         logger.warning("Max steps reached for 1-cycle LR scheduler")
-        #         return
-        
-        self.step += 1
-
-        opt = self.optimizers() # optimizer defined in configure_optimizers
-        sched = self.lr_schedulers() # access scheduler defined in configure_optimizers
-         
-        opt.zero_grad()
+        # automatic optimization: Lightning runs zero_grad/backward/step and steps the
+        # scheduler per the `interval`/`monitor` returned by configure_optimizers
         loss, preds, y = self._step(batch, batch_idx)
-        self.manual_backward(loss)
-        opt.step()
-
-        if not isinstance(sched, torch.optim.lr_scheduler.ReduceLROnPlateau):
-            sched.step() #reduce plateau sched is updated at end of epoch only instead TODO: should it be applied to val loop by default?
-
         self.train_loss(loss)
         self.train_acc(preds, y)
         metrics = {"train/loss": self.train_loss, "train/acc": self.train_acc}
-        self.log_dict(metrics, on_epoch=True, on_step=True, prog_bar=True)# Pass the validation loss to the scheduler
+        self.log_dict(metrics, on_epoch=True, on_step=True, prog_bar=True)
 
         return loss
 
@@ -207,11 +188,6 @@ class Classifier(ABC, L.LightningModule):
         # log `val_acc_best` as a value through `.compute()` method, instead of as a metric object
         # otherwise metric would be reset by lightning after each epoch
         self.log("val/acc_best", self.val_acc_best.compute(), sync_dist=True, prog_bar=True)
-        
-        sch = self.lr_schedulers()
-        if isinstance(sch, torch.optim.lr_scheduler.ReduceLROnPlateau):
-            logger.info("scheduler is an instance of Reduce plateau")
-            sch.step(self.trainer.callback_metrics["val/loss"])
 
     def test_step(self, batch, batch_idx, prog_bar=True, on_step=False, on_epoch=True, sync_dist=True):
         loss, preds, y = self._step(batch, batch_idx)
@@ -295,7 +271,14 @@ class Regressor(ABC, L.LightningModule):
             logger.warning("no scheduler has been setup")
             return {"optimizer": self.optimizer}
         self.scheduler = self.hparams.scheduler(optimizer=self.optimizer)
-        if isinstance(self.scheduler, torch.optim.lr_scheduler.OneCycleLR):
+        if isinstance(self.scheduler, torch.optim.lr_scheduler.ReduceLROnPlateau):
+            lr_scheduler = {
+                "scheduler": self.scheduler,
+                "monitor": "val/loss",
+                "interval": "epoch",
+                "frequency": 1,
+            }
+        elif isinstance(self.scheduler, torch.optim.lr_scheduler.OneCycleLR):
             lr_scheduler = {
                 "scheduler": self.scheduler,
                 "interval": "step",
@@ -402,7 +385,14 @@ class Diffuser(ABC, L.LightningModule):
             logger.warning("no scheduler has been setup")
             return {"optimizer": self.optimizer}
         self.scheduler = self.hparams.scheduler(optimizer=self.optimizer)
-        if isinstance(self.scheduler, torch.optim.lr_scheduler.OneCycleLR):
+        if isinstance(self.scheduler, torch.optim.lr_scheduler.ReduceLROnPlateau):
+            lr_scheduler = {
+                "scheduler": self.scheduler,
+                "monitor": "val/loss",
+                "interval": "epoch",
+                "frequency": 1,
+            }
+        elif isinstance(self.scheduler, torch.optim.lr_scheduler.OneCycleLR):
             lr_scheduler = {
                 "scheduler": self.scheduler,
                 "interval": "step",
@@ -480,7 +470,7 @@ class SequentialModelX(Classifier):
     def forward(self, x):
         return self._model(x)
 
-# %% ../../nbs/models.core.ipynb 18
+# %% ../../nbs/models.core.ipynb 19
 def lr_finder(
     model: Callable[...,torch.nn.Module], # partial model (missing optim & sched)
     datamodule: ImageDataModule, # data module
@@ -506,7 +496,7 @@ def lr_finder(
         plt.show()
     return lr_finder.suggestion()
 
-# %% ../../nbs/models.core.ipynb 20
+# %% ../../nbs/models.core.ipynb 21
 def train_one_cycle(
     model: Callable[...,torch.nn.Module], #partial model (missing optim & sched)
     datamodule: ImageDataModule,
