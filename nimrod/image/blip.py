@@ -29,7 +29,7 @@ import requests
 from transformers import BlipProcessor, BlipForConditionalGeneration
 
 # %% ../../nbs/image.blip.ipynb 8
-MED_CFG = "../config/data/image/med_config.json"
+MED_CFG = "../config/image/data/med_config.json"
 
 class BLIP_Base(nn.Module):
     def __init__(self,                 
