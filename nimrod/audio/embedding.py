@@ -30,46 +30,51 @@ from transformers import EncodecModel, AutoProcessor
 
 # %% ../../nbs/audio.embeddings.ipynb 8
 class EncoDec():
+    """EnCodec (transformers) wrapper: waveform <-> discrete codes at 24 kHz, 6 kbps (8 codebooks)."""
     def __init__(self, device:str='cpu'):
-        self.model = EncodecModel.encodec_model_24khz()
         self._device = device
-        self.model.to(self._device)
-        self.model.set_target_bandwidth(6.0)
+        self.model = EncodecModel.from_pretrained("facebook/encodec_24khz").to(self._device).eval()
+        self.processor = AutoProcessor.from_pretrained("facebook/encodec_24khz")
+        self.bandwidth = 6.0
+
+    def _encode(self, wav:torch.Tensor, sr:int)->torch.Tensor:
+        # (CxT) or (T) -> (1xDxT_frames)
+        wav = wav.float()
+        if wav.ndim == 1:
+            wav = wav.unsqueeze(0)
+        wav = wav.mean(dim=0) # mono
+        if sr != self.sample_rate:
+            wav = torchaudio.functional.resample(wav, sr, self.sample_rate)
+        inputs = self.processor(raw_audio=wav.cpu().numpy(), sampling_rate=self.sample_rate, return_tensors="pt")
+        with torch.no_grad():
+            encoded = self.model.encode(inputs["input_values"].to(self._device),
+                                        inputs["padding_mask"].to(self._device),
+                                        bandwidth=self.bandwidth)
+        # audio_codes: (nb_chunks, B, D, T_frames); a single chunk without chunk_length
+        return torch.cat(list(encoded.audio_codes), dim=-1)
 
     @dispatch
     def __call__(self, wav:torch.Tensor, sr:int)->torch.Tensor:
-        # (CxT) -> (CxDxT_frames)
-        if sr != self.model.sample_rate:
-            wav = convert_audio(wav, sr, self.model.sample_rate, self.model.channels) # model.sample_rate=24kHz
-        wav = wav.unsqueeze(0)
-        with torch.no_grad():
-            encoded_frames = self.model.encode(wav)
-        codes = torch.cat([encoded[0] for encoded in encoded_frames], dim=-1)
-        return(codes)
-    
+        # (CxT) -> (1xDxT_frames)
+        return self._encode(wav, sr)
+
     @dispatch
     def __call__(self, wav:np.ndarray, sr:int)->torch.Tensor:
-        wav = torch.from_numpy(wav).float().unsqueeze(0)
-        if sr != self.model.sample_rate:
-            wav = convert_audio(wav, sr, self.model.sample_rate, self.model.channels) # model.sample_rate=24kHz
-        # wav = wav.unsqueeze(0)
-        with torch.no_grad():
-            encoded_frames = self.model.encode(wav.to(self._device))
-        codes = torch.cat([encoded[0] for encoded in encoded_frames], dim=-1)
-        return(codes)
+        return self._encode(torch.from_numpy(wav), sr)
 
     def decode(self, codes:torch.Tensor)->torch.Tensor:
-        # (CxDxT_frames) -> (CxT)
-        frames_from_code = [(codes, None)]
-        return(self.model.decode(encoded_frames=frames_from_code))
+        # (BxDxT_frames) -> (Bx1xT)
+        with torch.no_grad():
+            return self.model.decode(codes.to(self._device).unsqueeze(0), [None])[0]
 
     @property
     def sample_rate(self):
-        return self.model.sample_rate
+        return self.processor.sampling_rate
     
     @property
     def device(self):
         return self._device
+
 
 # %% ../../nbs/audio.embeddings.ipynb 14
 # https://lhotse.readthedocs.io/en/v0.6_ba/features.html#creating-custom-feature-extractor
