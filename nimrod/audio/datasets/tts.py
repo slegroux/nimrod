@@ -53,7 +53,6 @@ class TTSDataset(Dataset):
 
 # %% ../../../nbs/audio.datasets.tts.ipynb 12
 from lhotse.recipes import download_libritts, prepare_libritts
-from ...text.tokenizers import Tokenizer
 from ..embedding import EncoDec
 from torchaudio.datasets import LIBRITTS
 from ..utils import plot_waveform
@@ -61,9 +60,9 @@ from ..utils import plot_waveform
 # %% ../../../nbs/audio.datasets.tts.ipynb 15
 class LibriTTSDataModule(LightningDataModule):
     def __init__(self,
-        target_dir="/data/en/libriTTS", # where data will be saved / retrieved
+        target_dir, # where data will be saved / retrieved
+        output_dir, # where to save manifest
         dataset_parts=["dev-clean", "test-clean"], # either full libritts or subset
-        output_dir="/home/syl20/slg/nimrod/recipes/libritts/data", # where to save manifest
         num_jobs=0 # num_jobs depending on number of cpus available
     ):
         super().__init__()
