@@ -50,7 +50,7 @@ You might want to use docker containers for reproductible development
 environment or run your project in the cloud
 
 ``` bash
-make container
+make docker-build
 docker pull slegroux/nimrod
 docker run -it --rm -p 8888:8888 slegroux/nimrod /bin/bash
 ```
