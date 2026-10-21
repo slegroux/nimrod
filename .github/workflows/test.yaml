@@ -43,6 +43,12 @@ jobs:
             git diff --stat
             exit 1
           fi
+          untracked=$(git status --porcelain --untracked-files=all -- nimrod)
+          if [ -n "$untracked" ]; then
+            echo "::error::nbdev_export created modules that aren't committed. Commit the exported .py files."
+            echo "$untracked"
+            exit 1
+          fi
 
       - name: Check for orphan modules
         run: |
