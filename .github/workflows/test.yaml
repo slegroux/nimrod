@@ -74,6 +74,13 @@ jobs:
             exit 1
           fi
 
+      - name: Smoke-train one batch
+        timeout-minutes: 10
+        run: |
+          python train.py experiment=mnist_mlp '~logger.wandb' logger=csv \
+            trainer.fast_dev_run=1 data.data_dir="$RUNNER_TEMP/data" \
+            hydra.run.dir="$RUNNER_TEMP/hydra"
+
       - name: Run tests
         run: |
           # Skip notebooks that can't run in CI:
