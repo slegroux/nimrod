@@ -62,6 +62,18 @@ jobs:
           print("No orphan modules.")
           EOF
 
+      - name: Compose Hydra experiment configs
+        run: |
+          failed=""
+          for f in config/experiment/*.yaml; do
+            name=$(basename "$f" .yaml)
+            python train.py experiment="$name" --cfg job --resolve > /dev/null || failed="$failed $name"
+          done
+          if [ -n "$failed" ]; then
+            echo "::error::Experiment configs failed to compose:$failed"
+            exit 1
+          fi
+
       - name: Run tests
         run: |
           # Skip notebooks that can't run in CI:
