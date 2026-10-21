@@ -21,14 +21,14 @@ sync: ## Merge changes from main branch to your current branch
 	git pull
 	git pull origin main
 
-test: ## Run not slow tests
-	pytest -k "not slow"
+test: ## Run notebook tests (same skip list as CI)
+	nbdev_test --do_print --timing --skip_file_re '^[_.]|image\.med|audio\.datasets\.stt|audio\.utils|audio\.features|models\.aligners'
 
-test-full: ## Run all tests
-	pytest
+test-full: ## Run all notebook tests
+	nbdev_test --do_print --timing
 
 train: ## Train the model
-	python src/train.py
+	python train.py
 
 docker-build:
 	# docker build --network host -t slegroux/nimrod -f ".devcontainer/Dockerfile" . --push
