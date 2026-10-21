@@ -17,6 +17,8 @@ from typing import Any, Callable, List, Optional, Tuple, Union, Iterator, Dict
 # from nimrod.audio.utils import plot_waveform
 
 # %% ../../nbs/audio.features.ipynb 6
+import torch
+
 class MelSpecgram(nn.Module):
     """MelSpecgram
 
