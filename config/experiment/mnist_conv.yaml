@@ -22,7 +22,7 @@ data:
   batch_size: 1024
   num_workers: 0
   pin_memory: true
-  data_dir: ${data_dir}
+  data_dir: ${paths.data_dir}
 
 model:
   nnet:
