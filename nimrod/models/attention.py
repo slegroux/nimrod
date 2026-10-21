@@ -113,7 +113,7 @@ class MultiheadAttention(nn.Module):
         
         super().__init__()
         self.n_heads = n_heads # number of heads
-        self.scale = math.sqrt(n_features)
+        self.scale = math.sqrt(n_features // n_heads)
         self.norm = nn.BatchNorm2d(n_features)
         self.kqv = nn.Linear(n_features, n_features*3)
         self.proj = nn.Linear(n_features, n_features)
