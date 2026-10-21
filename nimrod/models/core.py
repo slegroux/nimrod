@@ -329,6 +329,7 @@ class Regressor(ABC, L.LightningModule):
     
     def on_validation_epoch_end(self) -> None:
         mse = self.val_mse.compute()  # get current val acc
+        self.val_mse.reset()  # per-epoch metric, otherwise best tracks the all-epoch running mean
         self.val_mse_best(mse)  # update best so far val acc
         # log `val_acc_best` as a value through `.compute()` method, instead of as a metric object
         # otherwise metric would be reset by lightning after each epoch
