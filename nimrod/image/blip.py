@@ -29,7 +29,9 @@ import requests
 from transformers import BlipProcessor, BlipForConditionalGeneration
 
 # %% ../../nbs/image.blip.ipynb 8
-MED_CFG = "../config/image/data/med_config.json"
+from importlib.resources import files
+
+MED_CFG = str(files("nimrod.image") / "med_config.json")
 
 class BLIP_Base(nn.Module):
     def __init__(self,                 
