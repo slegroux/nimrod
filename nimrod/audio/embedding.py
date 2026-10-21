@@ -30,7 +30,7 @@ from transformers import EncodecModel, AutoProcessor
 
 # %% ../../nbs/audio.embeddings.ipynb 8
 class EncoDec():
-    """EnCodec (transformers) wrapper: waveform <-> discrete codes at 24 kHz, 6 kbps (8 codebooks)."""
+    """EnCodec (transformers) wrapper: waveform <-> discrete codes at 24 kHz, 6 kbps (8 codebooks). `decode` assumes chunk_length=None (24 kHz model only)."""
     def __init__(self, device:str='cpu'):
         self._device = device
         self.model = EncodecModel.from_pretrained("facebook/encodec_24khz").to(self._device).eval()

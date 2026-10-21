@@ -13,6 +13,7 @@ from matplotlib import pyplot as plt
 from lhotse import CutSet, RecordingSet, SupervisionSet, Fbank, FbankConfig
 from lhotse.dataset import BucketingSampler, OnTheFlyFeatures
 from lhotse.dataset.collation import TokenCollater
+from .stt import UnkTokenCollater
 from lhotse.dataset.vis import plot_batch
 from lhotse.recipes import download_librispeech, prepare_librispeech
 
@@ -83,7 +84,7 @@ class LibriTTSDataModule(LightningDataModule):
                 self.cuts_train = CutSet.from_manifests(**self.libri["dev-clean"])
         # token -> id mapping is always built from train cuts, once, and reused for test
         if getattr(self, "tokenizer", None) is None:
-            self.tokenizer = TokenCollater(self.cuts_train)
+            self.tokenizer = UnkTokenCollater(self.cuts_train)
         self.tokenizer(self.cuts_test.subset(first=2))
 
     def train_dataloader(self):
