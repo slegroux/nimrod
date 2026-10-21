@@ -35,6 +35,15 @@ jobs:
         run: |
           nbdev_export
 
+      - name: Check notebooks and exported modules are in sync
+        run: |
+          if ! git diff --exit-code; then
+            echo "::error::nbdev_clean/nbdev_export changed tracked files. Run nbdev_clean && nbdev_export locally and commit the result."
+            git status --short
+            git diff --stat
+            exit 1
+          fi
+
       - name: Run tests
         run: |
           # Skip notebooks that can't run in CI:
