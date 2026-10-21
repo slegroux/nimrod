@@ -386,6 +386,7 @@ class ImageDataModule(ImagePlotMixin, DataModule):
         num_workers: int = 0, # num_workers equal 0 means that it’s the main process that will do the data loading when needed, num_workers equal 1 is the same as any n, but you’ll only have a single worker, so it might be slow
         pin_memory: bool = False, # If you load your samples in the Dataset on CPU and would like to push it during training to the GPU, you can speed up the host to device transfer by enabling pin_memory. This lets your DataLoader allocate the samples in page-locked memory, which speeds-up the transfer
         persistent_workers: bool = False, # persist
+        seed: int = 42, # seed for the train/val split
         **kwargs
         ):
 
@@ -415,7 +416,7 @@ class ImageDataModule(ImagePlotMixin, DataModule):
     def dim(self)->List[int]:
         if self.train_ds:
             return list(self.train_ds[0][0].shape[-2:])
-        raise RuntimeError("train_ds is not initialized. Call prepare_data() first.")
+        raise RuntimeError("train_ds is not initialized. Call setup() first.")
 
     @property
     def name(self)->str:
@@ -425,94 +426,65 @@ class ImageDataModule(ImagePlotMixin, DataModule):
     def num_classes(self) -> int: # num of classes in dataset
         if self._num_classes is not None:
             return self._num_classes
-        raise RuntimeError("train_ds is not initialized. Call prepare_data() first.")
+        raise RuntimeError("train_ds is not initialized. Call setup() first.")
     
     @property
     def label_names(self) -> List[str]:  # Add this property
         if self.train_ds is not None:
             return self._label_names
-        raise RuntimeError("train_ds is not initialized. Call prepare_data() first.")
+        raise RuntimeError("train_ds is not initialized. Call setup() first.")
 
-    def prepare_data(self) -> None:
-        """Download data if needed 
-        """
-        # train set
-        self.train_ds = ImageDataset(
+    def _make_ds(self, split: str) -> ImageDataset:
+        return ImageDataset(
             self.hparams.name,
             *self.args,
             data_dir = self.hparams.data_dir,
-            split='train',
+            split=split,
             transforms = self.hparams.transforms,
             **self.kwargs
         )
-        # get num classes before setup method converst ImageDataset to Subset
-        self._num_classes = self.train_ds.num_classes
-        self._label_names = self.train_ds.label_names
-        # save class names before splitting test/valid and losing property
-        self.int2str = self.train_ds.int2str
-        # test set
-        splits = self.train_ds.splits
-        # test is test split from hugging face else use validation for test and split test into test/val
-        if 'test' in splits:
-            self.test_ds = ImageDataset(
-                self.hparams.name,
-                *self.args,
-                data_dir = self.hparams.data_dir,
-                split='test',
-                transforms = self.hparams.transforms,
-                **self.kwargs
-            )
-            if 'validation' in splits:
-                self.val_ds = ImageDataset(
-                    self.hparams.name,
-                    *self.args,
-                    data_dir = self.hparams.data_dir,
-                    split='validation',
-                    transforms = self.hparams.transforms,
-                    **self.kwargs
-                )
-            else:
-                self._val_ds = None # self.setup() will create validation from train set
 
-        elif 'test' not in splits:
-            if 'validation' in splits:
-                # make existing val set the actual test set and split training into train/val
-                self.test_ds = ImageDataset(
-                    self.hparams.name,
-                    *self.args,
-                    data_dir = self.hparams.data_dir,
-                    split='validation',
-                    transforms = self.hparams.transforms,
-                    **self.kwargs
-                )
-                self.val_ds = None
-            else:
-                self.setup(stage='split_train_data')
-                logger.info(f"split train into train/val {self.hparams.train_val_split}")
+    def _split_train_val(self) -> None:
+        # seeded so every rank (and every run) gets the same train/val partition
+        lengths = [round(split * len(self.train_ds)) for split in self.hparams.train_val_split]
+        self.train_ds, self.val_ds = random_split(
+            dataset=self.train_ds,
+            lengths=lengths,
+            generator=torch.Generator().manual_seed(self.hparams.seed)
+        )
+        logger.info(f"split train into train/val {self.hparams.train_val_split}")
+
+    def prepare_data(self) -> None:
+        """Download/cache data only (runs on local rank 0). Do not assign state here."""
+        train = self._make_ds('train')
+        for split in ('test', 'validation'):
+            if split in train.splits:
+                self._make_ds(split)
 
     def setup(self, stage: Optional[str] = None) -> None:
-        # called on every GPU when distrib
-        # stage: {fit,validate,test,predict}\n",
-        # concat train & test mnist dataset and randomly generate train, eval, test sets
-        if stage == 'split_train_data':
-            # TODO have separate test. here tes is a copy of val. fix later...
-            logger.warning(f"split train into train/val/test with val==test {self.hparams.train_val_split} ")
-            lengths = [round(split * len(self.train_ds)) for split in self.hparams.train_val_split]
-            self.train_ds, self.val_ds = random_split(dataset=self.train_ds, lengths=lengths)
-            self.test_ds = self.val_ds
-            logger.info(f"train: {len(self.train_ds)} val: {len(self.val_ds)}, test: {len(self.test_ds)}")
-
-
-        if not self.train_ds:
-            raise RuntimeError("prepare_data() must be called before accessing the train dataset.")
-        # if not self.test_ds:
-        #     raise RuntimeError("prepare_data() must be called before accessing the test dataset.")
-        if not self.val_ds:
-            # dataset = ConcatDataset(datasets=[trainset, testset])
-            logger.info(f"split train into train/val {self.hparams.train_val_split}")
-            lengths = [round(split * len(self.train_ds)) for split in self.hparams.train_val_split]
-            self.train_ds, self.val_ds = random_split(dataset=self.train_ds, lengths=lengths)
-            logger.info(f"train: {len(self.train_ds)} val: {len(self.val_ds)}, test: {len(self.test_ds)}")
+        # called on every process when distributed: build datasets here
+        if self.train_ds is not None:
+            return
+        train_ds = self._make_ds('train')
+        # keep metadata before splitting turns train_ds into a Subset
+        self._num_classes = train_ds.num_classes
+        self._label_names = train_ds.label_names
+        self.int2str = train_ds.int2str
+        splits = train_ds.splits
+        self.train_ds = train_ds
+        if 'test' in splits:
+            self.test_ds = self._make_ds('test')
+            if 'validation' in splits:
+                self.val_ds = self._make_ds('validation')
+        elif 'validation' in splits:
+            # existing val set becomes the test set; train is split into train/val
+            self.test_ds = self._make_ds('validation')
+        if self.val_ds is None:
+            self._split_train_val()
+            if self.test_ds is None:
+                logger.warning("no test split: using val as test")
+                self.test_ds = self.val_ds
+        logger.info(f"train: {len(self.train_ds)} val: {len(self.val_ds)}, test: {len(self.test_ds)}")
 
     def show(self, idx):
       self.plot(self.train_ds, idx, self.int2str)
@@ -615,35 +587,44 @@ class ImageSuperResDataModule(ImageDataModule):
         self._num_classes = None
         self.int2str = None
 
-    def prepare_data(self) -> None:
-        ds = partial(
-            ImageSuperResDataset,
+    def _make_ds(self, split: str) -> ImageSuperResDataset:
+        return ImageSuperResDataset(
             name=self.hparams.name,
             data_dir=self.hparams.data_dir,
             transform_x=self.hparams.transform_x,
             transform_y=self.hparams.transform_y,
-            revision=self.hparams.revision
+            revision=self.hparams.revision,
+            split=split
             )
-        try:
-            self.train_ds = ds(split='train')
-        except:
-            logger.warning("No training split. abort")
 
-        splits = self.train_ds.splits 
-        #TODO: figure out all cases and split training set when necessary
-        if 'test' in splits and 'validation' in splits:
-            self.test_ds = ds(split='test')
-            self.val_ds = ds(split='validation')
-        if 'test' in splits and 'validation' not in splits:
-            self.test_ds = ds(split='test')
-            self.val_ds = ds(split='test')
-            logging.warning("same dataset for validation and test")
-        if 'test' not in splits and 'validation' in splits:
-            self.test_ds = ds(split='validation')
-            self.val_ds = ds(split='validation')
-            logging.warning("same dataset for validation and test")
+    def prepare_data(self) -> None:
+        """Download/cache data only (runs on local rank 0). Do not assign state here."""
+        train = self._make_ds('train')
+        for split in ('test', 'validation'):
+            if split in train.splits:
+                self._make_ds(split)
 
-    
+    def setup(self, stage: Optional[str] = None) -> None:
+        if self.train_ds is not None:
+            return
+        self.train_ds = self._make_ds('train')
+        splits = self.train_ds.splits
+        if 'test' in splits:
+            self.test_ds = self._make_ds('test')
+        if 'validation' in splits:
+            self.val_ds = self._make_ds('validation')
+        # no explicit test/val: reuse the other, else split train
+        if self.val_ds is None and self.test_ds is not None:
+            self.val_ds = self.test_ds
+            logger.warning("same dataset for validation and test")
+        elif self.test_ds is None and self.val_ds is not None:
+            self.test_ds = self.val_ds
+            logger.warning("same dataset for validation and test")
+        elif self.val_ds is None:
+            self._split_train_val()
+            self.test_ds = self.val_ds
+            logger.warning("no test/validation split: split train, val used as test")
+
     def show(self, idx:int):
         x, y = self.train_ds[idx]
         fig, ax = plt.subplots(1,2, figsize=(10,5))
