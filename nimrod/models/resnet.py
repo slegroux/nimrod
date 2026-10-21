@@ -106,6 +106,7 @@ class ResNet(nn.Module):
         if weight_initialization:
             logger.info("Init conv & linear with kaiming")
             if isinstance(activation, partial):
+                wi = weight_init
                 if activation.func == nn.LeakyReLU:
                     logger.info("LeakyRelu layers weight init")
                     wi = partial(weight_init, leaky=activation.keywords.get('negative_slope'))
