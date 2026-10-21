@@ -77,14 +77,14 @@ class LibriTTSDataModule(LightningDataModule):
         if stage == 'fit' or stage == None:
             self.cuts_train = CutSet.from_manifests(**self.libri["dev-clean"])
             self.cuts_test = CutSet.from_manifests(**self.libri["test-clean"])
-            self.tokenizer = TokenCollater(self.cuts_train)
-            self.tokenizer(self.cuts_test.subset(first=2))
-            # self.tokenizer.inverse(*self.tokenizer(self.cuts_test.subset(first=2)))
         if stage == "test":
             self.cuts_test = CutSet.from_manifests(**self.libri["test-clean"])
-            self.tokenizer = TokenCollater(self.cuts_test)
-            self.tokenizer(self.cuts_test.subset(first=2))
-            # self.tokenizer.inverse(*self.tokenizer(self.cuts_test.subset(first=2)))
+            if getattr(self, "cuts_train", None) is None:
+                self.cuts_train = CutSet.from_manifests(**self.libri["dev-clean"])
+        # token -> id mapping is always built from train cuts, once, and reused for test
+        if getattr(self, "tokenizer", None) is None:
+            self.tokenizer = TokenCollater(self.cuts_train)
+        self.tokenizer(self.cuts_test.subset(first=2))
 
     def train_dataloader(self):
         train_sampler = BucketingSampler(self.cuts_train, max_duration=300, shuffle=True) #, bucket_method="equal_duration")
