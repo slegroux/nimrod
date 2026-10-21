@@ -115,7 +115,7 @@ class TinyUnet(nn.Module):
         n = len(layers)
         for i, layer in enumerate(self.decoder):
             if i != 0:
-                x += layers[n-i]
+                x = x + layers[n-i]
             x = layer(x)
         return self.end(x+layers[0])
         
