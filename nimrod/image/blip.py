@@ -5,9 +5,6 @@ __all__ = ['MED_CFG', 'BLIP_Base', 'BLIP_Decoder', 'blip_decoder', 'blip_feature
            'is_url', 'load_checkpoint']
 
 # %% ../../nbs/image.blip.ipynb 6
-import warnings
-warnings.filterwarnings("ignore")
-
 from ..utils import get_device
 from .vit import VisionTransformer, interpolate_pos_embed
 from .med import BertConfig, BertModel, BertLMHeadModel
@@ -163,7 +160,7 @@ class BLIP_Decoder(nn.Module):
                                                   num_return_sequences=1,
                                                   eos_token_id=self.tokenizer.sep_token_id,
                                                   pad_token_id=self.tokenizer.pad_token_id, 
-                                                  repetition_penalty=1.1,                                            
+                                                  repetition_penalty=repetition_penalty,                                            
                                                   **model_kwargs)
         else:
             #beam search
@@ -215,13 +212,13 @@ def create_vit(vit, image_size, use_grad_checkpointing=False, ckpt_layer=0, drop
         vision_width = 768
         visual_encoder = VisionTransformer(img_size=image_size, patch_size=16, embed_dim=vision_width, depth=12, 
                                            num_heads=12, use_grad_checkpointing=use_grad_checkpointing, ckpt_layer=ckpt_layer,
-                                           drop_path_rate=0 or drop_path_rate
+                                           drop_path_rate=drop_path_rate
                                           )   
     elif vit=='large':
         vision_width = 1024
         visual_encoder = VisionTransformer(img_size=image_size, patch_size=16, embed_dim=vision_width, depth=24, 
                                            num_heads=16, use_grad_checkpointing=use_grad_checkpointing, ckpt_layer=ckpt_layer,
-                                           drop_path_rate=0.1 or drop_path_rate
+                                           drop_path_rate=drop_path_rate or 0.1
                                           )   
     return visual_encoder, vision_width
 
@@ -232,9 +229,9 @@ def is_url(url_or_filename):
 def load_checkpoint(model,url_or_filename):
     if is_url(url_or_filename):
         cached_file = download_cached_file(url_or_filename, check_hash=False, progress=True)
-        checkpoint = torch.load(cached_file, map_location='cpu') 
+        checkpoint = torch.load(cached_file, map_location='cpu', weights_only=True) 
     elif os.path.isfile(url_or_filename):        
-        checkpoint = torch.load(url_or_filename, map_location='cpu') 
+        checkpoint = torch.load(url_or_filename, map_location='cpu', weights_only=True) 
     else:
         raise RuntimeError('checkpoint url or path is invalid')
         
