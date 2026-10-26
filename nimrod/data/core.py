@@ -136,7 +136,7 @@ class DataModule(ABC, L.LightningDataModule):
         return subsets
 
 # %% ../../nbs/data.core.ipynb 5
-def split_train_valid_test(dataset:Dataset, splits:List[float]):
+def split_train_valid_test(dataset:Dataset, splits:List[float], seed:int=42):
     lengths = [int(split * len(dataset)) for split in splits]
     # if rounding ends up getting rid of some datapoints and total length != length dataset
     remain = len(dataset) - sum(lengths)
@@ -144,6 +144,6 @@ def split_train_valid_test(dataset:Dataset, splits:List[float]):
     split_datasets = random_split(
                 dataset=dataset,
                 lengths=lengths,
-                # generator=torch.Generator().manual_seed(42),
+                generator=torch.Generator().manual_seed(seed),
             )
     return split_datasets

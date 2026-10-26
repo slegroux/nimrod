@@ -42,6 +42,7 @@ import os
 from pathlib import Path
 import requests
 import re
+import hashlib
 
 # nimrod
 # from nimrod.models.lm import Vocab
@@ -80,12 +81,18 @@ class Vocab:
     
     def _download_data(self):
         logger.info(f"Vocab: download data from url")
-        url = "https://raw.githubusercontent.com/karpathy/char-rnn/master/data/tinyshakespeare/input.txt"
-        response = requests.get(url)
+        # pinned upstream commit + sha256 (same as scripts/download_data.sh)
+        url = "https://raw.githubusercontent.com/karpathy/char-rnn/6f9487a6fe5b420b7ca9afb0d7c078e37c1d1b4e/data/tinyshakespeare/input.txt"
+        sha256 = "86c4e6aa9db7c042ec79f339dcb96d42b0075e16b8fc2e86bf0ca57e2dc565ed"
+        response = requests.get(url, timeout=60)
         response.raise_for_status()
-        
-        with open(self.data_path, 'w') as f:
-            f.write(response.text)
+        digest = hashlib.sha256(response.content).hexdigest()
+        if digest != sha256:
+            raise ValueError(f"Vocab: sha256 mismatch for {url}: {digest} != {sha256}")
+
+        self.data_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(self.data_path, 'wb') as f:
+            f.write(response.content)
 
     @dispatch
     def stoi(self, token:str)->int:
@@ -146,7 +153,7 @@ class CharDataset(Dataset):
                 ):
         logger.info("CharDataset: init")
         
-        # vocab will download data if not found
+        # data is downloaded by CharDataModule.prepare_data; Vocab still fetches it if used standalone
         self.v = Vocab(data_path=data_path, specials=specials)
         self._vocab_size = len(self.v)
         self.context_length = context_length
@@ -167,7 +174,8 @@ class CharDataset(Dataset):
         self.data = torch.tensor(self.v.stoi(tokens), dtype=torch.long)
 
     def __len__(self) -> int:
-        return len(self.data)
+        # number of full (context, target) windows: no wrap-around
+        return max(len(self.data) - self.context_length, 0)
 
     def _tokenizer(self, text: str) -> List[str]:
         parts = self.special_token_pattern.split(text)
@@ -192,11 +200,10 @@ class CharDataset(Dataset):
         return self.v
 
     def __getitem__(self, i: int) -> Tuple[torch.Tensor, torch.Tensor]:
-        # i = random.randint(0, len(self.data) - (self.context_length + 1))
-        max_index = len(self.data) - (self.context_length + 1)
-        if i > max_index:
-            # wrap around to the beginning if we hit the end
-            i = i % (max_index + 1)
+        if i < 0:
+            i += len(self)
+        if not 0 <= i < len(self):
+            raise IndexError(f"index {i} out of range for dataset of length {len(self)}")
         chunk = self.data[i : i + self.context_length + 1]
         x = chunk[:-1]
         y = chunk[1:]
@@ -222,7 +229,8 @@ class CharDataModule(DataModule, LightningDataModule):
             num_workers: int = 1,
             pin_memory: bool = False,
             persistent_workers: bool = False,
-            random_split: bool = True
+            random_split: bool = False,
+            seed: int = 42, # seed for the random split
             ):
 
         logger.info("CharDataModule: init")
@@ -237,7 +245,9 @@ class CharDataModule(DataModule, LightningDataModule):
         self.ds: CharDataset = None
     
     def prepare_data(self) -> None:
-        pass
+        # download once (rank 0) so that setup() only reads
+        if not Path(self.hparams.data_path).exists():
+            Vocab(data_path=self.hparams.data_path)
 
     
     def setup(self, stage: Optional[str] = None) -> None:
@@ -252,7 +262,8 @@ class CharDataModule(DataModule, LightningDataModule):
         if self.hparams.random_split:
             lengths = [int(p * len(self.ds)) for p in self.hparams.train_val_test_split]
             lengths[-1] = len(self.ds) - sum(lengths[:-1])
-            self.train_ds, self.val_ds, self.test_ds = random_split(self.ds, lengths)
+            self.train_ds, self.val_ds, self.test_ds = random_split(
+                self.ds, lengths, generator=torch.Generator().manual_seed(self.hparams.seed))
             logger.info(f"CharDataModule: train: {len(self.train_ds)} val: {len(self.val_ds)}, test: {len(self.test_ds)}")
         else:
             self.train_ds, self.val_ds, self.test_ds = self._sequential_split(self.ds, self.hparams.train_val_test_split)
