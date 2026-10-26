@@ -90,11 +90,10 @@ jobs:
       - name: Run tests
         run: |
           # Skip notebooks that can't run in CI:
-          #   image.med          - vendored BLIP uses transformers internals removed upstream
           #   audio.datasets.stt - needs a LibriSpeech manifest that isn't in the repo
           #   audio.utils/features, models.aligners - decode audio via torchaudio.load,
           #     which on torch 2.9 needs torchcodec + a matching ffmpeg (CI doesn't ship it;
           #     the library code itself imports fine and is unaffected).
           # (default ^[_.] preserved so _*/.* notebooks stay skipped.)
           nbdev_test --do_print --timing \
-            --skip_file_re '^[_.]|image\.med|audio\.datasets\.stt|audio\.utils|audio\.features|models\.aligners'
+            --skip_file_re '^[_.]|audio\.datasets\.stt|audio\.utils|audio\.features|models\.aligners'
