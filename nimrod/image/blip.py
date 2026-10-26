@@ -22,7 +22,7 @@ from torchvision.transforms.functional import InterpolationMode
 
 import os
 from urllib.parse import urlparse
-from timm.models.hub import download_cached_file
+from timm.models._hub import download_cached_file
 
 from PIL import Image
 import requests
