@@ -18,7 +18,7 @@ jobs:
           python -m pip install --upgrade pip
           # nbdev toolchain (pinned) + torch stack + deps all come from .[dev];
           # CPU torch index keeps the runner from pulling CUDA wheels.
-          pip install -e ".[dev]" --extra-index-url https://download.pytorch.org/whl/cpu
+          pip install -e ".[dev,all]" --extra-index-url https://download.pytorch.org/whl/cpu
 
       - name: Diagnostic Information
         run: |
