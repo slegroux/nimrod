@@ -61,7 +61,7 @@ class Classifier(ABC, L.LightningModule):
 
         logger.info("Classifier: init")
         super().__init__()
-        self.save_hyperparameters(ignore=['nnet'])
+        self.save_hyperparameters(ignore=['nnet', 'noise_scheduler'])
 
         self.nnet = nnet
         self.register_module('nnet', self.nnet)
@@ -163,7 +163,7 @@ class Classifier(ABC, L.LightningModule):
         # automatic optimization: Lightning runs zero_grad/backward/step and steps the
         # scheduler per the `interval`/`monitor` returned by configure_optimizers
         loss, preds, y = self._step(batch, batch_idx)
-        self.train_loss(loss)
+        self.train_loss(loss, weight=y.shape[0])
         self.train_acc(preds, y)
         metrics = {"train/loss": self.train_loss, "train/acc": self.train_acc}
         self.log_dict(metrics, on_epoch=True, on_step=True, prog_bar=True)
@@ -175,7 +175,7 @@ class Classifier(ABC, L.LightningModule):
 
     def validation_step(self, batch, batch_idx, prog_bar=True, on_step=False, on_epoch=True, sync_dist=True):
         loss, preds, y = self._step(batch, batch_idx)
-        self.val_loss(loss)
+        self.val_loss(loss, weight=y.shape[0]) # weight by batch size so the epoch mean is per-sample
         self.val_acc(preds, y)
         metrics = {"val/loss":self.val_loss, "val/acc": self.val_acc}
         self.log_dict(metrics, on_step=on_step, prog_bar=prog_bar, on_epoch=on_epoch, sync_dist=sync_dist)
@@ -191,7 +191,7 @@ class Classifier(ABC, L.LightningModule):
 
     def test_step(self, batch, batch_idx, prog_bar=True, on_step=False, on_epoch=True, sync_dist=True):
         loss, preds, y = self._step(batch, batch_idx)
-        self.test_loss(loss)
+        self.test_loss(loss, weight=y.shape[0])
         self.test_acc(preds, y)
         metrics = {"test/loss":self.test_loss, "test/acc": self.test_acc}
         self.log_dict(metrics, on_step=on_step, prog_bar=prog_bar, on_epoch=on_epoch, sync_dist=sync_dist)
@@ -240,7 +240,7 @@ class Regressor(ABC, L.LightningModule):
     ):
         logger.info("Regressor: init")
         super().__init__()
-        self.save_hyperparameters(ignore=['nnet'])
+        self.save_hyperparameters(ignore=['nnet', 'noise_scheduler'])
         self.lr = optimizer.keywords.get('lr') if optimizer else None # for lr finder
         self.nnet = nnet
         # explicitely register nnet as a  module to track its parameters

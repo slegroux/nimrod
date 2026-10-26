@@ -67,8 +67,8 @@ class DiffusorX(Regressor):
         B, C, H, W = x.shape
         # linspace?
         # t = torch.linspace(0, self.noise_scheduler.config.num_train_timesteps -1, (B,)).long() # dim (B)
-        t = torch.randint(0, self.noise_scheduler.config.num_train_timesteps, (B,)).to(self.device) # dim (B))
-        noise =  torch.randn(x.shape).to(self.device) # B,C,H,W
+        t = torch.randint(0, self.noise_scheduler.config.num_train_timesteps, (B,), device=x.device) # dim (B))
+        noise = torch.randn_like(x) # B,C,H,W
         # self.noise_scheduler = self.noise_scheduler.to(self.device)
         noisy_img = self.noise_scheduler.add_noise(x, noise, t) # 
         noise_pred = self.forward(noisy_img, t)
