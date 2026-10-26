@@ -7,7 +7,7 @@ __all__ = ['Phonemizer']
 import platform
 import os
 if platform.system() == 'Darwin':
-    os.environ['PHONEMIZER_ESPEAK_LIBRARY'] = "/opt/homebrew/Cellar/espeak/1.48.04_1/lib/libespeak.dylib"
+    os.environ.setdefault('PHONEMIZER_ESPEAK_LIBRARY', "/opt/homebrew/Cellar/espeak/1.48.04_1/lib/libespeak.dylib")
 
 from dotenv import load_dotenv
 load_dotenv()

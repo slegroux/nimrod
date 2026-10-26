@@ -66,6 +66,8 @@ class LibriSpeechDataModule(LightningDataModule):
 
     def prepare_data(self,) -> None:
         download_librispeech(target_dir=self.hparams.target_dir, dataset_parts=self.hparams.dataset_parts)
+        # write manifests once here; setup() re-reads them from output_dir (lhotse skips parts already prepared)
+        prepare_librispeech(Path(self.hparams.target_dir) / "LibriSpeech", dataset_parts=self.hparams.dataset_parts, output_dir=self.hparams.output_dir, num_jobs=self.hparams.num_jobs)
 
     def setup(self, stage = None):
         self.libri = prepare_librispeech(Path(self.hparams.target_dir) / "LibriSpeech", dataset_parts=self.hparams.dataset_parts, output_dir=self.hparams.output_dir, num_jobs=self.hparams.num_jobs)

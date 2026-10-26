@@ -44,7 +44,7 @@ class PhonemeCollater(TokenCollater):
             eos_symbol=eos_symbol,
             unk_symbol=unk_symbol
             )
-        tokens = {char for cut in cuts for char in cut.custom['phonemes']}
+        tokens = {tok for cut in cuts for tok in cut.custom['phonemes']}
         tokens_unique = (
             [pad_symbol, unk_symbol]
             + ([bos_symbol] if add_bos else [])
@@ -56,8 +56,9 @@ class PhonemeCollater(TokenCollater):
         self.idx2token = [token for token in tokens_unique]
     
     def __call__(self, cuts: CutSet) -> Tuple[torch.Tensor, torch.Tensor]:
-        token_sequences = [" ".join(cut.custom['phonemes']) for cut in cuts]
-        max_len = len(max(token_sequences, key=len))
+        # list(...) tokenises both a phoneme string and a list of phonemes, without inserting separators
+        token_sequences = [list(cut.custom['phonemes']) for cut in cuts]
+        max_len = max(len(seq) for seq in token_sequences)
         seqs = [
             ([self.bos_symbol] if self.add_bos else [])
             + list(seq)
@@ -68,7 +69,7 @@ class PhonemeCollater(TokenCollater):
 
         tokens_batch = torch.from_numpy(
             np.array(
-                [[self.token2idx[token] for token in seq] for seq in seqs],
+                [[self.token2idx.get(token, self.token2idx[self.unk_symbol]) for token in seq] for seq in seqs],
                 dtype=np.int64,
             )
         )
