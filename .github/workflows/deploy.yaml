@@ -15,6 +15,8 @@ jobs:
       # Pin Python 3.10: nbdev_docs re-executes notebooks, and that execution is
       # broken on Python 3.11+ here (a dependency interaction raises "argument of
       # type 'function' is not iterable"). 3.10 matches the green CI environment.
+      # fastgit<0.1 is pinned in settings.ini dev_requirements: newer releases need
+      # fastcore>=1.12, which nbdev 2.3.x (fastcore==1.5.29) cannot use.
       - uses: fastai/workflows/quarto-ghp@master
         with:
           version: '3.10'
