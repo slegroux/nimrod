@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from nimrod.models.lm import NNLM_L
+from nimrod.models.lm import NNLM_X
 from omegaconf import OmegaConf
 from hydra.utils import instantiate 
 import torch
@@ -20,16 +20,10 @@ def main():
     ckpt = "epoch=020-val_loss=1.74.ckpt"
     PATH = os.path.join("logs", "runs", run_id, "checkpoints", ckpt)
     
-    lm = NNLM_L.load_from_checkpoint(PATH)
+    # nnet is not stored in the checkpoint hparams: pass the instantiated one
+    lm = NNLM_X.load_from_checkpoint(PATH, nnet=lm.nnet)
     lm.to("cpu")
-    sequences = lm.sample(
-        n_iterations=20,
-        bos=dm.v.stoi('<bos>'),
-        eos=dm.v.stoi('<eos>'),
-        pad=dm.v.stoi('<pad>')
-        )
-    for seq in sequences:
-        print(''.join(dm.v.itos(i) for i in seq))
+    print(lm.sample("the ", dm.v, max_new_tokens=100))
 
 
 if __name__ == "__main__":
