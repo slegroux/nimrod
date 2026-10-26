@@ -94,12 +94,11 @@ class DataModule(ABC, L.LightningDataModule):
 
     def state_dict(self):
         """Extra things to save to checkpoint."""
-        # return {}
-        return NotImplemented
+        return {}
 
     def load_state_dict(self, state_dict: Dict[str, Any]):
         """Things to do when loading checkpoint."""
-        return NotImplemented
+        return None
 
     def _sequential_split(self, dataset: Dataset, split_ratios: Sequence[float]) -> List[Subset]:
         """Split a dataset into train, validation and test sets sequentially (not randomly).

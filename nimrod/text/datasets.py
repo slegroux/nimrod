@@ -223,7 +223,7 @@ class CharDataModule(DataModule, LightningDataModule):
             specials=['<pad>', '<unk>', '<bos>', '<eos>'],
             add_sentence_tokens: bool = False,
             # data module
-            train_val_test_split: Tuple[int, int, int] = (0.8, 0.1, 0.1),
+            train_val_test_split: Tuple[float, float, float] = (0.8, 0.1, 0.1),
             context_size: int = 3,
             batch_size: int = 32,
             num_workers: int = 1,
