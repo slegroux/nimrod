@@ -17,7 +17,10 @@ micromamba activate nimrod
 # 2. install the library + its Python deps (editable)
 pip install -e .
 
-# 3. verify
+# 3. (optional) dev tooling: nbdev toolchain, pytest, jupyterlab, pre-commit
+pip install -e ".[dev]"
+
+# 4. verify
 python -c "import nimrod, torch, lightning, torchvision; print('torch', torch.__version__)"
 ```
 
