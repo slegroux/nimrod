@@ -24,7 +24,7 @@ import pprint
 from omegaconf import OmegaConf
 from hydra.utils import instantiate
 
-from typing import List
+from typing import List, Optional, Callable, Any
 from dataclasses import dataclass, asdict
 
 from ..text.datasets import CharDataset, Vocab
@@ -100,13 +100,13 @@ def perplexity(
     ce = F.cross_entropy(logits, targets, ignore_index=ignore_index)
     return torch.exp(ce)
 
-class NNLM_X(Classifier, LightningModule):
+class NNLM_X(Classifier):
     def __init__(
             self,
             nnet: NNLM,
             num_classes:int,
             optimizer: torch.optim.Optimizer,
-            scheduler: torch.optim.lr_scheduler,
+            scheduler: Optional[Callable[...,Any]]=None,
             ):
 
         logger.info("NNLM_X: Init")
@@ -118,7 +118,7 @@ class NNLM_X(Classifier, LightningModule):
             )
         self.save_hyperparameters(logger=False, ignore=['nnet'])
         # required attribute for lr finder
-        self.lr = optimizer.keywords['lr']
+        self.lr = optimizer.keywords.get('lr')
         self.nnet = nnet
 
     def forward(self, x:torch.Tensor)->torch.Tensor:
