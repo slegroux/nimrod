@@ -168,19 +168,21 @@ class GPTLanguageModel(nn.Module):
     def generate(self, ids, max_new_tokens):
         was_training = self.training
         self.eval()
-        # ids is (B, T) arr #ids is token ID say of indices in the current context
-        for _ in range(max_new_tokens):
-            # crop ids to the last block_size tokens
-            ids_cond = ids[:, -self.block_size:]
-            # get the predictions
-            logits, loss = self(ids_cond)
-            # focus only on the last time step
-            logits = logits[:, -1, :] # becomes (B, C)
-            # apply softmax to get probabilities
-            probs = F.softmax(logits, dim=-1) # (B, C)
-            # sample from the distribution
-            ids_next = torch.multinomial(probs, num_samples=1) # (B, 1)
-            # append sampled index to the running sequence
-            ids = torch.cat((ids, ids_next), dim=1) # (B, T+1)
-        self.train(was_training)
+        try:
+            # ids is (B, T) arr #ids is token ID say of indices in the current context
+            for _ in range(max_new_tokens):
+                # crop ids to the last block_size tokens
+                ids_cond = ids[:, -self.block_size:]
+                # get the predictions
+                logits, loss = self(ids_cond)
+                # focus only on the last time step
+                logits = logits[:, -1, :] # becomes (B, C)
+                # apply softmax to get probabilities
+                probs = F.softmax(logits, dim=-1) # (B, C)
+                # sample from the distribution
+                ids_next = torch.multinomial(probs, num_samples=1) # (B, 1)
+                # append sampled index to the running sequence
+                ids = torch.cat((ids, ids_next), dim=1) # (B, T+1)
+        finally:
+            self.train(was_training)
         return ids #ids is token IDs

@@ -310,7 +310,7 @@ class Regressor(ABC, L.LightningModule):
 
     def training_step(self, batch, batch_idx):
         loss, y_hat, y = self._step(batch, batch_idx)
-        self.train_loss(loss)
+        self.train_loss(loss, weight=y.shape[0])
         self.train_mse(y_hat, y)
         # self.log("train/mse", self.train_mse, on_epoch=True, on_step=True, prog_bar=True)
         self.log("train/loss", self.train_loss, on_epoch=True, on_step=True, prog_bar=True)
@@ -321,7 +321,7 @@ class Regressor(ABC, L.LightningModule):
 
     def validation_step(self, batch, batch_idx):
         loss, y_hat, y = self._step(batch, batch_idx)
-        self.val_loss(loss)
+        self.val_loss(loss, weight=y.shape[0])
         self.val_mse(y_hat, y)
         # self.log("val/mse", self.val_mse, on_epoch=True, on_step=True, prog_bar=True)
         self.log("val/loss", self.val_loss, on_epoch=True, on_step=False, prog_bar=True, sync_dist=True)
@@ -337,7 +337,7 @@ class Regressor(ABC, L.LightningModule):
 
     def test_step(self, batch, batch_idx):
         loss, y_hat, y = self._step(batch, batch_idx)
-        self.test_loss(loss)
+        self.test_loss(loss, weight=y.shape[0])
         self.test_mse(y_hat, y)
     
         # self.log("test/mse", self.test_mse, on_epoch=True, on_step=True, prog_bar=True)

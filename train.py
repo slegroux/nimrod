@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
+import sys
 import torch
 from lightning.pytorch.tuner import Tuner
-import wandb
 from nimrod.utils import set_seed
 from nimrod.models.core import lr_finder
 from omegaconf import DictConfig, OmegaConf
@@ -132,11 +132,13 @@ def main(cfg: DictConfig) -> dict:
     # TEST
     if cfg.get("test"):
         log.info("Testing model")
-        # "best" needs a checkpoint, which only exists after training
-        trainer.test(model, datamodule=datamodule, ckpt_path="best" if cfg.get("train") else None)
+        # "best" needs a checkpoint: only after training, with a checkpoint callback
+        use_best = cfg.get("train") and trainer.checkpoint_callback is not None
+        trainer.test(model, datamodule=datamodule, ckpt_path="best" if use_best else None)
 
 
-    wandb.finish()
+    if "wandb" in sys.modules: # only when a wandb logger was created
+        sys.modules["wandb"].finish()
     # # return trainer.callback_metrics[cfg.get("optimized_metric")].item()
 
 if __name__ == "__main__":

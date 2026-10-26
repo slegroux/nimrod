@@ -80,18 +80,20 @@ class NNLM(nn.Module):
         was_training = self.training
         self.eval() # use batchnorm running stats (single-token contexts) & disable train-only layers
         device = next(self.parameters()).device
-        for _ in range(max_new_tokens):
-            # limit prompt to context size
-            context = prompt[-self.n_context:]
-            context = vocab.stoi(list(context))
-            context = [0] * (self.n_context - len(context)) + context # left-pad short prompts
+        try:
+            for _ in range(max_new_tokens):
+                # limit prompt to context size
+                context = prompt[-self.n_context:]
+                context = vocab.stoi(list(context))
+                context = [0] * (self.n_context - len(context)) + context # left-pad short prompts
 
-            logits = self(torch.tensor(context, device=device).unsqueeze(0))
-            logits = logits / temperature
-            probs = F.softmax(logits, dim=1)
-            ix = torch.multinomial(probs, num_samples=1).item()
-            prompt += vocab.itos(ix)
-        self.train(was_training)
+                logits = self(torch.tensor(context, device=device).unsqueeze(0))
+                logits = logits / temperature
+                probs = F.softmax(logits, dim=1)
+                ix = torch.multinomial(probs, num_samples=1).item()
+                prompt += vocab.itos(ix)
+        finally:
+            self.train(was_training)
         return(prompt)
 
 # %% ../../nbs/models.lm.ipynb 43
@@ -169,13 +171,15 @@ class NNBigram(nn.Module):
     def predict(self, idx, max_new_tokens):
         was_training = self.training
         self.eval()
-        for _ in range(max_new_tokens):
-            logits = self(idx)
-            logits = logits[:,-1,:] # last time step
-            probs = F.softmax(logits, dim=-1) #(B,C)
-            idx_next = torch.multinomial(probs, num_samples=1)
-            idx = torch.cat((idx, idx_next), dim=1)
-        self.train(was_training)
+        try:
+            for _ in range(max_new_tokens):
+                logits = self(idx)
+                logits = logits[:,-1,:] # last time step
+                probs = F.softmax(logits, dim=-1) #(B,C)
+                idx_next = torch.multinomial(probs, num_samples=1)
+                idx = torch.cat((idx, idx_next), dim=1)
+        finally:
+            self.train(was_training)
         return idx
     
     @property
