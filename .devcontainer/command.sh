@@ -18,8 +18,6 @@ pip install -e .
 # alternative install from python package
 # pip install slg-nimrod==0.0.11
 
-# spacy requirements for en
-python -m spacy download en_core_web_sm
 # nbdev stuff
 nbdev_install_hooks && nbdev_install_quarto
 # prevent some cloud GPU providers to automatically start tmux on login

@@ -22,7 +22,6 @@ dependencies:
   - pre-commit
   - python-dotenv
   - pytest
-  - spacy
   - tqdm
   - transformers
   - wandb
@@ -32,7 +31,6 @@ dependencies:
     - jupyterlab-quarto
     - torch
     - torchvision
-    - torchtext
     - torchaudio
     - plum-dispatch
     - https://github.com/kpu/kenlm/archive/master.zip

@@ -5,8 +5,8 @@
 #   pip install -e .                                                # pulls the rest from settings.ini
 #
 # Torch is pinned to the 2.9.1 release matrix: Blackwell-capable (DGX Spark/GB10
-# needs cu130 wheels on Linux), works on H100 and Apple MPS. torchtext was
-# dropped (archived + unused), which lifted the old torch 2.3 / numpy<2 pins.
+# needs cu130 wheels on Linux), works on H100 and Apple MPS. The old torch 2.3 /
+# numpy<2 pins are gone.
 # See INSTALL.md for the full rationale and the optional LM / speech extras.
 name: nimrod
 channels:
