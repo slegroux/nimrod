@@ -13,6 +13,8 @@ from lightning import LightningDataModule, LightningModule
 from lhotse.dataset import BucketingSampler, OnTheFlyFeatures
 from lhotse.dataset.collation import TokenCollater
 from lhotse.recipes import download_librispeech, prepare_librispeech
+from lhotse.recipes.librispeech import LIBRISPEECH, MINI_LIBRISPEECH
+from lhotse.recipes.utils import read_manifests_if_cached
 from lhotse.dataset.vis import plot_batch
 from lhotse import CutSet, RecordingSet, SupervisionSet, Fbank, FbankConfig
 
@@ -70,7 +72,13 @@ class LibriSpeechDataModule(LightningDataModule):
         prepare_librispeech(Path(self.hparams.target_dir) / "LibriSpeech", dataset_parts=self.hparams.dataset_parts, output_dir=self.hparams.output_dir, num_jobs=self.hparams.num_jobs)
 
     def setup(self, stage = None):
-        self.libri = prepare_librispeech(Path(self.hparams.target_dir) / "LibriSpeech", dataset_parts=self.hparams.dataset_parts, output_dir=self.hparams.output_dir, num_jobs=self.hparams.num_jobs)
+        # manifests are written by prepare_data(); only read them here
+        parts = self.hparams.dataset_parts
+        parts = LIBRISPEECH if parts == "librispeech" else MINI_LIBRISPEECH if parts == "mini_librispeech" else ([parts] if isinstance(parts, str) else list(parts))
+        self.libri = read_manifests_if_cached(dataset_parts=parts, output_dir=self.hparams.output_dir, prefix="librispeech", suffix="jsonl.gz")
+        missing = [p for p in parts if not self.libri or len(self.libri.get(p, {})) < 2]
+        if missing:
+            raise FileNotFoundError(f"LibriSpeech manifests missing for {missing} in {self.hparams.output_dir}: run prepare_data() first")
         if stage == "fit" or stage == None:
             self.cuts_train = CutSet.from_manifests(**self.libri["train-clean-5"])
             self.cuts_test = CutSet.from_manifests(**self.libri["dev-clean-2"])
