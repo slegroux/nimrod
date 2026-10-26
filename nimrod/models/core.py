@@ -17,7 +17,6 @@ from lightning.pytorch.tuner import Tuner
 from lightning import Trainer
 from lightning.pytorch.loggers import WandbLogger, TensorBoardLogger
 from lightning.pytorch.callbacks import ModelCheckpoint
-import wandb
 from lightning.pytorch.callbacks import LearningRateMonitor
 
 from ..image.datasets import ImageDataModule
@@ -455,5 +454,7 @@ def train_one_cycle(
     if test:
         trainer.test(model, datamodule.test_dataloader())
     logger.info(f"Best ckpt path: {ckpt_cb.best_model_path}")
-    wandb.finish()
+    if logger_cb=='wandb':
+        import wandb # imported here: wandb patches sys.stdout/stderr at import time
+        wandb.finish()
     return model, ckpt_cb.best_model_path
