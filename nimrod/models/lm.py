@@ -28,7 +28,7 @@ from typing import List, Optional, Callable, Any
 from dataclasses import dataclass, asdict
 
 from ..text.datasets import CharDataset, Vocab
-from ..utils import set_seed, get_device
+from ..utils import get_device
 from .core import Classifier
 
 import logging

@@ -22,8 +22,9 @@ from matplotlib import pyplot as plt
 import pandas as pd
 from typing import List, Optional, Type, Callable, Any
 from functools import partial
+from math import gcd
 
-from ..utils import get_device, set_seed
+from ..utils import get_device
 from .core import Classifier
 
 from pprint import pprint
@@ -49,7 +50,7 @@ class ConvBlock(nn.Module):
                 
         super().__init__()
         
-        if bias and normalization and issubclass(normalization, (nn.BatchNorm1d,nn.BatchNorm2d,nn.BatchNorm3d)):
+        if bias and normalization and isinstance(normalization, type) and issubclass(normalization, (nn.BatchNorm1d,nn.BatchNorm2d,nn.BatchNorm3d)):
             logger.warning('setting conv bias back to False as Batchnorm is used')
             # https://x.com/karpathy/status/1013245864570073090
             bias = False
@@ -65,7 +66,9 @@ class ConvBlock(nn.Module):
             )
         layers = [conv]
         if normalization:
-            if issubclass(normalization,  (nn.BatchNorm1d, nn.BatchNorm2d, nn.BatchNorm3d)):
+            if isinstance(normalization, type) and issubclass(normalization, nn.GroupNorm):
+                layers.append(normalization(gcd(8, out_channels), out_channels))
+            else:
                 layers.append(normalization(out_channels))
         if activation:
             layers.append(activation())
@@ -150,7 +153,7 @@ class DeconvBlock(nn.Module):
             if issubclass(normalization, (nn.BatchNorm1d,nn.BatchNorm2d,nn.BatchNorm3d)):
                 logger.warning('setting conv bias to False as Batchnorm is used')
                 # https://x.com/karpathy/status/1013245864570073090
-                bias = None
+                bias = False
 
         if use_transposed_conv:
             layers.append(
@@ -205,11 +208,10 @@ class ConvNet(nn.Module):
         for i in range(1, len(n_features) - 1):
             net.append(conv_(in_channels=n_features[i], out_channels=n_features[i+1], stride=2))
         
-        # head: plain conv to logits (no normalization/activation so logits can be negative),
-        # then global average pool so any input size / depth gives (B, num_classes)
-        net.append(conv_(in_channels=n_features[-1], out_channels=num_classes, stride=2, bias=True, normalization=None, activation=None))
+        # head: global average pool so any input size / depth gives (B, num_classes), then linear to logits
         net.append(nn.AdaptiveAvgPool2d(1))
         net.append(nn.Flatten(start_dim=1, end_dim=-1))
+        net.append(nn.Linear(n_features[-1], num_classes))
 
         self.net = nn.Sequential(*net)
 

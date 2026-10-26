@@ -21,7 +21,7 @@ import pandas as pd
 
 from ..image.datasets import ImageDataset
 from .conv import ConvBlock, DeconvBlock
-from ..utils import time_it, set_seed, get_device
+from ..utils import time_it, get_device
 
 import logging
 import warnings

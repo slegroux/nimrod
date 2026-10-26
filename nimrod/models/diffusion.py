@@ -23,7 +23,7 @@ from functools import partial
 from matplotlib import pyplot as plt
 import numpy as np
 
-from ..utils import get_device, set_seed, time_it
+from ..utils import get_device, time_it
 from ..image.datasets import ImageDataset, show_images, make_grid
 from .core import lr_finder, train_one_cycle, Regressor
 

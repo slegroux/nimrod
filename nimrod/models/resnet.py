@@ -19,7 +19,7 @@ import math
 
 from .conv import ConvBlock, PreActivationConvBlock
 from .core import Classifier, weight_init
-from ..utils import get_device, set_seed
+from ..utils import get_device
 from ..image.datasets import ImageDataModule
 
 from typing import List, Optional, Callable, Any, Type
@@ -95,11 +95,10 @@ class ResNet(nn.Module):
         for i in range(1, len(n_features)-1):
             layers += [res_(in_channels=n_features[i], out_channels=n_features[i+1])]
 
-        # head: plain conv back to n_classes (no normalization/activation so logits can be negative),
-        # then global average pool so any input size / depth gives (B, num_classes)
-        layers.append(ConvBlock(n_features[-1], num_classes, stride=2, bias=True, normalization=None, activation=None))
+        # head: global average pool so any input size / depth gives (B, num_classes), then linear to logits
         layers.append(nn.AdaptiveAvgPool2d(1))
         layers.append(nn.Flatten())
+        layers.append(nn.Linear(n_features[-1], num_classes))
 
         # layers += [nn.Flatten(), nn.Linear(n_features[-1], num_classes, bias=False), nn.BatchNorm1d(num_classes)]
         self.layers = nn.Sequential(*layers)

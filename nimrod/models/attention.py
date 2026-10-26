@@ -22,7 +22,7 @@ from matplotlib import pyplot as plt
 import pandas as pd
 import math
 
-from ..utils import get_device, set_seed
+from ..utils import get_device
 from .core import Classifier
 
 from pprint import pprint
