@@ -69,7 +69,7 @@ class NNLM(nn.Module):
         # input: (B,T)
         embedding = self.embedder(x) # ->(B,T,C)
         # we concatenate input of n_context length * n_emb (T*C) into linear layer:
-        h = self.l1(embedding.view(-1,self.n_context * self.n_emb))
+        h = self.l1(embedding.flatten(1))
         h = self.bn(h)
         h = torch.tanh(h)
         logits = self.l2(h)
@@ -77,17 +77,21 @@ class NNLM(nn.Module):
 
     @torch.no_grad()
     def sample(self, prompt:str, vocab:Vocab, max_new_tokens:int=50, temperature:float=1.0):
+        was_training = self.training
         self.eval() # use batchnorm running stats (single-token contexts) & disable train-only layers
+        device = next(self.parameters()).device
         for _ in range(max_new_tokens):
             # limit prompt to context size
             context = prompt[-self.n_context:]
             context = vocab.stoi(list(context))
+            context = [0] * (self.n_context - len(context)) + context # left-pad short prompts
 
-            logits = self(torch.tensor(context))
+            logits = self(torch.tensor(context, device=device).unsqueeze(0))
             logits = logits / temperature
             probs = F.softmax(logits, dim=1)
             ix = torch.multinomial(probs, num_samples=1).item()
             prompt += vocab.itos(ix)
+        self.train(was_training)
         return(prompt)
 
 # %% ../../nbs/models.lm.ipynb 43
@@ -161,13 +165,17 @@ class NNBigram(nn.Module):
         logits = self.emb(x) # B,T,C
         return logits
     
+    @torch.no_grad()
     def predict(self, idx, max_new_tokens):
+        was_training = self.training
+        self.eval()
         for _ in range(max_new_tokens):
             logits = self(idx)
             logits = logits[:,-1,:] # last time step
             probs = F.softmax(logits, dim=-1) #(B,C)
             idx_next = torch.multinomial(probs, num_samples=1)
             idx = torch.cat((idx, idx_next), dim=1)
+        self.train(was_training)
         return idx
     
     @property

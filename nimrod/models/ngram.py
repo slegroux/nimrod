@@ -123,6 +123,7 @@ class KenLM:
     def nbest(self, n:int, log_prob:bool=True):
         if not self.vocab:
             print('need to init vocab')
+            return []
         res = []
         for word in self.vocab:
             res.append((word, self.peek(word, log_prob)))
