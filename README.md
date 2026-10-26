@@ -25,8 +25,10 @@ pip install slg-nimrod
 ```
 
 The core install covers the models, image and text datasets and training.
-Optional stacks are extras: `audio`, `diffusion`, `image`, `tracking`;
-install everything with:
+Optional stacks are extras: `audio`, `diffusion`, `image`, `tracking`.
+`nimrod.models.diffusion` needs the `diffusion` extra, and
+`nimrod.models.ngram` needs `kenlm`, installed separately
+(<https://github.com/kpu/kenlm>). Install all extras with:
 
 ``` sh
 pip install "slg-nimrod[all]"
