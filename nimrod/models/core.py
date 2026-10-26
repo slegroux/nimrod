@@ -354,12 +354,13 @@ def lr_finder(
     model: Callable[...,torch.nn.Module], # partial model (missing optim & sched)
     datamodule: ImageDataModule, # data module
     num_training:int=100, # number of iterations
-    plot:bool=True # plot the learning rate vs loss
+    plot:bool=True, # plot the learning rate vs loss
+    optimizer:Optional[Callable[...,torch.optim.Optimizer]]=None # partial optimizer, defaults to AdamW(lr=1e-4)
     ):
 
     trainer = Trainer(accelerator="auto")
     tuner = Tuner(trainer)
-    optimizer = partial(torch.optim.AdamW, lr=1e-4, weight_decay=1e-5)
+    optimizer = optimizer or partial(torch.optim.AdamW, lr=1e-4, weight_decay=1e-5)
     model = model(optimizer=optimizer, scheduler=None)
     lr_finder = tuner.lr_find(
         model,

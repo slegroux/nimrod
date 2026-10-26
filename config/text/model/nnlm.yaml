@@ -1,4 +1,5 @@
 _target_: nimrod.models.lm.NNLM_X
+_partial_: true
 num_classes: 67
 
 nnet:
@@ -9,15 +10,4 @@ nnet:
   n_h: 100
   batch_norm: false # set true to add batchnorm on the hidden layer
 
-optimizer:
-  _target_: torch.optim.Adam
-  _partial_: true
-  lr: 0.001
-  weight_decay: 1e-5 # mild regularization
-
-scheduler:
-  _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
-  _partial_: true
-  mode: min
-  factor: 0.1
-  patience: 10
+# optimizer & scheduler come from config/optimizer and config/scheduler (train.py passes them to the partial model)
