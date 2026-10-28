@@ -1,6 +1,10 @@
 # Docs deploy (GitHub Pages) — status & deferred fix
 
-Status: **failing — deferred.** The published site
+Status: **docs build still not green end to end.** The first blocker found
+since this note was written — `fastgit` (pulled in by the action's unpinned
+`nbdev<3` install) importing `fastcore.aio`, absent from `fastcore==1.5.29` —
+is fixed by pinning `fastgit<0.1` in `settings.ini` `dev_requirements`. The
+notebook-execution failures below remain. The published site
 (<https://slegroux.github.io/nimrod/>) is frozen at the last green build
 (**Apr 6 2025**, `gh-pages` commit `0619f9f`). This is **pre-existing**: the
 deploy has been red since well before the torch-2.9 / nbdev-toolchain work
