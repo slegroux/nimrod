@@ -5,9 +5,6 @@ __all__ = ['MED_CFG', 'BLIP_Base', 'BLIP_Decoder', 'blip_decoder', 'blip_feature
            'is_url', 'load_checkpoint']
 
 # %% ../../nbs/image.blip.ipynb 6
-import warnings
-warnings.filterwarnings("ignore")
-
 from ..utils import get_device
 from .vit import VisionTransformer, interpolate_pos_embed
 from .med import BertConfig, BertModel, BertLMHeadModel
@@ -22,7 +19,6 @@ from torchvision.transforms.functional import InterpolationMode
 
 import os
 from urllib.parse import urlparse
-from timm.models.hub import download_cached_file
 
 from PIL import Image
 import requests
@@ -139,7 +135,7 @@ class BLIP_Decoder(nn.Module):
         
         return loss_lm
         
-    def generate(self, image, sample=False, num_beams=3, max_length=30, min_length=10, top_p=0.9, repetition_penalty=1.0):
+    def generate(self, image, sample=False, num_beams=3, max_length=30, min_length=10, top_p=0.9, repetition_penalty=None):
         image_embeds = self.visual_encoder(image)
 
         if not sample:
@@ -163,7 +159,7 @@ class BLIP_Decoder(nn.Module):
                                                   num_return_sequences=1,
                                                   eos_token_id=self.tokenizer.sep_token_id,
                                                   pad_token_id=self.tokenizer.pad_token_id, 
-                                                  repetition_penalty=1.1,                                            
+                                                  repetition_penalty=1.1 if repetition_penalty is None else repetition_penalty,
                                                   **model_kwargs)
         else:
             #beam search
@@ -173,7 +169,7 @@ class BLIP_Decoder(nn.Module):
                                                   num_beams=num_beams,
                                                   eos_token_id=self.tokenizer.sep_token_id,
                                                   pad_token_id=self.tokenizer.pad_token_id,     
-                                                  repetition_penalty=repetition_penalty,
+                                                  repetition_penalty=1.0 if repetition_penalty is None else repetition_penalty,
                                                   **model_kwargs)            
             
         captions = []    
@@ -208,20 +204,20 @@ def init_tokenizer():
     return tokenizer
 
 
-def create_vit(vit, image_size, use_grad_checkpointing=False, ckpt_layer=0, drop_path_rate=0):
+def create_vit(vit, image_size, use_grad_checkpointing=False, ckpt_layer=0, drop_path_rate=None):
         
     assert vit in ['base', 'large'], "vit parameter must be base or large"
     if vit=='base':
         vision_width = 768
         visual_encoder = VisionTransformer(img_size=image_size, patch_size=16, embed_dim=vision_width, depth=12, 
                                            num_heads=12, use_grad_checkpointing=use_grad_checkpointing, ckpt_layer=ckpt_layer,
-                                           drop_path_rate=0 or drop_path_rate
+                                           drop_path_rate=0 if drop_path_rate is None else drop_path_rate
                                           )   
     elif vit=='large':
         vision_width = 1024
         visual_encoder = VisionTransformer(img_size=image_size, patch_size=16, embed_dim=vision_width, depth=24, 
                                            num_heads=16, use_grad_checkpointing=use_grad_checkpointing, ckpt_layer=ckpt_layer,
-                                           drop_path_rate=0.1 or drop_path_rate
+                                           drop_path_rate=0.1 if drop_path_rate is None else drop_path_rate
                                           )   
     return visual_encoder, vision_width
 
@@ -231,10 +227,9 @@ def is_url(url_or_filename):
 
 def load_checkpoint(model,url_or_filename):
     if is_url(url_or_filename):
-        cached_file = download_cached_file(url_or_filename, check_hash=False, progress=True)
-        checkpoint = torch.load(cached_file, map_location='cpu') 
+        checkpoint = torch.hub.load_state_dict_from_url(url_or_filename, map_location='cpu', progress=True, check_hash=False, weights_only=True) 
     elif os.path.isfile(url_or_filename):        
-        checkpoint = torch.load(url_or_filename, map_location='cpu') 
+        checkpoint = torch.load(url_or_filename, map_location='cpu', weights_only=True) 
     else:
         raise RuntimeError('checkpoint url or path is invalid')
         
