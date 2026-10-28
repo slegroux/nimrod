@@ -195,6 +195,7 @@ class ImageDataset(ImagePlotMixin, Dataset):
         logging.getLogger('datasets').setLevel(logging.INFO)
         
         if data_dir is not None:
+            data_dir = os.path.expanduser(data_dir) # '~' is not expanded by makedirs / the hf cache
             os.makedirs(data_dir, exist_ok=True)
         super().__init__()
         self.exclude_grey_scale = exclude_grey_scale
@@ -247,7 +248,7 @@ class ImageDataset(ImagePlotMixin, Dataset):
             self.hf_ds = self.hf_ds.filter(lambda row: row[self.image_column_name].mode == 'RGB')
 
                 
-        self.images = self.hf_ds[self.image_column_name]
+        # images are read lazily per item (see _image) rather than materialising the whole column
 
         # LABELS
 
@@ -290,15 +291,18 @@ class ImageDataset(ImagePlotMixin, Dataset):
             logger.warning("info from_image_folder=True at init")
             return self.info
 
+    def _image(self, idx:int):
+        return self.hf_ds[idx][self.image_column_name] # PIL image, decoded on access
+
     def __len__(self) -> int: # length of dataset
-        return len(self.images)
+        return len(self.hf_ds)
     
     def __getitem__(
         self,
         idx:int # index into the dataset
     ) -> tuple[torch.FloatTensor, int]: # Y image data, x digit number
       
-        image = self.images[idx] # PIL image
+        image = self._image(idx) # PIL image
         label = self.labels[idx]
 
         # Check the number of channels in the PIL image
@@ -327,9 +331,9 @@ class ImageDataset(ImagePlotMixin, Dataset):
         ratio:float, # percentage of train/dev split,
     ) -> tuple[Dataset, Dataset]: # train and set mnnist datasets
 
-        train_set_size = int(len(self.images) * ratio)
-        valid_set_size = len(self.images) - train_set_size
-        ds = list(zip(self.images, self.labels))
+        train_set_size = int(len(self) * ratio)
+        valid_set_size = len(self) - train_set_size
+        ds = list(zip(self.hf_ds[self.image_column_name], self.labels))
         # split the train set into two randomly sample
         train_set, valid_set = data.random_split(ds, [train_set_size, valid_set_size])
         return train_set, valid_set
@@ -348,15 +352,22 @@ class ImageDataset(ImagePlotMixin, Dataset):
         self.plot_grid(self, n_rows, n_cols, self.hf_ds.features['label'].int2str)
     
     def compute_image_normalization(self):
-        full_dl = DataLoader(self, batch_size=len(self))
-        full_batch = next(iter(full_dl))
-        mean = full_batch[0].float().mean([0,2,3])
-        std = full_batch[0].float().std([0,2,3])
-        return mean, std
+        # per-channel mean/std over all pixels, accumulated batch by batch
+        n, s, ss = 0, 0., 0.
+        for x, _ in DataLoader(self, batch_size=1024):
+            x = x.double()
+            n += x.numel() // x.shape[1]
+            s = s + x.sum([0,2,3])
+            ss = ss + (x ** 2).sum([0,2,3])
+        mean = s / n
+        std = ((ss - n * mean ** 2) / (n - 1)).sqrt()
+        return mean.float(), std.float()
 
 # %% ../../nbs/image.datasets.ipynb 13
-def normalize_image_datasets(name, data_dir='../data/image', splits=['train', 'validation']):
-    mean, std = [], []
+def normalize_image_datasets(name, data_dir='../data/image', splits=['train']):
+    # statistics must come from the train split only (no val/test leakage);
+    # when several splits are given the std is pooled, not averaged
+    mean, std, n = [], [], []
     for split in splits:
 
         ds = ImageDataset(
@@ -367,10 +378,13 @@ def normalize_image_datasets(name, data_dir='../data/image', splits=['train', 'v
         m, s = ds.compute_image_normalization()
         mean.append(m)
         std.append(s)
+        n.append(len(ds))
 
-    mean = torch.stack(mean).mean(dim=0)
-    std = torch.stack(std).mean(dim=0)
-    return mean, std
+    w = torch.tensor(n, dtype=torch.float).unsqueeze(1) / sum(n)
+    mean, std = torch.stack(mean), torch.stack(std)
+    pooled_mean = (w * mean).sum(0)
+    pooled_var = (w * (std ** 2 + mean ** 2)).sum(0) - pooled_mean ** 2
+    return pooled_mean, pooled_var.sqrt()
 
 # %% ../../nbs/image.datasets.ipynb 16
 class ImageDataModule(ImagePlotMixin, DataModule):
@@ -380,7 +394,7 @@ class ImageDataModule(ImagePlotMixin, DataModule):
         name: str, # name of dataset from hugging face
         *args, # arguments to pass to hugging face dataset
         data_dir: Optional[str] = "~/Data/", # path to source data dir where data is stored
-        transforms: Union[transforms.Compose, Callable, None] = transforms.Compose([transforms.ToTensor(),transforms.Normalize((0.1307,), (0.3081,))]), # transform to apply to each sample
+        transforms: Union[transforms.Compose, Callable, None] = transforms.Compose([transforms.ToTensor()]), # transform to apply to each sample (no dataset-specific normalization by default; compute it with normalize_image_datasets)
         train_val_split:List[float] = [0.8, 0.2], # train val test percentage
         batch_size: int = 64, # size of compute batch
         num_workers: int = 0, # num_workers equal 0 means that it’s the main process that will do the data loading when needed, num_workers equal 1 is the same as any n, but you’ll only have a single worker, so it might be slow
@@ -535,14 +549,14 @@ class ImageSuperResDataset(ImageDataset):
     def __getitem__(self, idx:int) -> Tuple[torch.FloatTensor, torch.FloatTensor]:
         if self.transform_x:
 
-            image_x = self.transform_x(self.images[idx])
+            image_x = self.transform_x(self._image(idx))
         else:
-            image_x = self.images[idx]
+            image_x = self._image(idx)
 
         if self.transform_y:
-            image_y = self.transform_y(self.images[idx])
+            image_y = self.transform_y(self._image(idx))
         else:
-            image_y = self.images[idx]
+            image_y = self._image(idx)
         
         return image_x, image_y
         

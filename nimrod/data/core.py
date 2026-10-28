@@ -94,12 +94,11 @@ class DataModule(ABC, L.LightningDataModule):
 
     def state_dict(self):
         """Extra things to save to checkpoint."""
-        # return {}
-        return NotImplemented
+        return {}
 
     def load_state_dict(self, state_dict: Dict[str, Any]):
         """Things to do when loading checkpoint."""
-        return NotImplemented
+        return None
 
     def _sequential_split(self, dataset: Dataset, split_ratios: Sequence[float]) -> List[Subset]:
         """Split a dataset into train, validation and test sets sequentially (not randomly).
@@ -136,7 +135,7 @@ class DataModule(ABC, L.LightningDataModule):
         return subsets
 
 # %% ../../nbs/data.core.ipynb 5
-def split_train_valid_test(dataset:Dataset, splits:List[float]):
+def split_train_valid_test(dataset:Dataset, splits:List[float], seed:int=42):
     lengths = [int(split * len(dataset)) for split in splits]
     # if rounding ends up getting rid of some datapoints and total length != length dataset
     remain = len(dataset) - sum(lengths)
@@ -144,6 +143,6 @@ def split_train_valid_test(dataset:Dataset, splits:List[float]):
     split_datasets = random_split(
                 dataset=dataset,
                 lengths=lengths,
-                # generator=torch.Generator().manual_seed(42),
+                generator=torch.Generator().manual_seed(seed),
             )
     return split_datasets

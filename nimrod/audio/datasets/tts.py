@@ -54,6 +54,7 @@ class TTSDataset(Dataset):
 
 # %% ../../../nbs/audio.datasets.tts.ipynb 12
 from lhotse.recipes import download_libritts, prepare_libritts
+from lhotse.recipes.utils import read_manifests_if_cached
 from ..embedding import EncoDec
 from torchaudio.datasets import LIBRITTS
 from ..utils import plot_waveform
@@ -72,9 +73,17 @@ class LibriTTSDataModule(LightningDataModule):
     def prepare_data(self,) -> None:
         # takes a while to download from openslr mirror (~15 min each for test/dev-clean)
         download_libritts(target_dir=self.hparams.target_dir, dataset_parts=self.hparams.dataset_parts)
+        # write manifests once here; setup() re-reads them from output_dir (lhotse skips parts already prepared)
+        prepare_libritts(corpus_dir=Path(self.hparams.target_dir) / "LibriTTS", dataset_parts=self.hparams.dataset_parts, output_dir=self.hparams.output_dir, num_jobs=self.hparams.num_jobs)
 
     def setup(self, stage = None):
-        self.libri = prepare_libritts(corpus_dir=Path(self.hparams.target_dir) / "LibriTTS", dataset_parts=self.hparams.dataset_parts, output_dir=self.hparams.output_dir, num_jobs=self.hparams.num_jobs)
+        # manifests are written by prepare_data(); only read them here
+        parts = self.hparams.dataset_parts
+        parts = [parts] if isinstance(parts, str) else list(parts)
+        self.libri = read_manifests_if_cached(dataset_parts=parts, output_dir=self.hparams.output_dir, prefix="libritts", suffix="jsonl.gz")
+        missing = [p for p in parts if not self.libri or len(self.libri.get(p, {})) < 2]
+        if missing:
+            raise FileNotFoundError(f"LibriTTS manifests missing for {missing} in {self.hparams.output_dir}: run prepare_data() first")
         if stage == 'fit' or stage == None:
             self.cuts_train = CutSet.from_manifests(**self.libri["dev-clean"])
             self.cuts_test = CutSet.from_manifests(**self.libri["test-clean"])
