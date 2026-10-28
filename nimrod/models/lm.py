@@ -24,11 +24,11 @@ import pprint
 from omegaconf import OmegaConf
 from hydra.utils import instantiate
 
-from typing import List
+from typing import List, Optional, Callable, Any
 from dataclasses import dataclass, asdict
 
 from ..text.datasets import CharDataset, Vocab
-from ..utils import set_seed, get_device
+from ..utils import get_device
 from .core import Classifier
 
 import logging
@@ -69,7 +69,7 @@ class NNLM(nn.Module):
         # input: (B,T)
         embedding = self.embedder(x) # ->(B,T,C)
         # we concatenate input of n_context length * n_emb (T*C) into linear layer:
-        h = self.l1(embedding.view(-1,self.n_context * self.n_emb))
+        h = self.l1(embedding.flatten(1))
         h = self.bn(h)
         h = torch.tanh(h)
         logits = self.l2(h)
@@ -77,17 +77,23 @@ class NNLM(nn.Module):
 
     @torch.no_grad()
     def sample(self, prompt:str, vocab:Vocab, max_new_tokens:int=50, temperature:float=1.0):
+        was_training = self.training
         self.eval() # use batchnorm running stats (single-token contexts) & disable train-only layers
-        for _ in range(max_new_tokens):
-            # limit prompt to context size
-            context = prompt[-self.n_context:]
-            context = vocab.stoi(list(context))
+        device = next(self.parameters()).device
+        try:
+            for _ in range(max_new_tokens):
+                # limit prompt to context size
+                context = prompt[-self.n_context:]
+                context = vocab.stoi(list(context))
+                context = [0] * (self.n_context - len(context)) + context # left-pad short prompts
 
-            logits = self(torch.tensor(context))
-            logits = logits / temperature
-            probs = F.softmax(logits, dim=1)
-            ix = torch.multinomial(probs, num_samples=1).item()
-            prompt += vocab.itos(ix)
+                logits = self(torch.tensor(context, device=device).unsqueeze(0))
+                logits = logits / temperature
+                probs = F.softmax(logits, dim=1)
+                ix = torch.multinomial(probs, num_samples=1).item()
+                prompt += vocab.itos(ix)
+        finally:
+            self.train(was_training)
         return(prompt)
 
 # %% ../../nbs/models.lm.ipynb 43
@@ -100,13 +106,13 @@ def perplexity(
     ce = F.cross_entropy(logits, targets, ignore_index=ignore_index)
     return torch.exp(ce)
 
-class NNLM_X(Classifier, LightningModule):
+class NNLM_X(Classifier):
     def __init__(
             self,
             nnet: NNLM,
             num_classes:int,
             optimizer: torch.optim.Optimizer,
-            scheduler: torch.optim.lr_scheduler,
+            scheduler: Optional[Callable[...,Any]]=None,
             ):
 
         logger.info("NNLM_X: Init")
@@ -118,7 +124,7 @@ class NNLM_X(Classifier, LightningModule):
             )
         self.save_hyperparameters(logger=False, ignore=['nnet'])
         # required attribute for lr finder
-        self.lr = optimizer.keywords['lr']
+        self.lr = optimizer.keywords.get('lr')
         self.nnet = nnet
 
     def forward(self, x:torch.Tensor)->torch.Tensor:
@@ -161,13 +167,19 @@ class NNBigram(nn.Module):
         logits = self.emb(x) # B,T,C
         return logits
     
+    @torch.no_grad()
     def predict(self, idx, max_new_tokens):
-        for _ in range(max_new_tokens):
-            logits = self(idx)
-            logits = logits[:,-1,:] # last time step
-            probs = F.softmax(logits, dim=-1) #(B,C)
-            idx_next = torch.multinomial(probs, num_samples=1)
-            idx = torch.cat((idx, idx_next), dim=1)
+        was_training = self.training
+        self.eval()
+        try:
+            for _ in range(max_new_tokens):
+                logits = self(idx)
+                logits = logits[:,-1,:] # last time step
+                probs = F.softmax(logits, dim=-1) #(B,C)
+                idx_next = torch.multinomial(probs, num_samples=1)
+                idx = torch.cat((idx, idx_next), dim=1)
+        finally:
+            self.train(was_training)
         return idx
     
     @property

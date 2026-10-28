@@ -9,7 +9,7 @@ import torch
 
 from .resnet import ResBlock
 from .core import Regressor
-from ..utils import get_device, set_seed
+from ..utils import get_device
 
 from rich import print
 from typing import Optional, Type, List, Callable, Any

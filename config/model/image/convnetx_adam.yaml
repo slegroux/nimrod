@@ -1,4 +1,5 @@
 _target_: nimrod.models.conv.ConvNetX
+_partial_: true
 num_classes: 10 #default value overridden by hydra at instantiation if necessary
 nnet:
   _target_: nimrod.models.conv.ConvNet
@@ -13,15 +14,4 @@ nnet:
     _target_: hydra.utils.get_class
     path: torch.nn.ReLU
 
-optimizer:
-  _target_: torch.optim.Adam
-  _partial_: true
-  lr: 1e-4
-  # weight_decay: 1e-5 # mild regularization
-
-scheduler:
-  _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
-  _partial_: true
-  mode: min
-  factor: 0.1
-  patience: 5
+# optimizer & scheduler come from config/optimizer and config/scheduler (train.py passes them to the partial model)

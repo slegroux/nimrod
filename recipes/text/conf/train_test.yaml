@@ -9,8 +9,15 @@ datamodule:
   persistent_workers: False
 
 model:
-  _target_: nimrod.models.lm.NNLM_L
-  n_vocab: 70
-  n_emb: 10
-  n_context: 3
-  n_h: 100  
+  _target_: nimrod.models.lm.NNLM_X
+  num_classes: 70
+  nnet:
+    _target_: nimrod.models.lm.NNLM
+    n_vocab: ${..num_classes}
+    n_emb: 10
+    n_context: 3
+    n_h: 100
+  optimizer:
+    _target_: torch.optim.Adam
+    _partial_: true
+    lr: 0.001

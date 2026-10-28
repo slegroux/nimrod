@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
+import sys
 import torch
 from lightning.pytorch.tuner import Tuner
-import wandb
 from nimrod.utils import set_seed
 from nimrod.models.core import lr_finder
 from omegaconf import DictConfig, OmegaConf
@@ -34,8 +34,6 @@ def main(cfg: DictConfig) -> dict:
     datamodule = instantiate(cfg.data) #, num_workers=multiprocessing.cpu_count())
     datamodule.prepare_data()
     datamodule.setup()
-    total_steps = len(datamodule.train_dataloader()) * cfg.trainer.max_epochs
-    log.info(f"Total steps: {total_steps}")
 
     # MODEL
     log.info("Setup partial model")
@@ -94,12 +92,13 @@ def main(cfg: DictConfig) -> dict:
     # TUNER
     tuner = Tuner(trainer)
     if cfg.get("tune_batch_size"):
-        tuner.scale_batch_size(model, datamodule=datamodule, mode="power")
+        # the tuner needs a module, not the partial (it sets datamodule.batch_size)
+        tuner.scale_batch_size(model(optimizer=optimizer, scheduler=None), datamodule=datamodule, mode="power")
 
     if cfg.get("tune_lr"):
         log.info("Tuning learning rate")
         # TODO: should i pass same tuner to it?
-        suggested_lr = lr_finder(model, datamodule, plot=cfg.get("plot_lr_tuning"))
+        suggested_lr = lr_finder(model, datamodule, optimizer=optimizer, plot=cfg.get("plot_lr_tuning"))
         # fig_name= os.path.join(cfg.paths.output_dir, 'lr_finder.png')
         log.info(f"Suggested learning rate: {suggested_lr}")
 
@@ -110,6 +109,9 @@ def main(cfg: DictConfig) -> dict:
 
     # SCHEDULER
     log.info("Setup scheduler")
+    # after batch size tuning: steps depend on the final batch size
+    total_steps = len(datamodule.train_dataloader()) * cfg.trainer.max_epochs
+    log.info(f"Total steps: {total_steps}")
     if get_class(cfg.scheduler._target_) == torch.optim.lr_scheduler.OneCycleLR:
         cfg.scheduler.total_steps = total_steps
 
@@ -130,10 +132,13 @@ def main(cfg: DictConfig) -> dict:
     # TEST
     if cfg.get("test"):
         log.info("Testing model")
-        trainer.test(datamodule=datamodule, ckpt_path="best")
+        # "best" needs a checkpoint: only after training, with a checkpoint callback
+        use_best = cfg.get("train") and trainer.checkpoint_callback is not None
+        trainer.test(model, datamodule=datamodule, ckpt_path="best" if use_best else None)
 
 
-    wandb.finish()
+    if "wandb" in sys.modules: # only when a wandb logger was created
+        sys.modules["wandb"].finish()
     # # return trainer.callback_metrics[cfg.get("optimized_metric")].item()
 
 if __name__ == "__main__":

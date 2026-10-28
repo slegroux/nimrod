@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from nimrod.text.datasets import CharDataModule
-from nimrod.models.lm import NNLM_L
+from nimrod.models.lm import NNLM_X
 from omegaconf import OmegaConf
 from hydra.utils import instantiate
 from lightning import Trainer

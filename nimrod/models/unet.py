@@ -17,7 +17,7 @@ from matplotlib import pyplot as plt
 from .conv import ConvBlock, DeconvBlock
 from .resnet import ResBlock
 from .core import Regressor, weight_init
-from ..utils import get_device, set_seed
+from ..utils import get_device
 
 from functools import partial
 
