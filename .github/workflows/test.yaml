@@ -91,6 +91,12 @@ jobs:
             trainer.fast_dev_run=1 data.data_dir="$RUNNER_TEMP/data" \
             hydra.run.dir="$RUNNER_TEMP/hydra"
 
+      - name: Execute notebooks as the docs build does
+        # nbdev_docs runs import/export/show_doc cells; the Pages deploy fails on the
+        # first one that raises. Same step as the deploy, minus quarto and the publish.
+        if: matrix.python-version == '3.10'
+        run: nbdev_proc_nbs --force
+
       - name: Run tests
         run: |
           # Skip notebooks that can't run in CI:
